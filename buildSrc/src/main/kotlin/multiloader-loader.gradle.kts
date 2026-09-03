@@ -19,6 +19,8 @@ dependencies {
     }
     compileOnly(commonProject)
 
+    implementation(project(":natives"))
+
     add("commonJava", project(mapOf("path" to ":common", "configuration" to "commonJava")))
     add("commonResources", project(mapOf("path" to ":common", "configuration" to "commonResources")))
 }

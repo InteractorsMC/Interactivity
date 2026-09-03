@@ -22,3 +22,5 @@ build
 eclipse
 run
 runs
+
+natives/src/main/resources/natives/*

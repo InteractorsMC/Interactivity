@@ -8,6 +8,10 @@ val parchmentMinecraft = project.property("parchment_minecraft") as String
 val parchmentVersion = project.property("parchment_version") as String
 val modId = project.property("mod_id") as String
 
+dependencies {
+    jarJar(project(":natives"))
+}
+
 neoForge {
     version.set(neoforgeVersion)
     // Automatically enable neoforge AccessTransformers if the file exists

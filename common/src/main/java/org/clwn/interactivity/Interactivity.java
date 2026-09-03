@@ -2,9 +2,11 @@ package org.clwn.interactivity;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import org.clwn.interactivity.natives.NativeLibraryLoader;
 import org.clwn.interactivity.util.platform.Services;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Items;
+import org.clwn.interactivity.natives.TestJni;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +27,14 @@ public class Interactivity {
         LOGGER.info("Hello from Common init on {}! we are currently in a {} environment!", Services.PLATFORM.getPlatformName(), Services.PLATFORM.getEnvironmentName());
         LOGGER.info("The ID for diamonds is {}", BuiltInRegistries.ITEM.getKey(Items.DIAMOND));
 
+        // Load native libraries and test JNI
+        try {
+            loadNatives();
+            TestJni.printHello();
+        } catch (Throwable t) {
+            LOGGER.warn("[Interactivity] Native library test: {}", t.getMessage());
+        }
+
         // It is common for all supported loaders to provide a similar feature that can not be used directly in the
         // common code. A popular way to get around this is using Java's built-in service loader feature to create
         // your own abstraction layer. You can learn more about this in our provided services class. In this example
@@ -33,6 +43,11 @@ public class Interactivity {
         if (Services.PLATFORM.isModLoaded("interactivity")) {
             LOGGER.info("Hello to interactivity");
         }
+    }
+
+    private static void loadNatives() {
+        NativeLibraryLoader.load("joltjni");
+        NativeLibraryLoader.load("interactivity_natives");
     }
 
     public static ResourceLocation getIdentifier(String path) {

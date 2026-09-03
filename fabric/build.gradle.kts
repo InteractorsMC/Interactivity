@@ -18,6 +18,8 @@ dependencies {
     })
     "modImplementation"("net.fabricmc:fabric-loader:$fabricLoaderVersion")
     "modImplementation"("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
+
+    include(project(":natives"))
 }
 
 loom {

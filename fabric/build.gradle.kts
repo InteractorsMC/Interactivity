@@ -20,6 +20,13 @@ dependencies {
     "modImplementation"("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
 
     include(project(":natives"))
+
+    // Dependencies
+    val midnightlib = "eu.midnightdust:midnightlib:${project.property("midnightlib_version")}-fabric"
+    "modImplementation"(midnightlib)
+    include(midnightlib)
+
+    "modImplementation"("com.terraformersmc:modmenu:${project.property("modmenu_version")}")
 }
 
 loom {

@@ -1,12 +1,13 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "org.clwn.interactivity.mixin",
+  "package": "org.clwn.interactivity.core.mixin",
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_18",
   "mixins": [],
   "client": [
-    "MixinMinecraft"
+    "MixinMinecraft",
+    "useless.SplashManagerMixin"
   ],
   "server": [],
   "injectors": {

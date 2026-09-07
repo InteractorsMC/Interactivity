@@ -11,6 +11,7 @@ pluginManagement {
             }
             filter {
                 includeGroup("net.fabricmc")
+                includeGroup("net.fabricmc.unpick") // I have no idea why this works
                 includeGroup("fabric-loom")
             }
         }

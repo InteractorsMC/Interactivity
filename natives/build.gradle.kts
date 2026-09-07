@@ -32,7 +32,7 @@ val nativePlatforms = mapOf(
 )
 
 dependencies {
-    implementation("com.github.stephengold:jolt-jni-Windows64:6.0.0")
+    api("com.github.stephengold:jolt-jni-Windows64:6.0.0")
 
     nativeExtraction("com.github.stephengold:jolt-jni-Windows64:6.0.0:ReleaseDp")
     nativeExtraction("com.github.stephengold:jolt-jni-Windows_ARM64:6.0.0:ReleaseDp")

@@ -26,6 +26,10 @@ dependencies {
     // fabric and neoforge both bundle mixinextras, so it is safe to use it in common
     compileOnly("io.github.llamalad7:mixinextras-common:0.3.5")
     annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5")
+
+    // Dependencies
+    val midnightlib = "eu.midnightdust:midnightlib:${project.property("midnightlib_version")}-fabric"
+    compileOnly(midnightlib)
 }
 
 val commonJava by configurations.creating {

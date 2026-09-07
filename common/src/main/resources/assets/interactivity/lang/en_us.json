@@ -1,0 +1,20 @@
+{
+  "interactivity.midnightconfig.title": "Interactivity",
+
+  "interactivity.midnightconfig.category.physics": "Physics",
+  "interactivity.midnightconfig.isClientSidePredictionEnabled": "Enable client-side prediction",
+  "interactivity.midnightconfig.maxCoresAmount": "Physics simulation cores",
+  "interactivity.midnightconfig.maxCoresAmount.tooltip": "The maximum number of CPU cores to use for physics simulation per world. If more than available cores, uses all available cores. Default to maximum available cores.",
+
+  "interactivity.midnightconfig.category.network": "Network",
+  "interactivity.midnightconfig.networkTransportComment": "Priorities for default networking transports. TCP (Minecraft Networking) can always be used, so if you want to disable other transports, make their priority lower than TCP.",
+  "interactivity.midnightconfig.localTransport": "Local transport priority",
+  "interactivity.midnightconfig.tcpTransport": "TCP transport priority",
+  "interactivity.midnightconfig.udpTransport": "UDP transport priority",
+  "interactivity.midnightconfig.udpPort": "UDP transport port",
+  "interactivity.midnightconfig.udpPort.tooltip": "-1 — Use Minecraft server port\n0 — Disable UDP transport",
+
+  "interactivity.midnightconfig.category.dev": "Developer",
+  "interactivity.midnightconfig.uselessDevOption": "Useless developer option",
+  "interactivity.midnightconfig.uselessDevOption.tooltip": "This option does nothing useful: turn it on and try to find out what it does!"
+}

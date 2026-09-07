@@ -55,6 +55,14 @@ repositories {
         name = "BlameJared"
         url = uri("https://maven.blamejared.com")
     }
+    maven {
+        name = "MidnightDust"
+        url = uri("https://maven.midnightdust.eu/releases")
+    }
+    maven {
+        name = "TerraformersMC"
+        url = uri("https://maven.terraformersmc.com/")
+    }
 }
 
 // Declare capabilities on the outgoing configurations.

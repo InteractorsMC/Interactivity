@@ -16,7 +16,10 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "org.clwn.interactivity.InteractivityFabric"
+            "org.clwn.interactivity.fabric.InteractivityFabric"
+        ],
+        "modmenu": [
+            "org.clwn.interactivity.fabric.compat.ModMenu"
         ]
     },
     "mixins": [

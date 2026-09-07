@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "org.clwn.interactivity.mixin",
+  "package": "org.clwn.interactivity.neoforge.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
   "client": [

@@ -8,7 +8,10 @@
 package org.clwn.interactivity.api.network;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import org.apache.commons.lang3.function.TriConsumer;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.Consumer;
@@ -20,15 +23,14 @@ import java.util.function.Consumer;
  * @implSpec Implementations must create separate networking thread,
  * if not using existing networking thread (e.g., Minecraft's networking thread).
  */
+@ApiStatus.Internal
 public interface NetworkTransport {
     /**
      * Starts listening for incoming packets and invokes the provided packet handler for each received packet.
      * @param packetHandler A consumer that will be invoked with the received packet buffer.
      */
-    @ApiStatus.Internal
-    void startListening(Consumer<FriendlyByteBuf> packetHandler);
+    void startListening(TriConsumer<PacketContext, ResourceLocation, FriendlyByteBuf> packetHandler);
 
-    @ApiStatus.Internal
     void stopListening();
 
     /**
@@ -41,9 +43,15 @@ public interface NetworkTransport {
      */
     void initializeConnection(Player player, Consumer<Boolean> onComplete);
 
-    @ApiStatus.Internal
-    void sendPacketToPlayer(NetworkPacket packet, Player player);
+    boolean canBeUsedForPlayer(Player player);
 
-    @ApiStatus.Internal
+    void sendPacketToPlayer(ServerPlayer player, NetworkPacket packet);
+
     void sendPacketToServer(NetworkPacket packet);
+
+    /**
+     * Retrieves priority of transport.
+     * @return Priority of transport.
+     */
+    int getPriority();
 }

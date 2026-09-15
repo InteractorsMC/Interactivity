@@ -1,19 +1,22 @@
+/*
+ * Copyright (c) 2026 timtaran
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org.
+ */
 package org.clwn.interactivity.fabric;
 
 import net.fabricmc.api.ModInitializer;
 import org.clwn.interactivity.Interactivity;
+import org.clwn.interactivity.fabric.event.BusNotifierFabric;
 
 public class InteractivityFabric implements ModInitializer {
-    
+
     @Override
     public void onInitialize() {
-        
-        // This method is invoked by the Fabric mod loader when it is ready
-        // to load your mod. You can access Fabric and Common code in this
-        // project.
+        BusNotifierFabric.registerEvents();
 
-        // Use Fabric to bootstrap the Common mod.
-        Interactivity.LOGGER.info("Hello Fabric world!");
         Interactivity.init();
     }
 }

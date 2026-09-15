@@ -8,16 +8,25 @@
 package org.clwn.interactivity.api.network;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 public interface NetworkPacket {
+    int BYTEBUFFER_CAPACITY = 1350;
+
+    ResourceLocation getIdentifier();
+
+    /**
+     * Encodes packet data into bytebuffer.
+     * @param buf Bytebuffer
+     * @implSpec Maximum amount of bytes that can be written is {@code BYTEBUFFER_CAPACITY}
+     */
     void encode(FriendlyByteBuf buf);
 
     /**
      * Handles the received network packet.
      *
-     * @param player The player sending the packet, or {@code null} if the packet is sent by server.
+     * @param context The packet context
      */
-    void handlePacket(@Nullable Player player);
+    void handle(@Nullable PacketContext context);
 }

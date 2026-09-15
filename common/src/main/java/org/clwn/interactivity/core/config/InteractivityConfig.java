@@ -24,7 +24,7 @@ public class InteractivityConfig extends MidnightConfig {
 
     @Entry(
             category = NETWORK,
-            min = 0,
+            min = -1,
             max = 5000,
             isSlider = true
     )
@@ -32,7 +32,7 @@ public class InteractivityConfig extends MidnightConfig {
 
     @Entry(
             category = NETWORK,
-            min = 0,
+            min = -1,
             max = 5000,
             isSlider = true
     )
@@ -40,11 +40,11 @@ public class InteractivityConfig extends MidnightConfig {
 
     @Entry(
             category = NETWORK,
-            min = 0,
+            min = -1,
             max = 5000,
             isSlider = true
     )
-    public static int tcpTransport = 1000;
+    public static int tcpTransport = 0;
 
     @Entry(
             category = NETWORK,

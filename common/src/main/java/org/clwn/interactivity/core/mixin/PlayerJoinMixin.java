@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.nio.charset.StandardCharsets;
 
 @Mixin(PlayerList.class)
-public class MixinMinecraft {
+public class PlayerJoinMixin {
     
     @Inject(at = @At("TAIL"), method = "placeNewPlayer")
     private void init(Connection connection, ServerPlayer player, CommonListenerCookie cookie, CallbackInfo info) {

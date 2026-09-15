@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2026 timtaran
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org.
+ */
 package org.clwn.interactivity.core.network;
 
 import net.minecraft.network.FriendlyByteBuf;
@@ -7,25 +14,39 @@ import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.api.network.NetworkManager;
 import org.clwn.interactivity.api.network.NetworkPacket;
 import org.clwn.interactivity.api.network.NetworkTransport;
+import org.clwn.interactivity.api.network.PacketContext;
 import org.clwn.interactivity.core.event.EventBus;
 import org.clwn.interactivity.core.event.lifecycle.PlayerConfigureStateEvent;
+import org.clwn.interactivity.core.event.lifecycle.ServerLifecycleEvents;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 public class NetworkManagerImpl implements NetworkManager {
     public static NetworkManagerImpl INSTANCE = new NetworkManagerImpl();
 
-    private Map<String, Function<FriendlyByteBuf, ? extends NetworkPacket>> serverListeners = new HashMap<>();
-    private Map<String, Function<FriendlyByteBuf, ? extends NetworkPacket>> clientListeners = new HashMap<>();
+    private final Map<ResourceLocation, Function<FriendlyByteBuf, ? extends NetworkPacket>> serverDecoders = new HashMap<>();
+    private final Map<ResourceLocation, Function<FriendlyByteBuf, ? extends NetworkPacket>> clientDecoders = new HashMap<>();
+
+    /**
+     * List of all registered network transports
+     */
+    private final List<NetworkTransport> networkTransports;
 
     private NetworkManagerImpl() {
         EventBus.subscribe(PlayerConfigureStateEvent.class, event -> {
             Player player = event.player();
             configurePlayer(player);
         });
+
+        EventBus.subscribe(ServerLifecycleEvents.ServerStartingEvent.class, serverStartingEvent -> startListening());
+        EventBus.subscribe(ServerLifecycleEvents.ServerStoppingEvent.class, serverStoppingEvent -> stopListening());
+
+        networkTransports = ServiceLoader.load(NetworkTransport.class)
+                .stream()
+                .map(ServiceLoader.Provider::get)
+                .toList();
     }
 
     @Override
@@ -34,7 +55,7 @@ public class NetworkManagerImpl implements NetworkManager {
             Function<FriendlyByteBuf, T> decoder
     ) {
         Interactivity.LOGGER.debug("Registering S2C packet: {}", identifier.toString());
-        clientListeners.put(identifier.toString(), decoder);
+        clientDecoders.put(identifier, decoder);
     }
 
     @Override
@@ -43,27 +64,71 @@ public class NetworkManagerImpl implements NetworkManager {
             Function<FriendlyByteBuf, T> decoder
     ) {
         Interactivity.LOGGER.debug("Registering C2S packet: {}", identifier.toString());
-        serverListeners.put(identifier.toString(), decoder);
+        serverDecoders.put(identifier, decoder);
 
     }
 
-    @Override
-    public void handle(FriendlyByteBuf buf) {
-
+    private void startListening() {
+        getEnabledTransports().forEach((networkTransport -> networkTransport.startListening(this::handle)));
     }
 
-    @Override
-    public void configurePlayer(Player player) {
+    private void stopListening() {
+        getEnabledTransports().forEach(NetworkTransport::stopListening);
+    }
 
+    /**
+     * Handles the received network packet.
+     * @param buf The buffer containing the packet data.
+     */
+    private void handle(PacketContext context, ResourceLocation identifier, FriendlyByteBuf buf) {
+        Function<FriendlyByteBuf, ? extends NetworkPacket> decoder = null;
+
+        switch (context.receiverSide()) {
+            case SERVER -> decoder = serverDecoders.get(identifier);
+            case CLIENT -> decoder = clientDecoders.get(identifier);
+        }
+
+        if (decoder == null) {
+            return;
+        }
+
+        NetworkPacket packet = decoder.apply(buf);
+        packet.handle(context);
+    }
+
+    /**
+     * Configures the network transport for the specified player.
+     *
+     * @param player The player for whom the network transport should be configured.
+     */
+    private void configurePlayer(Player player) {
+        // ...
     }
 
     @Override
     public NetworkTransport getPlayerTransport(Player player) {
-        return null;
+        // todo
+        return getAvailableTransports(player).getFirst();
     }
 
     @Override
     public @Nullable NetworkTransport getCurrentTransport() {
-        return null;
+        return getEnabledTransports().getFirst();
+    }
+
+    private List<NetworkTransport> getAvailableTransports(Player player) {
+        return networkTransports.stream()
+                .filter(transport -> transport.canBeUsedForPlayer(player))
+                .toList();
+    }
+
+    /**
+     * Returns sorted list of all enabled transports
+     */
+    private List<NetworkTransport> getEnabledTransports() {
+        return networkTransports.stream()
+                .filter(networkTransport -> networkTransport.getPriority() != -1)
+                .sorted(Comparator.comparingInt(NetworkTransport::getPriority))
+                .toList();
     }
 }

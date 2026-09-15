@@ -12,17 +12,19 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
-import net.minecraft.world.entity.player.Player;
 import org.clwn.interactivity.Interactivity;
+import org.clwn.interactivity.api.network.PacketContext;
+import org.clwn.interactivity.api.util.Side;
 import org.clwn.interactivity.core.util.platform.services.INetworkingHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
 
+// todo: blow this shit up and rework fucking everything (related to configuration phase)
 public class FabricNetworkingHelper implements INetworkingHelper {
 
     @Override
-    public <T extends CustomPacketPayload> void registerPacket(PacketStageType stage, PacketType packetType, CustomPacketPayload.Type<T> type, StreamCodec<FriendlyByteBuf, T> codec, BiConsumer<Player, T> handler) {
+    public <T extends CustomPacketPayload> void registerPacket(PacketStageType stage, PacketType packetType, CustomPacketPayload.Type<T> type, StreamCodec<FriendlyByteBuf, T> codec, BiConsumer<PacketContext, T> handler) {
         Interactivity.LOGGER.debug("Registering packet: {}", type);
 
         if (stage == PacketStageType.COMMON || stage == PacketStageType.PLAY) {
@@ -49,28 +51,24 @@ public class FabricNetworkingHelper implements INetworkingHelper {
 
 
     @Environment(EnvType.CLIENT)
-    private static <T extends CustomPacketPayload> void registerClientListener(CustomPacketPayload.Type<?> type, BiConsumer<Player, T> handler) {
-        ClientPlayNetworking.registerGlobalReceiver(type, ((payload, context) -> handler.accept(context.player(), (T) payload)));
+    private static <T extends CustomPacketPayload> void registerClientListener(CustomPacketPayload.Type<?> type, BiConsumer<PacketContext, T> handler) {
+        ClientPlayNetworking.registerGlobalReceiver(type, ((payload, context) -> handler.accept(new PacketContext(context.player(), Side.CLIENT), (T) payload)));
     }
 
-    private static <T extends CustomPacketPayload> void registerServerListener(CustomPacketPayload.Type<?> type, BiConsumer<Player, T> handler) {
-        ServerPlayNetworking.registerGlobalReceiver(type, ((payload, context) -> handler.accept(context.player(), (T) payload)));
+    private static <T extends CustomPacketPayload> void registerServerListener(CustomPacketPayload.Type<?> type, BiConsumer<PacketContext, T> handler) {
+        ServerPlayNetworking.registerGlobalReceiver(type, ((payload, context) -> handler.accept(new PacketContext(context.player(), Side.SERVER), (T) payload)));
     }
 
     @Override
-    public void sendPacketToPlayer(Player player, CustomPacketPayload packet, PacketStageType stage, @Nullable ServerConfigurationPacketListenerImpl serverConfigurationPacketListener) {
-        if (player instanceof ServerPlayer serverPlayer) {
-            if ((stage == PacketStageType.COMMON && ServerPlayNetworking.canSend(serverPlayer, packet.type())) || stage == PacketStageType.PLAY) {
-                ServerPlayNetworking.send(serverPlayer, packet);
-            } else {
-                if (serverConfigurationPacketListener == null) {
-                    throw new IllegalArgumentException("No configuration packet listener provided");
-                }
-
-                ServerConfigurationNetworking.send(serverConfigurationPacketListener, packet);
-            }
+    public void sendPacketToPlayer(ServerPlayer player, CustomPacketPayload packet, PacketStageType stage, @Nullable ServerConfigurationPacketListenerImpl serverConfigurationPacketListener) {
+        if ((stage == PacketStageType.COMMON && ServerPlayNetworking.canSend(player, packet.type())) || stage == PacketStageType.PLAY) {
+            ServerPlayNetworking.send(player, packet);
         } else {
-            throw new IllegalArgumentException("Player must be a ServerPlayer to send S2C packets.");
+            if (serverConfigurationPacketListener == null) {
+                throw new IllegalArgumentException("No configuration packet listener provided");
+            }
+
+            ServerConfigurationNetworking.send(serverConfigurationPacketListener, packet);
         }
     }
 

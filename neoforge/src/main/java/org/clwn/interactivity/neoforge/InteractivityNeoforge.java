@@ -15,11 +15,15 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.neoforge.network.event.RegisterConfigurationTasksEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.clwn.interactivity.Interactivity;
+import org.clwn.interactivity.api.network.PacketContext;
+import org.clwn.interactivity.api.util.Side;
 import org.clwn.interactivity.core.util.platform.services.INetworkingHelper;
+import org.clwn.interactivity.neoforge.event.BusNotifierNeoforge;
 import org.clwn.interactivity.neoforge.util.platform.NeoForgeNetworkingHelper;
 
 @Mod(Interactivity.MOD_ID)
@@ -36,7 +40,6 @@ public class InteractivityNeoforge {
         Interactivity.init();
 
         eventBus.register(InteractivityNeoforge.class);
-
     }
 
     @SubscribeEvent
@@ -51,57 +54,62 @@ public class InteractivityNeoforge {
                         packet.type(),
                         packet.codec(),
                         new DirectionalPayloadHandler<>(
-                                ((payload, context) -> packet.handler().accept(context.player(), payload)),
-                                ((payload, context) -> packet.handler().accept(context.player(), payload))
+                                ((payload, context) -> packet.handler().accept(new PacketContext(context.player(), Side.CLIENT), payload)),
+                                ((payload, context) -> packet.handler().accept(new PacketContext(context.player(), Side.SERVER), payload))
                         ));
             } else if (packet.packetType() == INetworkingHelper.PacketType.S2C && packet.stage() == INetworkingHelper.PacketStageType.COMMON) {
                 registrar.commonToClient(
                         packet.type(),
                         packet.codec(),
-                        (payload, context) -> packet.handler().accept(context.player(), payload));
+                        (payload, context) -> packet.handler().accept(new PacketContext(context.player(), Side.CLIENT), payload));
             } else if (packet.packetType() == INetworkingHelper.PacketType.C2S && packet.stage() == INetworkingHelper.PacketStageType.COMMON) {
                 registrar.commonToServer(
                         packet.type(),
                         packet.codec(),
-                        (payload, context) -> packet.handler().accept(context.player(), payload));
+                        (payload, context) -> packet.handler().accept(new PacketContext(context.player(), Side.SERVER), payload));
             } else if (packet.packetType() == INetworkingHelper.PacketType.BIDIRECTIONAL && packet.stage() == INetworkingHelper.PacketStageType.CONFIGURATION) {
                 registrar.configurationBidirectional(
                         packet.type(),
                         packet.codec(),
                         new DirectionalPayloadHandler<>(
-                                ((payload, context) -> packet.handler().accept(context.player(), payload)),
-                                ((payload, context) -> packet.handler().accept(context.player(), payload))
+                                ((payload, context) -> packet.handler().accept(new PacketContext(context.player(), Side.CLIENT), payload)),
+                                ((payload, context) -> packet.handler().accept(new PacketContext(context.player(), Side.SERVER), payload))
                         ));
             } else if (packet.packetType() == INetworkingHelper.PacketType.S2C && packet.stage() == INetworkingHelper.PacketStageType.CONFIGURATION) {
                 registrar.configurationToClient(
                         packet.type(),
                         packet.codec(),
-                        (payload, context) -> packet.handler().accept(context.player(), payload));
+                        (payload, context) -> packet.handler().accept(new PacketContext(context.player(), Side.CLIENT), payload));
             } else if (packet.packetType() == INetworkingHelper.PacketType.C2S && packet.stage() == INetworkingHelper.PacketStageType.CONFIGURATION) {
                 registrar.configurationToServer(
                         packet.type(),
                         packet.codec(),
-                        (payload, context) -> packet.handler().accept(context.player(), payload));
+                        (payload, context) -> packet.handler().accept(new PacketContext(context.player(), Side.SERVER), payload));
             } else if (packet.packetType() == INetworkingHelper.PacketType.BIDIRECTIONAL && packet.stage() == INetworkingHelper.PacketStageType.PLAY) {
                 registrar.playBidirectional(
                         packet.type(),
                         packet.codec(),
                         new DirectionalPayloadHandler<>(
-                                ((payload, context) -> packet.handler().accept(context.player(), payload)),
-                                ((payload, context) -> packet.handler().accept(context.player(), payload))
+                                ((payload, context) -> packet.handler().accept(new PacketContext(context.player(), Side.CLIENT), payload)),
+                                ((payload, context) -> packet.handler().accept(new PacketContext(context.player(), Side.SERVER), payload))
                         ));
             } else if (packet.packetType() == INetworkingHelper.PacketType.S2C && packet.stage() == INetworkingHelper.PacketStageType.PLAY) {
                 registrar.playToClient(
                         packet.type(),
                         packet.codec(),
-                        (payload, context) -> packet.handler().accept(context.player(), payload));
+                        (payload, context) -> packet.handler().accept(new PacketContext(context.player(), Side.CLIENT), payload));
             } else if (packet.packetType() == INetworkingHelper.PacketType.C2S && packet.stage() == INetworkingHelper.PacketStageType.PLAY) {
                 registrar.playToServer(
                         packet.type(),
                         packet.codec(),
-                        (payload, context) -> packet.handler().accept(context.player(), payload));
+                        (payload, context) -> packet.handler().accept(new PacketContext(context.player(), Side.SERVER), payload));
             }
         }
         NeoForgeNetworkingHelper.packetsToRegister.clear();
+    }
+
+    @SubscribeEvent
+    public static void notifyBusOnPlayerConfigure(RegisterConfigurationTasksEvent event) {
+
     }
 }

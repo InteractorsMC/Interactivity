@@ -10,12 +10,11 @@ package org.clwn.interactivity.api.network;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import org.clwn.interactivity.core.network.NetworkManagerImpl;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public interface NetworkManager {
@@ -43,11 +42,11 @@ public interface NetworkManager {
             Function<FriendlyByteBuf, T> decoder
     );
 
-    default void sendPacketToPlayer(NetworkPacket packet, Player player) {
+    default void sendPacketToPlayer(ServerPlayer player, NetworkPacket packet) {
         NetworkTransport transport = getPlayerTransport(player);
 
         if (transport != null) {
-            transport.sendPacketToPlayer(packet, player);
+            transport.sendPacketToPlayer(player, packet);
         }
     }
 
@@ -58,24 +57,7 @@ public interface NetworkManager {
             transport.sendPacketToServer(packet);
         }
 
-    };
-
-    /**
-     * Handles the received network packet.
-     * @param buf The buffer containing the packet data.
-     * @implSpec This method must be provided to {@link NetworkTransport#startListening(Consumer)} as consumer.
-     */
-    @ApiStatus.Internal
-    void handle(FriendlyByteBuf buf);
-
-    /**
-     * Configures the network transport for the specified player.
-     *
-     * @param player The player for whom the network transport should be configured.
-     * @implSpec Implementations must manually register this method to be called
-     * when a player reaches the configuration stage.
-     */
-    void configurePlayer(Player player);
+    }
 
     /**
      * Retrieves the network transport associated with the specified player.

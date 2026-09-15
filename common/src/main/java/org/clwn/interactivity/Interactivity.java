@@ -8,14 +8,14 @@
 package org.clwn.interactivity;
 
 import eu.midnightdust.lib.config.MidnightConfig;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
+import org.clwn.interactivity.api.network.NetworkManager;
+import org.clwn.interactivity.api.util.Side;
 import org.clwn.interactivity.core.config.InteractivityConfig;
 import org.clwn.interactivity.core.network.packet.s2c.HelloClientPacket;
 import org.clwn.interactivity.core.util.platform.Services;
 import org.clwn.interactivity.core.util.platform.services.INetworkingHelper;
 import org.clwn.interactivity.natives.NativeLibraryLoader;
+import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +26,7 @@ import java.util.Arrays;
 // import and access the vanilla codebase, libraries used by vanilla, and optionally third party libraries that provide
 // common compatible binaries. This means common code can not directly use loader specific concepts such as Forge events
 // however it will be compatible with all supported mod loaders.
+@ApiStatus.Internal
 public class Interactivity {
     public static final String MOD_ID = "interactivity";
     public static final String MOD_NAME = "Interactivity";
@@ -41,25 +42,19 @@ public class Interactivity {
                 INetworkingHelper.PacketType.BIDIRECTIONAL,
                 HelloClientPacket.TYPE,
                 HelloClientPacket.STREAM_CODEC,
-                (player, packet) -> {
-                    LOGGER.info("Received HelloClientPacket: {} {}", player, Arrays.toString(packet.data()));
-                    if (!(player instanceof ServerPlayer)) {
+                (context, packet) -> {
+                    LOGGER.info("Received HelloClientPacket: {} {}", context.player(), Arrays.toString(packet.data()));
+                    if (context.receiverSide() == Side.CLIENT) {
                         Services.PLATFORM_NETWORK.sendPacketToServer(new HelloClientPacket("Hello from client!".getBytes(StandardCharsets.UTF_8)), INetworkingHelper.PacketStageType.COMMON);
                     }
                 }
                 );
+
+        NetworkManager.getInstance(); // todo: remove. now used to just load class
     }
 
     private static void loadNatives() {
         NativeLibraryLoader.load("joltjni");
         NativeLibraryLoader.load("interactivity_natives");
-    }
-
-    public static ResourceLocation getIdentifier(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
-    }
-
-    public static Component getTranslation(String key, Object... args) {
-        return Component.translatable(key, args);
     }
 }

@@ -7,7 +7,7 @@
   "interactivity.midnightconfig.maxCoresAmount.tooltip": "The maximum number of CPU cores to use for physics simulation per world. If more than available cores, uses all available cores. Default to maximum available cores.",
 
   "interactivity.midnightconfig.category.network": "Network",
-  "interactivity.midnightconfig.networkTransportComment": "Priorities for default networking transports. TCP (Minecraft Networking) can always be used, so if you want to disable other transports, make their priority lower than TCP.",
+  "interactivity.midnightconfig.networkTransportComment": "Priorities for default networking transports. If you want to disable other transports, set their priority to -1.",
   "interactivity.midnightconfig.localTransport": "Local transport priority",
   "interactivity.midnightconfig.tcpTransport": "TCP transport priority",
   "interactivity.midnightconfig.udpTransport": "UDP transport priority",

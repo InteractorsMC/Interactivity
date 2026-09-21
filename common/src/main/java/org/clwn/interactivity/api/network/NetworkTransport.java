@@ -27,6 +27,7 @@ import java.util.function.Consumer;
 public interface NetworkTransport {
     /**
      * Starts listening for incoming packets and invokes the provided packet handler for each received packet.
+     *
      * @param packetHandler A consumer that will be invoked with the received packet buffer.
      */
     void startListening(TriConsumer<PacketContext, ResourceLocation, FriendlyByteBuf> packetHandler);
@@ -51,6 +52,7 @@ public interface NetworkTransport {
 
     /**
      * Retrieves priority of transport.
+     *
      * @return Priority of transport.
      */
     int getPriority();

@@ -131,6 +131,18 @@ tasks.named<ProcessResources>("processResources") {
     inputs.properties(expandProps)
 }
 
+tasks.withType<Javadoc> {
+    options {
+        this as StandardJavadocDocletOptions
+        tags(
+            "apiNote:a:API Note:",
+            "implSpec:a:Implementation Requirements:",
+            "implNote:a:Implementation Note:"
+        )
+    }
+}
+
+
 publishing {
     publications {
         register<MavenPublication>("mavenJava") {

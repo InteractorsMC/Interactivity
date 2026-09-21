@@ -27,20 +27,6 @@ neoForge {
         create("client") {
             client()
         }
-        create("data") {
-            data()
-
-            // DataGen can be run by - "./gradlew :neoforge:runData" in Terminal.
-            // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-            programArguments.addAll(
-                listOf(
-                    "--mod", modId,
-                    "--all",
-                    "--output", file("src/generated/resources/").absolutePath,
-                    "--existing", file("src/main/resources/").absolutePath
-                )
-            )
-        }
         create("server") {
             server()
         }

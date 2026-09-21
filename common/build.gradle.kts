@@ -6,6 +6,7 @@ plugins {
 val neoFormVersionVal = project.property("neo_form_version") as String
 val parchmentMinecraft = project.property("parchment_minecraft") as String
 val parchmentVersion = project.property("parchment_version") as String
+val modId = project.property("mod_id") as String
 
 neoForge {
     neoFormVersion = neoFormVersionVal
@@ -17,6 +18,24 @@ neoForge {
     parchment {
         minecraftVersion = parchmentMinecraft
         mappingsVersion = parchmentVersion
+    }
+
+    runs {
+        create("data") { // todo: finish datagen by feeding it's results to artifacts, or remove if not required for this project (probably gonna happen)
+            data()
+
+            // DataGen can be run by - "./gradlew :neoforge:runData" in Terminal.
+            // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
+            programArguments.addAll(
+                listOf(
+                    "--mod", modId,
+                    "--all",
+                    "--output", file("src/generated/resources/").absolutePath,
+                    "--existing", file("src/main/resources/").absolutePath
+                )
+            )
+        }
+
     }
 }
 

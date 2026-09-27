@@ -23,7 +23,6 @@ import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.api.network.PacketContext;
 import org.clwn.interactivity.api.util.Side;
 import org.clwn.interactivity.core.util.platform.services.INetworkingHelper;
-import org.clwn.interactivity.neoforge.event.BusNotifierNeoforge;
 import org.clwn.interactivity.neoforge.util.platform.NeoForgeNetworkingHelper;
 
 @Mod(Interactivity.MOD_ID)

@@ -8,13 +8,13 @@
 package org.clwn.interactivity.core.event.lifecycle;
 
 import net.minecraft.server.MinecraftServer;
+import org.clwn.interactivity.core.event.Event;
 
 public final class ServerLifecycleEvents {
-    public record ServerStartingEvent(MinecraftServer server) {
+    public static final Event<ServerEvent> SERVER_STARTING_EVENT = new Event<>();
+    public static final Event<ServerEvent> SERVER_STOPPING_EVENT = new Event<>();
 
-    }
-
-    public record ServerStoppingEvent(MinecraftServer server) {
+    public record ServerEvent(MinecraftServer server) {
 
     }
 }

@@ -10,18 +10,13 @@ package org.clwn.interactivity.fabric.event;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
-import org.clwn.interactivity.core.event.EventBus;
 import org.clwn.interactivity.core.event.lifecycle.ServerLifecycleEvents;
 
-public class BusNotifierFabric {
+public class EventNotifierFabric {
     public static void registerEvents() {
-        net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTING.register((server) -> {
-            EventBus.publish(new ServerLifecycleEvents.ServerStartingEvent(server));
-        });
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTING.register((server) -> ServerLifecycleEvents.SERVER_STARTING_EVENT.publish(new ServerLifecycleEvents.ServerEvent(server)));
 
-        net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPING.register((server) -> {
-            EventBus.publish(new ServerLifecycleEvents.ServerStoppingEvent(server));
-        });
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPING.register((server) -> ServerLifecycleEvents.SERVER_STOPPING_EVENT.publish(new ServerLifecycleEvents.ServerEvent(server)));
 
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
             registerClientEvents();

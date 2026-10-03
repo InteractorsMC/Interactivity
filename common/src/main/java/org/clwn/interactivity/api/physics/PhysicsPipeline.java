@@ -8,6 +8,7 @@
 package org.clwn.interactivity.api.physics;
 
 import net.minecraft.world.level.Level;
+import org.clwn.interactivity.api.physics.world.PhysicsWorld;
 import org.clwn.interactivity.core.physics.PhysicsPipelineImpl;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,9 +16,5 @@ import org.jetbrains.annotations.Nullable;
  * Controls all simulation configuration across all {@link PhysicsWorld} instances.
  */
 public interface PhysicsPipeline {
-    @Nullable static PhysicsPipeline getInstance() {
-        return PhysicsPipelineImpl.INSTANCE;
-    }
-
     PhysicsWorld getPhysicsWorld(Level level);
 }

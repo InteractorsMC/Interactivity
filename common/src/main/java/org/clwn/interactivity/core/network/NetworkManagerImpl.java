@@ -15,8 +15,7 @@ import org.clwn.interactivity.api.network.NetworkManager;
 import org.clwn.interactivity.api.network.NetworkPacket;
 import org.clwn.interactivity.api.network.NetworkTransport;
 import org.clwn.interactivity.api.network.PacketContext;
-import org.clwn.interactivity.core.event.EventBus;
-import org.clwn.interactivity.core.event.lifecycle.PlayerConfigureStateEvent;
+import org.clwn.interactivity.core.event.lifecycle.PlayerLifecycleEvents;
 import org.clwn.interactivity.core.event.lifecycle.ServerLifecycleEvents;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,13 +34,13 @@ public class NetworkManagerImpl implements NetworkManager {
     private final List<NetworkTransport> networkTransports;
 
     private NetworkManagerImpl() {
-        EventBus.subscribe(PlayerConfigureStateEvent.class, event -> {
+        PlayerLifecycleEvents.PLAYER_CONFIGURE_STATE_EVENT.subscribe(event -> {
             Player player = event.player();
             configurePlayer(player);
         });
 
-        EventBus.subscribe(ServerLifecycleEvents.ServerStartingEvent.class, serverStartingEvent -> startListening());
-        EventBus.subscribe(ServerLifecycleEvents.ServerStoppingEvent.class, serverStoppingEvent -> stopListening());
+        ServerLifecycleEvents.SERVER_STARTING_EVENT.subscribe(serverStartingEvent -> startListening());
+        ServerLifecycleEvents.SERVER_STOPPING_EVENT.subscribe(serverStoppingEvent -> stopListening());
 
         networkTransports = ServiceLoader.load(NetworkTransport.class)
                 .stream()

@@ -18,10 +18,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Function;
 
 public interface NetworkManager {
-    static NetworkManager getInstance() {
-        return NetworkManagerImpl.INSTANCE;
-    }
-
     /**
      * Registers a server-to-client packet type with the specified identifier and decoder function.
      * @param identifier Unique identifier for the packet type.

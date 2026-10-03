@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org.
  */
-package org.clwn.interactivity.core.mixin;
+package org.clwn.interactivity.core.mixin.event.lifecycle;
 
 import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.nio.charset.StandardCharsets;
 
 @Mixin(PlayerList.class)
-public class PlayerJoinMixin {
+public class PlayerListMixin {
     
     @Inject(at = @At("TAIL"), method = "placeNewPlayer")
     private void init(Connection connection, ServerPlayer player, CommonListenerCookie cookie, CallbackInfo info) {

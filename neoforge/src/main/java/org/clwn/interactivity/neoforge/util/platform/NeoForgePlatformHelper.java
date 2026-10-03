@@ -7,6 +7,7 @@
  */
 package org.clwn.interactivity.neoforge.util.platform;
 
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.LoadingModList;
 import org.clwn.interactivity.core.util.platform.services.IPlatformHelper;
 import net.neoforged.fml.ModList;
@@ -35,5 +36,10 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
     public boolean isDevelopmentEnvironment() {
 
         return !FMLLoader.isProduction();
+    }
+
+    @Override
+    public boolean isClientEnvironment() {
+        return FMLLoader.getDist().isClient();
     }
 }

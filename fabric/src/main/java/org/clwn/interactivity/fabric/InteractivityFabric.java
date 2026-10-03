@@ -9,13 +9,13 @@ package org.clwn.interactivity.fabric;
 
 import net.fabricmc.api.ModInitializer;
 import org.clwn.interactivity.Interactivity;
-import org.clwn.interactivity.fabric.event.BusNotifierFabric;
+import org.clwn.interactivity.fabric.event.EventNotifierFabric;
 
 public class InteractivityFabric implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        BusNotifierFabric.registerEvents();
+        EventNotifierFabric.registerEvents();
 
         Interactivity.init();
     }

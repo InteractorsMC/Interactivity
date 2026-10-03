@@ -6,8 +6,9 @@
   "compatibilityLevel": "JAVA_18",
   "mixins": [],
   "client": [
-    "PlayerJoinMixin",
-    "useless.SplashManagerMixin"
+    "event.lifecycle.PlayerListMixin",
+    "useless.SplashManagerMixin",
+    "event.render.LevelRendererMixin"
   ],
   "server": [],
   "injectors": {

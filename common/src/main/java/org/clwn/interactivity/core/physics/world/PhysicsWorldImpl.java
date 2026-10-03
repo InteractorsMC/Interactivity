@@ -5,10 +5,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org.
  */
-package org.clwn.interactivity.core.physics;
+package org.clwn.interactivity.core.physics.world;
 
 import com.github.stephengold.joltjni.*;
-import org.clwn.interactivity.api.physics.PhysicsWorld;
+import org.clwn.interactivity.api.physics.world.PhysicsWorld;
 import org.clwn.interactivity.core.config.InteractivityConfig;
 
 public class PhysicsWorldImpl implements PhysicsWorld {
@@ -18,5 +18,20 @@ public class PhysicsWorldImpl implements PhysicsWorld {
         int numWorkerThreads = Math.min(InteractivityConfig.AVAILABLE_CORES, InteractivityConfig.maxCoresAmount);
         JobSystem jobSystem = new JobSystemThreadPool(
                 Jolt.cMaxPhysicsJobs, Jolt.cMaxPhysicsBarriers, numWorkerThreads);
+    }
+
+    @Override
+    public int getTick() {
+        return PhysicsWorld.STARTING_TICK;
+    }
+
+    @Override
+    public void pauseSimulation() {
+
+    }
+
+    @Override
+    public void continueSimulation() {
+
     }
 }

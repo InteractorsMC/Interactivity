@@ -3,6 +3,7 @@
 
   "interactivity.midnightconfig.category.physics": "Physics",
   "interactivity.midnightconfig.isClientSidePredictionEnabled": "Enable client-side prediction",
+  "interactivity.midnightconfig.isClientSidePredictionEnabled.tooltip": "If client were started with client-side prediction disabled and you want to enable it, you should restart the game.",
   "interactivity.midnightconfig.maxCoresAmount": "Physics simulation cores",
   "interactivity.midnightconfig.maxCoresAmount.tooltip": "The maximum number of CPU cores to use for physics simulation per world. If more than available cores, uses all available cores. Default to maximum available cores.",
 

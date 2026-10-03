@@ -12,18 +12,18 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import org.clwn.interactivity.Interactivity;
-import org.clwn.interactivity.core.event.EventBus;
+import org.clwn.interactivity.core.event.Event;
 import org.clwn.interactivity.core.event.lifecycle.ServerLifecycleEvents;
 
 @EventBusSubscriber(modid = Interactivity.MOD_ID)
-public class BusNotifierNeoforge {
+public class EventNotifierNeoforge {
     @SubscribeEvent
     public static void serverStart(ServerStartingEvent event) {
-        EventBus.publish(new ServerLifecycleEvents.ServerStartingEvent(event.getServer()));
+        ServerLifecycleEvents.SERVER_STARTING_EVENT.publish(new ServerLifecycleEvents.ServerEvent(event.getServer()));
     }
 
     @SubscribeEvent
     public static void serverStop(ServerStoppingEvent event) {
-        EventBus.publish(new ServerLifecycleEvents.ServerStoppingEvent(event.getServer()));
+        ServerLifecycleEvents.SERVER_STOPPING_EVENT.publish(new ServerLifecycleEvents.ServerEvent(event.getServer()));
     }
 }

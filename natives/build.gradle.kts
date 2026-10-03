@@ -1,12 +1,15 @@
 plugins {
     `java-library`
     `maven-publish`
+    id("interactivity-base")
 }
 
 val modId = project.property("mod_id") as String
 val modName = project.property("mod_name") as String
 val modAuthor = project.property("mod_author") as String
 val javaVersion = project.property("java_version") as String
+
+val joltJniVersion = project.findProperty("jolt_jni_version") as? String
 
 base {
     archivesName.set("$modId-natives")
@@ -17,61 +20,95 @@ java {
     withSourcesJar()
 }
 
-repositories {
-    mavenCentral()
-}
+
+val osName = System.getProperty("os.name").lowercase()
+val osArch = System.getProperty("os.arch").lowercase()
+val isWindows = osName.contains("win")
+val isMac = osName.contains("mac")
+val isAarch64 = osArch.contains("aarch64") || osArch.contains("arm64")
 
 val nativeExtraction by configurations.creating
-val nativePlatforms = mapOf(
-    "Windows64" to "windows-x86_64",
-    "Windows_ARM64" to "windows-aarch64",
-    "Linux64" to "linux-x86_64",
-    "Linux_ARM64" to "linux-aarch64",
-    "MacOSX64" to "macos-x86_64",
-    "MacOSX_ARM64" to "macos-aarch64",
+val joltHeaders by configurations.creating
+val joltDevLib by configurations.creating
+
+data class NativeTarget(val classifier: String, val platformDir: String, val targetFileName: String)
+
+val joltNativeTargets = listOf(
+    NativeTarget("windows-x64-ReleaseDp", "windows-x86_64", "joltjni.dll"),
+    NativeTarget("linux-x64-ReleaseDp", "linux-x86_64", "libjoltjni.so"),
+    NativeTarget("linux-arm64-ReleaseDp", "linux-aarch64", "libjoltjni.so"),
+    NativeTarget("macos-x64-ReleaseDp", "macos-x86_64", "libjoltjni.dylib"),
+    NativeTarget("macos-arm64-ReleaseDp", "macos-aarch64", "libjoltjni.dylib")
 )
 
 dependencies {
-    api("com.github.stephengold:jolt-jni-Windows64:6.0.0")
+    api("interactorsmc:jolt-jni:$joltJniVersion@jar")
 
-    nativeExtraction("com.github.stephengold:jolt-jni-Windows64:6.0.0:ReleaseDp")
-    nativeExtraction("com.github.stephengold:jolt-jni-Windows_ARM64:6.0.0:ReleaseDp")
+    joltHeaders("interactorsmc:jolt-headers:$joltJniVersion@zip")
 
-    nativeExtraction("com.github.stephengold:jolt-jni-Linux64:6.0.0:ReleaseDp")
-    nativeExtraction("com.github.stephengold:jolt-jni-Linux_ARM64:6.0.0:ReleaseDp")
-
-    nativeExtraction("com.github.stephengold:jolt-jni-MacOSX64:6.0.0:ReleaseDp")
-    nativeExtraction("com.github.stephengold:jolt-jni-MacOSX_ARM64:6.0.0:ReleaseDp")
-}
-
-tasks.processResources {
-    nativePlatforms.forEach { (artifactName, platformName) ->
-        from(
-            zipTree(
-                nativeExtraction.files.single {
-                    it.name.contains("jolt-jni-$artifactName")
-                }
-            )
-        ) {
-            include("**/*.dll", "**/*.so", "**/*.dylib")
-
-            eachFile {
-                relativePath = RelativePath(true, "natives", platformName, name)
-            }
+    joltNativeTargets.forEach { target ->
+        val ext = when {
+            target.classifier.startsWith("windows") -> "dll"
+            target.classifier.startsWith("linux") -> "so"
+            target.classifier.startsWith("macos") -> "dylib"
+            else -> error("Unknown platform")
         }
+        nativeExtraction("interactorsmc:joltjni:$joltJniVersion:${target.classifier}@$ext")
     }
 
-    dependsOn(compileNatives)
+    joltDevLib("interactorsmc:joltjni:$joltJniVersion:windows-x64-ReleaseDp@lib")
+}
+
+// Директории внутри build/ (не засоряют git)
+val joltDir = layout.buildDirectory.dir("jolt")
+val joltIncludeDir = joltDir.map { it.dir("include") }
+val joltLibDir = joltDir.map { it.dir("lib") }
+
+// Распаковка C++ хедеров Jolt
+val extractJoltHeaders by tasks.registering(Sync::class) {
+    group = "native"
+    description = "Extracts Jolt C++ headers for CMake"
+    from(joltHeaders.elements.map { files -> files.map { zipTree(it.asFile) } })
+    into(joltIncludeDir)
+}
+
+val prepareJoltLib by tasks.registering(Copy::class) {
+    group = "native"
+    description = "Prepares host Jolt native library for CMake linking"
+    into(joltLibDir)
+
+    val currentClassifier = when {
+        isWindows -> "windows-x64-ReleaseDp"
+        isMac -> if (isAarch64) "macos-arm64-ReleaseDp" else "macos-x64-ReleaseDp"
+        else -> if (isAarch64) "linux-arm64-ReleaseDp" else "linux-x64-ReleaseDp"
+    }
+
+    if (isWindows) {
+        from(joltDevLib) {
+            include("*$currentClassifier*.lib")
+            rename { "joltjni.lib" }
+        }
+        from(nativeExtraction) {
+            include("*$currentClassifier*.dll")
+            rename { "joltjni.dll" }
+        }
+    } else if (isMac) {
+        from(nativeExtraction) {
+            include("*$currentClassifier*.dylib")
+            rename { "libjoltjni.dylib" }
+        }
+    } else {
+        from(nativeExtraction) {
+            include("*$currentClassifier*.so")
+            rename { "libjoltjni.so" }
+        }
+    }
 }
 
 // Automatically generate C/C++ JNI headers into src/main/cpp/include when compiling Java classes
 tasks.withType<JavaCompile> {
     options.headerOutputDirectory.set(file("src/main/cpp/include"))
 }
-
-// -------------------------------------------------------------
-// Automated C++ / CMake Compilation
-// -------------------------------------------------------------
 
 val cppDir = file("src/main/cpp")
 val cmakeBuildDir = layout.buildDirectory.dir("intermediates/cmake").get().asFile
@@ -92,7 +129,7 @@ var configureSucceeded = false
 val configureNatives = tasks.register<Exec>("configureNatives") {
     group = "native"
     description = "Configures CMake for native C++ library"
-    dependsOn(tasks.named("compileJava"))
+    dependsOn(tasks.named("compileJava"), extractJoltHeaders, prepareJoltLib)
 
     workingDir = cppDir
     isIgnoreExitValue = true
@@ -105,7 +142,9 @@ val configureNatives = tasks.register<Exec>("configureNatives") {
         "cmake",
         "-B", cmakeBuildDir.absolutePath,
         "-S", cppDir.absolutePath,
-        "-DCMAKE_BUILD_TYPE=Release"
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DJOLT_INCLUDE_DIR=${joltIncludeDir.get().asFile.absolutePath}",
+        "-DJOLT_LIB_DIR=${joltLibDir.get().asFile.absolutePath}"
     )
 
     onlyIf {
@@ -160,8 +199,17 @@ val compileNatives = tasks.register<Exec>("compileNatives") {
     }
 }
 
-// Ensure natives are compiled before resources are processed into the JAR
-tasks.named("processResources") {
+tasks.processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    joltNativeTargets.forEach { target ->
+        from(nativeExtraction) {
+            include("*${target.classifier}*")
+            into("natives/${target.platformDir}")
+            rename { target.targetFileName }
+        }
+    }
+
     dependsOn(compileNatives)
 }
 

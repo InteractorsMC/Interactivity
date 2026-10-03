@@ -1,6 +1,7 @@
 plugins {
     `java-library`
     `maven-publish`
+    id("interactivity-base")
 }
 
 val modId = project.property("mod_id") as String

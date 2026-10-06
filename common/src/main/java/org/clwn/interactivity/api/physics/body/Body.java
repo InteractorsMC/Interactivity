@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2026 timtaran
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org.
+ */
 package org.clwn.interactivity.api.physics.body;
 
 import org.clwn.interactivity.api.physics.world.PhysicsWorld;
@@ -9,7 +16,7 @@ public abstract class Body {
     private final UUID uuid;
     private final BodyType<? extends Body> type;
 
-    protected Body(PhysicsWorld world, UUID uuid, BodyType<? extends Body> type) {
+    protected Body(BodyType<? extends Body> type, PhysicsWorld world, UUID uuid) {
         this.world = world;
         this.uuid = uuid;
         this.type = type;
@@ -25,9 +32,5 @@ public abstract class Body {
 
     public final BodyType<? extends Body> getType() {
         return type;
-    }
-
-    /** Called after the body has been constructed and inserted into runtime state. */
-    protected void initialize() {
     }
 }

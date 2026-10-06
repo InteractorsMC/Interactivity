@@ -1,5 +1,4 @@
 /*
- * Copyright (c) 2025 xI-Mx-Ix
  * Copyright (c) 2026 timtaran
  *
  * This Source Code Form is subject to the terms of the Mozilla Public

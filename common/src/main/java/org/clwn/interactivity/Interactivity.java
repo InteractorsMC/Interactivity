@@ -7,6 +7,7 @@
  */
 package org.clwn.interactivity;
 
+import org.clwn.interactivity.builtin.InteractivityBuiltin;
 import org.clwn.interactivity.core.InteractivityCore;
 import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
@@ -21,5 +22,6 @@ public class Interactivity {
 
     public static void init() {
         InteractivityCore.init();
+        InteractivityBuiltin.init();
     }
 }

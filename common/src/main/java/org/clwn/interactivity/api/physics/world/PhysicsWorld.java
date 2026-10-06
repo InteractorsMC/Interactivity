@@ -7,7 +7,11 @@
  */
 package org.clwn.interactivity.api.physics.world;
 
-public interface PhysicsWorld {
+import net.minecraft.world.level.Level;
+
+import java.util.concurrent.Executor;
+
+public interface PhysicsWorld extends Executor {
     /**
      * Tick value from what physics world must start simulation (now is minimum signed int value)
      */
@@ -19,6 +23,8 @@ public interface PhysicsWorld {
      */
     int getTick();
 
+    boolean isRunning();
+
     void pauseSimulation();
 
     void continueSimulation();
@@ -29,5 +35,5 @@ public interface PhysicsWorld {
      */
     boolean isRollingBack();
 
-
+    Level getLevel();
 }

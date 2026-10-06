@@ -19,6 +19,23 @@ public class InteractivityConfig extends MidnightConfig {
     @Entry(category = PHYSICS)
     public static boolean isClientSidePredictionEnabled = true;
 
+    @Entry(
+            category = PHYSICS,
+            min = 20,
+            max = 240,
+            isSlider = true
+    )
+    public static int physicsTickRate = 90;
+
+    @Entry(
+            category = PHYSICS,
+            min = 1,
+            max = 128,
+            isSlider = true
+    )
+    public static int maxCoresAmount = AVAILABLE_CORES;
+
+
     @Comment(category = NETWORK)
     public static Comment networkTransportComment;
 
@@ -53,13 +70,6 @@ public class InteractivityConfig extends MidnightConfig {
     )
     public static int udpPort = -1;
 
-    @Entry(
-            category = PHYSICS,
-            min = 1,
-            max = 128,
-            isSlider = true
-    )
-    public static int maxCoresAmount = AVAILABLE_CORES;
 
     @Entry(category = DEV)
     public static boolean uselessDevOption = false;

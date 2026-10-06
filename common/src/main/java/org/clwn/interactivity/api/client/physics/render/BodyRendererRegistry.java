@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2026 timtaran
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org.
+ */
 package org.clwn.interactivity.api.client.physics.render;
 
 import org.clwn.interactivity.api.physics.body.Body;
@@ -5,10 +12,10 @@ import org.clwn.interactivity.api.physics.body.BodyType;
 
 
 public interface BodyRendererRegistry {
-    <T extends Body> void register(
-            BodyType<T> bodyType,
-            Class<BodyRenderer<T>> factory
+    <B extends Body, R extends BodyRenderer<?>> void register(
+            BodyType<B> bodyType,
+            R renderer
     );
 
-    <T extends Body> BodyRenderer<T> getRenderer(BodyType<T> bodyType);
+    <B extends Body> BodyRenderer<B> getRenderer(BodyType<B> bodyType);
 }

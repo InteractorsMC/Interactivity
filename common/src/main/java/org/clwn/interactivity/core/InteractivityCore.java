@@ -1,20 +1,22 @@
+/*
+ * Copyright (c) 2026 timtaran
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org.
+ */
 package org.clwn.interactivity.core;
 
 import eu.midnightdust.lib.config.MidnightConfig;
 import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.api.InteractivityAPI;
 import org.clwn.interactivity.api.physics.behavior.EventListenerBehavior;
-import org.clwn.interactivity.api.util.Side;
 import org.clwn.interactivity.core.client.render.RenderPipeline;
 import org.clwn.interactivity.core.config.InteractivityConfig;
-import org.clwn.interactivity.core.network.packet.s2c.HelloClientPacket;
+import org.clwn.interactivity.core.physics.PhysicsPipelineImpl;
 import org.clwn.interactivity.core.physics.behavior.BehaviorRegistryImpl;
-import org.clwn.interactivity.core.util.platform.Services;
-import org.clwn.interactivity.core.util.platform.services.INetworkingHelper;
 import org.clwn.interactivity.natives.NativeLibraryLoader;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 public class InteractivityCore {
     private static final RenderPipeline renderPipeline = new RenderPipeline();
@@ -23,20 +25,10 @@ public class InteractivityCore {
         MidnightConfig.init(Interactivity.MOD_ID, InteractivityConfig.class);
 
         loadNatives();
-        registerBehaviors();
 
-        Services.PLATFORM_NETWORK.registerPacket(
-                INetworkingHelper.PacketStageType.COMMON,
-                INetworkingHelper.PacketType.BIDIRECTIONAL,
-                HelloClientPacket.TYPE,
-                HelloClientPacket.STREAM_CODEC,
-                (context, packet) -> {
-                    Interactivity.LOGGER.info("Received HelloClientPacket: {} {}", context.player(), Arrays.toString(packet.data()));
-                    if (context.receiverSide() == Side.CLIENT) {
-                        Services.PLATFORM_NETWORK.sendPacketToServer(new HelloClientPacket("Hello from client!".getBytes(StandardCharsets.UTF_8)), INetworkingHelper.PacketStageType.COMMON);
-                    }
-                }
-        );
+        PhysicsPipelineImpl.INSTANCE = new PhysicsPipelineImpl();
+
+        registerBehaviors();
 
         InteractivityAPI.getInstance().getNetworkManager(); // todo: remove. now used to just load class
     }

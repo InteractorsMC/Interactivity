@@ -7,12 +7,14 @@
  */
 package org.clwn.interactivity.neoforge.event;
 
+import net.minecraft.server.level.ServerLevel;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import org.clwn.interactivity.Interactivity;
-import org.clwn.interactivity.core.event.Event;
+import org.clwn.interactivity.core.event.lifecycle.LevelLifecycleEvents;
 import org.clwn.interactivity.core.event.lifecycle.ServerLifecycleEvents;
 
 @EventBusSubscriber(modid = Interactivity.MOD_ID)
@@ -25,5 +27,23 @@ public class EventNotifierNeoforge {
     @SubscribeEvent
     public static void serverStop(ServerStoppingEvent event) {
         ServerLifecycleEvents.SERVER_STOPPING_EVENT.publish(new ServerLifecycleEvents.ServerEvent(event.getServer()));
+    }
+
+    @SubscribeEvent
+    public static void levelLoad(LevelEvent.Load event) {
+        if (event.getLevel() instanceof ServerLevel serverLevel) {
+            LevelLifecycleEvents.LEVEL_LOAD_EVENT.publish(new LevelLifecycleEvents.ServerLevelEvent(serverLevel));
+        } else {
+            Interactivity.LOGGER.info("Level load event received for a non-server level: {}", event.getLevel()); // todo: remove
+        }
+    }
+
+    @SubscribeEvent
+    public static void levelUnload(LevelEvent.Unload event) {
+        if (event.getLevel() instanceof ServerLevel serverLevel) {
+            LevelLifecycleEvents.LEVEL_UNLOAD_EVENT.publish(new LevelLifecycleEvents.ServerLevelEvent(serverLevel));
+        } else {
+            Interactivity.LOGGER.info("Level unload event received for a non-server level: {}", event.getLevel()); // todo: remove
+        }
     }
 }

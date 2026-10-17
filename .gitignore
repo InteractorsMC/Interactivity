@@ -13,6 +13,7 @@ out
 *.iml
 .idea/*
 */.idea/*
+natives/src/main/cpp/.idea
 !.idea/scopes
 
 # gradle

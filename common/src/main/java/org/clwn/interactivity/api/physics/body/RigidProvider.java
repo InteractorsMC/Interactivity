@@ -5,7 +5,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org.
  */
-package org.clwn.interactivity.core.physics.world;
+package org.clwn.interactivity.api.physics.body;
 
-public class PhysicsDataStore {
+public interface RigidProvider {
+    int createJoltBody(Body body, RigidBodyFactory factory);
+
 }

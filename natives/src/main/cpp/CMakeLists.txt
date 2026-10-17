@@ -80,7 +80,6 @@ target_compile_definitions(interactivity_natives PRIVATE
 
 target_link_libraries(interactivity_natives PRIVATE
     joltjni
-    ${JNI_LIBRARIES}
 )
 
 set_target_properties(interactivity_natives PROPERTIES

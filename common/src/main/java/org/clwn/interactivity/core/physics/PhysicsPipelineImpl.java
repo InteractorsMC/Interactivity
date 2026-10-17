@@ -13,6 +13,7 @@ import lombok.Getter;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.api.physics.PhysicsPipeline;
 import org.clwn.interactivity.api.physics.world.PhysicsWorld;
 import org.clwn.interactivity.core.client.physics.world.ClientPhysicsWorldImpl;
@@ -42,6 +43,9 @@ public class PhysicsPipelineImpl implements PhysicsPipeline {
         Jolt.installDefaultTraceCallback();
         Jolt.installDefaultAssertCallback();
 
+        boolean success = Jolt.newFactory();
+        assert success;
+
         Jolt.registerTypes();
 
         this.physicsLayerRegistry = new PhysicsLayerRegistryImpl();
@@ -68,12 +72,14 @@ public class PhysicsPipelineImpl implements PhysicsPipeline {
         }
 
         physicsWorlds.put(level, physicsWorld);
+        Interactivity.LOGGER.info("Initializing physics world for level: {}", level);
         physicsWorld.init();
         return physicsWorld;
     }
 
     public void removePhysicsWorld(Level level) {
         PhysicsWorldImpl physicsWorld = physicsWorlds.remove(level);
+        Interactivity.LOGGER.info("Removing physics world for level: {}", level);
         physicsWorld.close();
     }
 }

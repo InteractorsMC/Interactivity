@@ -7,33 +7,31 @@
  */
 package org.clwn.interactivity.core.physics.world;
 
-import com.github.stephengold.joltjni.*;
 import com.github.stephengold.joltjni.enumerate.EPhysicsUpdateError;
 import lombok.Getter;
 import net.minecraft.world.level.Level;
 import org.clwn.interactivity.Interactivity;
-import org.clwn.interactivity.api.physics.body.BodyManager;
+import org.clwn.interactivity.api.physics.body.PhysicsStateAccessor;
+import org.clwn.interactivity.api.physics.world.JoltBridge;
 import org.clwn.interactivity.api.physics.world.PhysicsWorld;
 import org.clwn.interactivity.core.config.InteractivityConfig;
 import org.clwn.interactivity.core.physics.PhysicsLayerRegistryImpl;
+import org.clwn.interactivity.core.physics.body.AbstractBodyManager;
 import org.clwn.interactivity.core.physics.system.PhysicsWorldEventDispatcher;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class PhysicsWorldImpl implements PhysicsWorld {
+public abstract class PhysicsWorldImpl implements PhysicsWorld {
     @Getter
-    protected int tick = PhysicsWorld.STARTING_TICK;
+    protected int tick;
 
     @Getter
-    boolean isRunning = false;
+    protected boolean isRunning;
 
     @Getter
-    protected boolean rollingBack = false;
-
-    @Getter
-    protected BodyManager bodyManager;
+    protected boolean rollingBack;
 
     @Getter
     protected Level level;
@@ -74,7 +72,10 @@ public class PhysicsWorldImpl implements PhysicsWorld {
             return;
         }
 
+        this.physicsSimulation.init();
+
         this.isRunning = true;
+        physicsRunner.setPaused(false);
         String threadName = "Interactivity Physics Thread - " + level.dimension().location().getPath();
         this.workingThread = new Thread(physicsRunner, threadName);
         this.workingThread.setDaemon(true);
@@ -136,5 +137,17 @@ public class PhysicsWorldImpl implements PhysicsWorld {
     @Override
     public void continueSimulation() {
 
+    }
+
+    public abstract AbstractBodyManager getBodyManager();
+
+    @Override
+    public PhysicsStateAccessor getPhysicsStateAccessor() {
+        return getBodyManager().getBodyDataStore();
+    }
+
+    @Override
+    public JoltBridgeImpl getJoltBridge() {
+        return this.physicsSimulation.getJoltBridge();
     }
 }

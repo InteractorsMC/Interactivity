@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 xI-Mx-Ix
+ * Copyright (c) 2025-2026 xI-Mx-Ix
  * Copyright (c) 2026 timtaran
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -8,12 +8,11 @@
  */
 package org.clwn.interactivity.core.physics;
 
-import com.github.stephengold.joltjni.BroadPhaseLayerInterfaceTable;
-import com.github.stephengold.joltjni.ObjectLayerPairFilterTable;
-import com.github.stephengold.joltjni.ObjectVsBroadPhaseLayerFilter;
-import com.github.stephengold.joltjni.ObjectVsBroadPhaseLayerFilterTable;
+import com.github.stephengold.joltjni.*;
 import lombok.Getter;
-import org.clwn.interactivity.api.client.physics.PhysicsLayerRegistry;
+import org.clwn.interactivity.api.physics.BroadPhaseLayer;
+import org.clwn.interactivity.api.physics.ObjectLayer;
+import org.clwn.interactivity.api.physics.PhysicsLayerRegistry;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -48,16 +47,22 @@ public final class PhysicsLayerRegistryImpl implements PhysicsLayerRegistry {
         objectLayerPairFilter = new ObjectLayerPairFilterTable(MAX_OBJECT_LAYERS);
 
         // Non-moving objects never collide with each other
-        objectLayerPairFilter.disableCollision(NON_MOVING, NON_MOVING);
+        objectLayerPairFilter.disableCollision(ObjectLayer.NON_MOVING.getValue(), ObjectLayer.NON_MOVING.getValue());
 
         // Moving objects collide with everything
-        objectLayerPairFilter.enableCollision(MOVING, NON_MOVING);
-        objectLayerPairFilter.enableCollision(MOVING, MOVING);
-        objectLayerPairFilter.enableCollision(MOVING, TERRAIN);
+        objectLayerPairFilter.enableCollision(ObjectLayer.MOVING.getValue(), ObjectLayer.NON_MOVING.getValue());
+        objectLayerPairFilter.enableCollision(ObjectLayer.MOVING.getValue(), ObjectLayer.MOVING.getValue());
+        objectLayerPairFilter.enableCollision(ObjectLayer.MOVING.getValue(), ObjectLayer.TERRAIN.getValue());
 
         // Terrain only collides with moving objects
-        objectLayerPairFilter.disableCollision(TERRAIN, TERRAIN);
-        objectLayerPairFilter.disableCollision(TERRAIN, NON_MOVING);
+        objectLayerPairFilter.disableCollision(ObjectLayer.TERRAIN.getValue(), ObjectLayer.TERRAIN.getValue());
+        objectLayerPairFilter.disableCollision(ObjectLayer.TERRAIN.getValue(), ObjectLayer.NON_MOVING.getValue());
+
+        // Ghost
+        objectLayerPairFilter.disableCollision(ObjectLayer.GHOST.getValue(), ObjectLayer.NON_MOVING.getValue());
+        objectLayerPairFilter.disableCollision(ObjectLayer.GHOST.getValue(), ObjectLayer.TERRAIN.getValue());
+        objectLayerPairFilter.disableCollision(ObjectLayer.GHOST.getValue(), ObjectLayer.MOVING.getValue());
+        objectLayerPairFilter.disableCollision(ObjectLayer.GHOST.getValue(), ObjectLayer.GHOST.getValue());
 
         /* -------- Broad Phase Layer Interface --------
          * Maps object layers to broad-phase layers.
@@ -68,13 +73,14 @@ public final class PhysicsLayerRegistryImpl implements PhysicsLayerRegistry {
                         NUM_BROAD_PHASE_LAYERS
                 );
 
-        broadPhaseLayerInterface.mapObjectToBroadPhaseLayer(NON_MOVING, BP_NON_MOVING);
-        broadPhaseLayerInterface.mapObjectToBroadPhaseLayer(TERRAIN, BP_NON_MOVING);
-        broadPhaseLayerInterface.mapObjectToBroadPhaseLayer(MOVING, BP_MOVING);
+        broadPhaseLayerInterface.mapObjectToBroadPhaseLayer(ObjectLayer.NON_MOVING.getValue(), BroadPhaseLayer.NON_MOVING.getValue());
+        broadPhaseLayerInterface.mapObjectToBroadPhaseLayer(ObjectLayer.TERRAIN.getValue(), BroadPhaseLayer.NON_MOVING.getValue());
+        broadPhaseLayerInterface.mapObjectToBroadPhaseLayer(ObjectLayer.MOVING.getValue(), BroadPhaseLayer.MOVING.getValue());
+        broadPhaseLayerInterface.mapObjectToBroadPhaseLayer(ObjectLayer.GHOST.getValue(), BroadPhaseLayer.MOVING.getValue());
 
         // Initialize remaining slots to non-moving broad-phase by default
-        for (short i = 3; i < MAX_OBJECT_LAYERS; i++) {
-            broadPhaseLayerInterface.mapObjectToBroadPhaseLayer(i, BP_NON_MOVING);
+        for (int i = ObjectLayer.values().length; i < MAX_OBJECT_LAYERS; i++) {
+            broadPhaseLayerInterface.mapObjectToBroadPhaseLayer(i, BroadPhaseLayer.NON_MOVING.getValue());
         }
 
         /* -------- Object vs Broad Phase Layer Filter --------
@@ -90,16 +96,16 @@ public final class PhysicsLayerRegistryImpl implements PhysicsLayerRegistry {
     }
 
     @Override
-    public short claimLayer() {
+    public int claimLayer() {
         int id = nextAvailableLayer.getAndIncrement();
         if (id >= MAX_OBJECT_LAYERS) {
             throw new IllegalStateException("Maximum pre-allocated physics layers reached: " + MAX_OBJECT_LAYERS);
         }
-        return (short) id;
+        return (int) id;
     }
 
     @Override
-    public void setCollision(short layer1, short layer2, boolean enabled) {
+    public void setCollision(int layer1, int layer2, boolean enabled) {
         if (enabled) {
             objectLayerPairFilter.enableCollision(layer1, layer2);
         } else {
@@ -108,7 +114,7 @@ public final class PhysicsLayerRegistryImpl implements PhysicsLayerRegistry {
     }
 
     @Override
-    public void setBroadPhaseMapping(short objectLayer, short broadPhaseLayer) {
+    public void setBroadPhaseMapping(int objectLayer, int broadPhaseLayer) {
         broadPhaseLayerInterface.mapObjectToBroadPhaseLayer(objectLayer, broadPhaseLayer);
     }
 

@@ -8,15 +8,11 @@
 package org.clwn.interactivity.api.physics.world;
 
 import net.minecraft.world.level.Level;
+import org.clwn.interactivity.api.physics.body.PhysicsStateAccessor;
 
 import java.util.concurrent.Executor;
 
 public interface PhysicsWorld extends Executor {
-    /**
-     * Tick value from what physics world must start simulation (now is minimum signed int value)
-     */
-    int STARTING_TICK = -2147483648;
-
     /**
      * Returns current physics tick
      * @return current physics tick
@@ -36,4 +32,8 @@ public interface PhysicsWorld extends Executor {
     boolean isRollingBack();
 
     Level getLevel();
+
+    PhysicsStateAccessor getPhysicsStateAccessor();
+
+    JoltBridge getJoltBridge();
 }

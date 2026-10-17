@@ -9,6 +9,7 @@ package org.clwn.interactivity.core.client;
 
 import org.clwn.interactivity.api.client.InteractivityClientAPI;
 import org.clwn.interactivity.api.client.physics.render.BodyRendererRegistry;
+import org.clwn.interactivity.core.client.physics.render.BodyRendererRegistryImpl;
 
 public class InteractivityClientAPIImpl implements InteractivityClientAPI {
     public static final InteractivityClientAPIImpl INSTANCE = new InteractivityClientAPIImpl();
@@ -19,6 +20,6 @@ public class InteractivityClientAPIImpl implements InteractivityClientAPI {
 
     @Override
     public BodyRendererRegistry getBodyRendererRegistry() {
-        return null;
+        return BodyRendererRegistryImpl.INSTANCE;
     }
 }

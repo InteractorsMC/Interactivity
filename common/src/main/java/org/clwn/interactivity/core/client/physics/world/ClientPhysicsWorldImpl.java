@@ -11,6 +11,7 @@ import lombok.Getter;
 import net.minecraft.client.multiplayer.ClientLevel;
 import org.clwn.interactivity.api.client.physics.world.ClientPhysicsWorld;
 import org.clwn.interactivity.core.physics.PhysicsLayerRegistryImpl;
+import org.clwn.interactivity.core.physics.body.AbstractBodyManager;
 import org.clwn.interactivity.core.physics.world.PhysicsWorldImpl;
 
 public class ClientPhysicsWorldImpl extends PhysicsWorldImpl implements ClientPhysicsWorld {
@@ -20,5 +21,11 @@ public class ClientPhysicsWorldImpl extends PhysicsWorldImpl implements ClientPh
     public ClientPhysicsWorldImpl(ClientLevel level, PhysicsLayerRegistryImpl physicsLayerRegistry) {
         super(level, physicsLayerRegistry);
         this.clientLevel = level;
+    }
+
+    @Override
+    public AbstractBodyManager getBodyManager() {
+        // todo
+        return null;
     }
 }

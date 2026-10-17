@@ -8,7 +8,6 @@
 package org.clwn.interactivity.api.physics;
 
 import net.minecraft.world.level.Level;
-import org.clwn.interactivity.api.client.physics.PhysicsLayerRegistry;
 import org.clwn.interactivity.api.physics.world.PhysicsWorld;
 import org.jetbrains.annotations.Nullable;
 

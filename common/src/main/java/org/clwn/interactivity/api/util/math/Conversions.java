@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 xI-Mx-Ix
+ * Copyright (c) 2025-2026 xI-Mx-Ix
  * Copyright (c) 2026 timtaran
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -36,6 +36,35 @@ public final class Conversions {
     }
 
     // --- To JOML Conversions ---
+
+    public static Vector3d toJoml(Vec3d in) {
+        return new Vector3d(in.getX(), in.getY(), in.getZ());
+    }
+
+    public static void toJoml(Vec3d in, Vector3d out) {
+        out.set(in.getX(), in.getY(), in.getZ());
+    }
+
+    public static Vector3f toJoml(Vec3f in) {
+        return new Vector3f(in.getX(), in.getY(), in.getZ());
+    }
+
+    public static void toJoml(Vec3f in, Vector3f out) {
+        out.set(in.getX(), in.getY(), in.getZ());
+    }
+
+    public static Quaternionf toJoml(
+            org.clwn.interactivity.api.util.math.Quat in
+    ) {
+        return new Quaternionf(
+                in.getX(), in.getY(), in.getZ(), in.getW()
+        );
+    }
+
+    public static void toJoml(
+            org.clwn.interactivity.api.util.math.Quat in, Quaternionf out) {
+        out.set(in.getX(), in.getY(), in.getZ(), in.getW());
+    }
 
     /**
      * Converts a Jolt {@link Vec3Arg} (single-precision) to a JOML {@link Vector3f}.
@@ -130,6 +159,30 @@ public final class Conversions {
     }
 
     // --- To Jolt Conversions ---
+
+    public static RVec3 toJolt(Vec3d in) {
+        return new RVec3(in.getX(), in.getY(), in.getZ());
+    }
+
+    public static void toJolt(Vec3d in, RVec3 out) {
+        out.set(in.getX(), in.getY(), in.getZ());
+    }
+
+    public static Vec3 toJolt(Vec3f in) {
+        return new Vec3(in.getX(), in.getY(), in.getZ());
+    }
+
+    public static void toJolt(Vec3f in, Vec3 out) {
+        out.set(in.getX(), in.getY(), in.getZ());
+    }
+
+    public static Quat toJolt(org.clwn.interactivity.api.util.math.Quat in) {
+        return new Quat(in.getX(), in.getY(), in.getZ(), in.getW());
+    }
+
+    public static void toQuat(org.clwn.interactivity.api.util.math.Quat in, Quat out) {
+        out.set(in.getX(), in.getY(), in.getZ(), in.getW());
+    }
 
     /**
      * Converts a JOML {@link Vector3f} to a Jolt {@link Vec3} (single-precision).
@@ -228,6 +281,14 @@ public final class Conversions {
     }
 
     // --- To Minecraft Conversions ---
+
+    public static net.minecraft.world.phys.Vec3 toMinecraft(Vec3f in) {
+        return new net.minecraft.world.phys.Vec3(in.getX(), in.getY(), in.getZ());
+    }
+
+    public static net.minecraft.world.phys.Vec3 toMinecraft(Vec3d in) {
+        return new net.minecraft.world.phys.Vec3(in.getX(), in.getY(), in.getZ());
+    }
 
     /**
      * Converts a JOML {@link Vector3d} to a Minecraft {@link net.minecraft.world.phys.Vec3}.

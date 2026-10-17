@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 xI-Mx-Ix
+ * Copyright (c) 2025-2026 xI-Mx-Ix
  * Copyright (c) 2026 timtaran
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -9,6 +9,8 @@
 package org.clwn.interactivity.core.physics.world;
 
 import com.github.stephengold.joltjni.*;
+import lombok.Getter;
+import org.clwn.interactivity.api.physics.world.JoltBridge;
 import org.clwn.interactivity.core.config.InteractivityConfig;
 import org.clwn.interactivity.core.physics.PhysicsLayerRegistryImpl;
 
@@ -66,6 +68,8 @@ public class PhysicsSimulation {
      */
     private TempAllocator tempAllocator;
 
+    @Getter
+    private JoltBridgeImpl joltBridge;
 
     /**
      * Constructs a new physics simulation instance with the specified configuration.
@@ -109,6 +113,7 @@ public class PhysicsSimulation {
 
         this.physicsSystem.optimizeBroadPhase();
 
+        this.joltBridge = new JoltBridgeImpl(this.physicsSystem);
     }
 
     /**

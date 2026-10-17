@@ -5,8 +5,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org.
  */
-package org.clwn.interactivity.core.physics.body;
+package org.clwn.interactivity.core.physics.body.type;
 
+import lombok.Getter;
 import net.minecraft.resources.ResourceLocation;
 import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.physics.body.BodyType;
@@ -23,6 +24,7 @@ public final class BodyTypeImpl<T extends Body> implements BodyType<T> {
     private final ResourceLocation typeId;
     private final BodyType.Factory<T> factory;
     private final Map<Class<? extends Behavior>, Behavior> behaviors;
+    @Getter
     private final long behaviorMask;
 
     BodyTypeImpl(
@@ -63,9 +65,5 @@ public final class BodyTypeImpl<T extends Body> implements BodyType<T> {
             return Optional.empty();
         }
         return Optional.of(behaviorClass.cast(behavior));
-    }
-
-    public long getBehaviorMask() {
-        return behaviorMask;
     }
 }

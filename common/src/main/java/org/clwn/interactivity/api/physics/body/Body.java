@@ -7,6 +7,8 @@
  */
 package org.clwn.interactivity.api.physics.body;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.clwn.interactivity.api.physics.world.PhysicsWorld;
 
 import java.util.UUID;
@@ -15,6 +17,9 @@ public abstract class Body {
     private final PhysicsWorld world;
     private final UUID uuid;
     private final BodyType<? extends Body> type;
+
+    @Getter @Setter
+    private int physicsId;
 
     protected Body(BodyType<? extends Body> type, PhysicsWorld world, UUID uuid) {
         this.world = world;

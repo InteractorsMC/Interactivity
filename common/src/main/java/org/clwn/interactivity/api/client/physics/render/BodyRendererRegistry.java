@@ -7,6 +7,7 @@
  */
 package org.clwn.interactivity.api.client.physics.render;
 
+import net.minecraft.resources.ResourceLocation;
 import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.physics.body.BodyType;
 
@@ -17,5 +18,9 @@ public interface BodyRendererRegistry {
             R renderer
     );
 
-    <B extends Body> BodyRenderer<B> getRenderer(BodyType<B> bodyType);
+    default <B extends Body> BodyRenderer<?> getRenderer(BodyType<B> bodyType) {
+        return getRenderer(bodyType.getTypeId());
+    }
+
+    BodyRenderer<?> getRenderer(ResourceLocation bodyTypeId);
 }

@@ -13,5 +13,6 @@ package org.clwn.interactivity.api.physics.behavior;
  *     Behavior does not execute runtime logic. Core systems interpret it.
  * </p>
  */
+// todo: possible make behaviors parametrized so behaviors like RigidBehavior (and RigidProvider) can pass body type instead of abstract one
 public interface Behavior {
 }

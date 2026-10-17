@@ -11,3 +11,4 @@ JNIEXPORT void JNICALL Java_org_clwn_interactivity_natives_TestJni_printHello
     std::cout << "Hello World from JNI!" << std::endl;
     std::cout.flush();
 }
+

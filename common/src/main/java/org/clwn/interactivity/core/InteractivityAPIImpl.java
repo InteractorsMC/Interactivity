@@ -13,7 +13,7 @@ import org.clwn.interactivity.api.physics.PhysicsPipeline;
 import org.clwn.interactivity.api.physics.body.BodyTypeRegistry;
 import org.clwn.interactivity.core.network.NetworkManagerImpl;
 import org.clwn.interactivity.core.physics.PhysicsPipelineImpl;
-import org.clwn.interactivity.core.physics.body.BodyTypeRegistryImpl;
+import org.clwn.interactivity.core.physics.body.type.BodyTypeRegistryImpl;
 
 public class InteractivityAPIImpl implements InteractivityAPI {
     public static final InteractivityAPI INSTANCE = new InteractivityAPIImpl();

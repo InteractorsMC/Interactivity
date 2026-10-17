@@ -11,10 +11,14 @@ import lombok.Getter;
 import net.minecraft.server.level.ServerLevel;
 import org.clwn.interactivity.api.physics.world.ServerPhysicsWorld;
 import org.clwn.interactivity.core.physics.PhysicsLayerRegistryImpl;
+import org.clwn.interactivity.core.physics.body.ServerBodyManager;
 
 public class ServerPhysicsWorldImpl extends PhysicsWorldImpl implements ServerPhysicsWorld {
     @Getter
     protected final ServerLevel serverLevel;
+
+    @Getter
+    protected final ServerBodyManager bodyManager = new ServerBodyManager(this);
 
     public ServerPhysicsWorldImpl(ServerLevel level, PhysicsLayerRegistryImpl physicsLayerRegistry) {
         super(level, physicsLayerRegistry);

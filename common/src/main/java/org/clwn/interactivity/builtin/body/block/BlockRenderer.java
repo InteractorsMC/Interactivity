@@ -32,8 +32,6 @@ public class BlockRenderer implements BodyRenderer<BlockRenderer.BlockRenderStat
 
     @Override
     public void extract(ExtractionContext context, Body body, BlockRenderState state) {
-        state.setPosition(Conversions.toMinecraft(body.getPosition()));
-        state.setRotation(new Vec3(0, 0, 0));
     }
 
     @Override

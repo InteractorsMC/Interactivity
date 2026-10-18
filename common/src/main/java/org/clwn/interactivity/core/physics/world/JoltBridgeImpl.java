@@ -69,7 +69,6 @@ public class JoltBridgeImpl implements JoltBridge {
             }
 
             body.setPhysicsId(bodyId);
-            // todo: send events
 
             return bodyId;
 

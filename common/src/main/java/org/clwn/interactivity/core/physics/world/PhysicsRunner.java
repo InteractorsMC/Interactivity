@@ -12,12 +12,11 @@ import lombok.Setter;
 /**
  * A class that runs the physics simulation in a separate thread.
  * <p>
- *     Contains:
- *     <ul>
- *         <li>Physics ticker - called every time accumulated time reaches the fixed time step</li>
- *         <li>Queue executor - responsible for executing queued tasks</li>
- *     </ul>
- * </p>
+ * Contains:
+ * <ul>
+ *     <li>Physics ticker - called every time accumulated time reaches the fixed time step</li>
+ *     <li>Queue executor - responsible for executing queued tasks</li>
+ * </ul>
  */
 public class PhysicsRunner implements Runnable {
     @Setter

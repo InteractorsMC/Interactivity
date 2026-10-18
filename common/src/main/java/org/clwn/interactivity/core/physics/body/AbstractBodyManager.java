@@ -97,7 +97,7 @@ public abstract class AbstractBodyManager implements BodyManager {
         // todo: notify network manager and netsync
 
         // Dispatch Jolt creation based on body type's provider
-        // todo: rigid + soft; remove if bodyId == -1 (fail)
+        // todo: rigid + soft; remove if bodyId == -1 (fail); send events
         this.physicsWorld.getJoltBridge().createAndAddJoltRigidBody(body, position, rotation, linearVelocity, angularVelocity, activation, motionType);
     }
 

@@ -10,7 +10,6 @@ package org.clwn.interactivity.core.physics.world;
 
 import com.github.stephengold.joltjni.*;
 import lombok.Getter;
-import org.clwn.interactivity.api.physics.world.JoltBridge;
 import org.clwn.interactivity.core.config.InteractivityConfig;
 import org.clwn.interactivity.core.physics.PhysicsLayerRegistryImpl;
 

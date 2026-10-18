@@ -11,14 +11,17 @@
  */
 package org.clwn.interactivity.builtin.body.block;
 
-import com.github.stephengold.joltjni.Body;
 import lombok.Getter;
 import lombok.Setter;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import org.clwn.interactivity.api.client.physics.render.BodyRenderer;
 import org.clwn.interactivity.api.client.render.ExtractionContext;
 import org.clwn.interactivity.api.client.render.RenderContext;
-import org.clwn.interactivity.api.physics.world.PhysicsWorld;
+import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.util.math.Conversions;
 
 public class BlockRenderer implements BodyRenderer<BlockRenderer.BlockRenderState> {
@@ -28,13 +31,22 @@ public class BlockRenderer implements BodyRenderer<BlockRenderer.BlockRenderStat
     }
 
     @Override
-    public void extract(ExtractionContext context, PhysicsWorld physicsWorld, Body body, BlockRenderState state) {
+    public void extract(ExtractionContext context, Body body, BlockRenderState state) {
         state.setPosition(Conversions.toMinecraft(body.getPosition()));
         state.setRotation(new Vec3(0, 0, 0));
     }
 
     @Override
     public void submit(BlockRenderState state, RenderContext context) {
+        Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(
+                context.lowLevel().getPoseStack().last(),
+                Minecraft.getInstance().renderBuffers().bufferSource().getBuffer(ItemBlockRenderTypes.getRenderType(Blocks.STONE.defaultBlockState(), false)),
+                Blocks.STONE.defaultBlockState(),
+                Minecraft.getInstance().getBlockRenderer().getBlockModel(Blocks.STONE.defaultBlockState()),
+                255, 255, 255,
+                15728880,
+                OverlayTexture.NO_OVERLAY
+        );
     }
 
     public static class BlockRenderState {

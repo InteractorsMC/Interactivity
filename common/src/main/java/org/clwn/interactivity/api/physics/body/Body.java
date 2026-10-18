@@ -10,32 +10,44 @@ package org.clwn.interactivity.api.physics.body;
 import lombok.Getter;
 import lombok.Setter;
 import org.clwn.interactivity.api.physics.world.PhysicsWorld;
+import org.clwn.interactivity.api.util.math.Quat;
+import org.clwn.interactivity.api.util.math.Vec3d;
+import org.clwn.interactivity.api.util.math.Vec3f;
 
 import java.util.UUID;
 
 public abstract class Body {
-    private final PhysicsWorld world;
+    @Getter
+    private final PhysicsWorld physicsWorld;
+
+    @Getter
     private final UUID uuid;
+
+    @Getter
     private final BodyType<? extends Body> type;
 
     @Getter @Setter
     private int physicsId;
 
-    protected Body(BodyType<? extends Body> type, PhysicsWorld world, UUID uuid) {
-        this.world = world;
+    protected Body(BodyType<? extends Body> type, PhysicsWorld physicsWorld, UUID uuid) {
+        this.physicsWorld = physicsWorld;
         this.uuid = uuid;
         this.type = type;
     }
 
-    public final PhysicsWorld getWorld() {
-        return world;
+    public Vec3d getPosition() {
+        return this.physicsWorld.getPhysicsStateAccessor().getPosition(this.uuid);
     }
 
-    public final UUID getUuid() {
-        return uuid;
+    public Quat getRotation() {
+        return this.physicsWorld.getPhysicsStateAccessor().getRotation(this.uuid);
     }
 
-    public final BodyType<? extends Body> getType() {
-        return type;
+    public Vec3f getLinearVelocity() {
+        return this.physicsWorld.getPhysicsStateAccessor().getLinearVelocity(this.uuid);
+    }
+
+    public Vec3f getAngularVelocity() {
+        return this.physicsWorld.getPhysicsStateAccessor().getAngularVelocity(this.uuid);
     }
 }

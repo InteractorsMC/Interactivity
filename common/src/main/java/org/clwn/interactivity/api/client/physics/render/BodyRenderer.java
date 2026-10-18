@@ -7,17 +7,15 @@
  */
 package org.clwn.interactivity.api.client.physics.render;
 
-import com.github.stephengold.joltjni.Body;
 import org.clwn.interactivity.api.client.render.ExtractionContext;
 import org.clwn.interactivity.api.client.render.RenderContext;
-import org.clwn.interactivity.api.physics.world.PhysicsWorld;
+import org.clwn.interactivity.api.physics.body.Body;
 
 public interface BodyRenderer<S> {
     S createState();
 
     void extract(
             ExtractionContext context,
-            PhysicsWorld physicsWorld,
             Body body,
             S state
     );

@@ -4,9 +4,14 @@
 
 ## Plan
 
-- [ ] Basic rendering
-- [ ] Basic physics with network sync
-- [ ] Custom registries containing body types, renderer, behavior system
-- [ ] Adding custom bodies to physics world
+- [X] Basic rendering
+- [X] Basic physics with network sync
+- [X] Custom registries containing body types, renderer, behavior system
+- [X] Adding custom bodies to physics world
+- [ ] Event system
+- [ ] Built-in physics gun
+- [ ] Terrain generation
+- [ ] Constraints system
+- [ ] Save manager
 - [ ] Native ContactListeners
 - [ ] Client-side predictions

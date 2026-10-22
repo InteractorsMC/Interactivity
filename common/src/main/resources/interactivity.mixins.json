@@ -4,8 +4,11 @@
   "package": "org.clwn.interactivity.core.mixin",
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_18",
-  "mixins": [],
+  "mixins": [
+    "event.lifecycle.PlayerListMixin"
+  ],
   "client": [
+    "event.lifecycle.MinecraftMixin",
     "event.lifecycle.PlayerListMixin",
     "useless.SplashManagerMixin",
     "event.render.LevelRendererMixin"

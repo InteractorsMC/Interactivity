@@ -12,6 +12,7 @@ import eu.midnightdust.lib.config.MidnightConfig;
 public class InteractivityConfig extends MidnightConfig {
     public static final String PHYSICS = "physics";
     public static final String NETWORK = "network";
+    public static final String RENDER = "render";
     public static final String DEV = "dev";
 
     public static final int AVAILABLE_CORES = Runtime.getRuntime().availableProcessors();
@@ -70,6 +71,42 @@ public class InteractivityConfig extends MidnightConfig {
     )
     public static int udpPort = -1;
 
+    public enum RenderSamplerType {
+        /**
+         * Shows the body between the two newest known states. Never overshoots, but is always slightly behind.
+         */
+        INTERPOLATION,
+
+        /**
+         * Like interpolation, but continues the movement with the last known velocity when no newer state has arrived.
+         */
+        EXTRAPOLATION
+    }
+
+    @Entry(category = RENDER)
+    public static RenderSamplerType renderSampler = RenderSamplerType.INTERPOLATION;
+
+    @Entry(
+            category = RENDER,
+            min = 0,
+            max = 10
+    )
+    public static double interpolationDelayTicks = 1.5;
+
+    @Entry(
+            category = RENDER,
+            min = 0,
+            max = 1000,
+            isSlider = true
+    )
+    public static int maxExtrapolationMs = 250;
+
+    @Entry(
+            category = RENDER,
+            min = 0,
+            max = 2
+    )
+    public static double cullingInflation = 0.25;
 
     @Entry(category = DEV)
     public static boolean uselessDevOption = false;

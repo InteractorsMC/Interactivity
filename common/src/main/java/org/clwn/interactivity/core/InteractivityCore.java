@@ -9,19 +9,21 @@ package org.clwn.interactivity.core;
 
 import eu.midnightdust.lib.config.MidnightConfig;
 import org.clwn.interactivity.Interactivity;
-import org.clwn.interactivity.api.InteractivityAPI;
+import org.clwn.interactivity.api.client.InteractivityCoreClient;
 import org.clwn.interactivity.api.physics.behavior.EventListenerBehavior;
 import org.clwn.interactivity.api.physics.behavior.RigidBehavior;
-import org.clwn.interactivity.core.client.render.RenderPipeline;
+import org.clwn.interactivity.api.physics.behavior.SummonableBehavior;
 import org.clwn.interactivity.core.config.InteractivityConfig;
+import org.clwn.interactivity.core.event.lifecycle.CommandRegistrationEvents;
+import org.clwn.interactivity.core.network.packet.PacketRegistry;
 import org.clwn.interactivity.core.physics.PhysicsPipelineImpl;
 import org.clwn.interactivity.core.physics.behavior.BehaviorRegistryImpl;
+import org.clwn.interactivity.core.physics.command.InteractivityCommand;
+import org.clwn.interactivity.core.util.platform.Services;
 import org.clwn.interactivity.natives.NativeLibraryLoader;
 
 
 public class InteractivityCore {
-    private static final RenderPipeline renderPipeline = new RenderPipeline();
-
     public static void init() {
         MidnightConfig.init(Interactivity.MOD_ID, InteractivityConfig.class);
 
@@ -31,7 +33,13 @@ public class InteractivityCore {
 
         registerBehaviors();
 
-        InteractivityAPI.getInstance().getNetworkManager(); // todo: remove. now used to just load class
+        PacketRegistry.registerPackets();
+
+        CommandRegistrationEvents.REGISTER_EVENT.subscribe(context -> InteractivityCommand.register(context.dispatcher()));
+
+        if (Services.PLATFORM.isClientEnvironment()) {
+            InteractivityCoreClient.init();
+        }
     }
 
     private static void loadNatives() {
@@ -42,5 +50,6 @@ public class InteractivityCore {
     private static void registerBehaviors() {
         BehaviorRegistryImpl.INSTANCE.registerBehavior(RigidBehavior.class);
         BehaviorRegistryImpl.INSTANCE.registerBehavior(EventListenerBehavior.class);
+        BehaviorRegistryImpl.INSTANCE.registerBehavior(SummonableBehavior.class);
     }
 }

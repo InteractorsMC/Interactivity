@@ -124,6 +124,16 @@ public class PhysicsStateContainer {
     public final LongBuffer behaviorFlags;
 
     /**
+     * Network id of the body in each slot, {@code -1} when the slot is not synchronized.
+     */
+    public final IntBuffer networkId;
+
+    /**
+     * Physics tick the state in this slot belongs to.
+     */
+    public final IntBuffer stateTick;
+
+    /**
      * Reference to the high-level {@link Body} wrapper objects for each slot.
      */
     public final Body[] bodies;
@@ -178,6 +188,14 @@ public class PhysicsStateContainer {
 
         this.behaviorFlags = ByteBuffer.allocateDirect(capacity * Long.BYTES).order(ByteOrder.nativeOrder()).asLongBuffer();
 
+        this.networkId = ByteBuffer.allocateDirect(capacity * Integer.BYTES).order(ByteOrder.nativeOrder()).asIntBuffer();
+        this.stateTick = ByteBuffer.allocateDirect(capacity * Integer.BYTES).order(ByteOrder.nativeOrder()).asIntBuffer();
+
+        for (int i = 0; i < capacity; i++) {
+            this.rotW.put(i, 1f);
+            this.networkId.put(i, -1);
+        }
+
         this.bodies = new Body[capacity];
 
     }
@@ -189,39 +207,54 @@ public class PhysicsStateContainer {
      * memory allocation while maintaining data integrity.
      *
      * @param other The destination container to copy data into.
-     * @throws IllegalArgumentException if the other container's capacity is smaller than this container's.
      */
     public void copyTo(PhysicsStateContainer other) {
-        int copyLength = Math.min(this.capacity, other.capacity);
+        copyRangeTo(0, other, 0, Math.min(this.capacity, other.capacity));
+    }
 
-        BufferUtils.copyDoubleBuffer(this.posX, other.posX, copyLength);
-        BufferUtils.copyDoubleBuffer(this.posY, other.posY, copyLength);
-        BufferUtils.copyDoubleBuffer(this.posZ, other.posZ, copyLength);
+    /**
+     * Copies the base physics data of a range of slots into a range of slots of another container.
+     * <p>
+     * Used by history containers, which keep several ticks in one container and have to move
+     * each tick to its new position when the capacity changes.
+     *
+     * @param srcOffset Index of the first slot to read.
+     * @param other     The destination container.
+     * @param dstOffset Index of the first slot to write.
+     * @param length    The number of slots to copy.
+     */
+    public void copyRangeTo(int srcOffset, PhysicsStateContainer other, int dstOffset, int length) {
+        BufferUtils.copyDoubleBuffer(this.posX, srcOffset, other.posX, dstOffset, length);
+        BufferUtils.copyDoubleBuffer(this.posY, srcOffset, other.posY, dstOffset, length);
+        BufferUtils.copyDoubleBuffer(this.posZ, srcOffset, other.posZ, dstOffset, length);
 
-        BufferUtils.copyFloatBuffer(this.rotX, other.rotX, copyLength);
-        BufferUtils.copyFloatBuffer(this.rotY, other.rotY, copyLength);
-        BufferUtils.copyFloatBuffer(this.rotZ, other.rotZ, copyLength);
-        BufferUtils.copyFloatBuffer(this.rotW, other.rotW, copyLength);
+        BufferUtils.copyFloatBuffer(this.rotX, srcOffset, other.rotX, dstOffset, length);
+        BufferUtils.copyFloatBuffer(this.rotY, srcOffset, other.rotY, dstOffset, length);
+        BufferUtils.copyFloatBuffer(this.rotZ, srcOffset, other.rotZ, dstOffset, length);
+        BufferUtils.copyFloatBuffer(this.rotW, srcOffset, other.rotW, dstOffset, length);
 
-        BufferUtils.copyFloatBuffer(this.velX, other.velX, copyLength);
-        BufferUtils.copyFloatBuffer(this.velY, other.velY, copyLength);
-        BufferUtils.copyFloatBuffer(this.velZ, other.velZ, copyLength);
+        BufferUtils.copyFloatBuffer(this.velX, srcOffset, other.velX, dstOffset, length);
+        BufferUtils.copyFloatBuffer(this.velY, srcOffset, other.velY, dstOffset, length);
+        BufferUtils.copyFloatBuffer(this.velZ, srcOffset, other.velZ, dstOffset, length);
 
-        BufferUtils.copyFloatBuffer(this.angVelX, other.angVelX, copyLength);
-        BufferUtils.copyFloatBuffer(this.angVelY, other.angVelY, copyLength);
-        BufferUtils.copyFloatBuffer(this.angVelZ, other.angVelZ, copyLength);
-        BufferUtils.copyFloatBuffer(this.aabbMinX, other.aabbMinX, copyLength);
-        BufferUtils.copyFloatBuffer(this.aabbMinY, other.aabbMinY, copyLength);
-        BufferUtils.copyFloatBuffer(this.aabbMinZ, other.aabbMinZ, copyLength);
-        BufferUtils.copyFloatBuffer(this.aabbMaxX, other.aabbMaxX, copyLength);
-        BufferUtils.copyFloatBuffer(this.aabbMaxY, other.aabbMaxY, copyLength);
-        BufferUtils.copyFloatBuffer(this.aabbMaxZ, other.aabbMaxZ, copyLength);
+        BufferUtils.copyFloatBuffer(this.angVelX, srcOffset, other.angVelX, dstOffset, length);
+        BufferUtils.copyFloatBuffer(this.angVelY, srcOffset, other.angVelY, dstOffset, length);
+        BufferUtils.copyFloatBuffer(this.angVelZ, srcOffset, other.angVelZ, dstOffset, length);
+        BufferUtils.copyFloatBuffer(this.aabbMinX, srcOffset, other.aabbMinX, dstOffset, length);
+        BufferUtils.copyFloatBuffer(this.aabbMinY, srcOffset, other.aabbMinY, dstOffset, length);
+        BufferUtils.copyFloatBuffer(this.aabbMinZ, srcOffset, other.aabbMinZ, dstOffset, length);
+        BufferUtils.copyFloatBuffer(this.aabbMaxX, srcOffset, other.aabbMaxX, dstOffset, length);
+        BufferUtils.copyFloatBuffer(this.aabbMaxY, srcOffset, other.aabbMaxY, dstOffset, length);
+        BufferUtils.copyFloatBuffer(this.aabbMaxZ, srcOffset, other.aabbMaxZ, dstOffset, length);
 
-        BufferUtils.copyByteBuffer(this.isActive, other.isActive, copyLength);
+        BufferUtils.copyByteBuffer(this.isActive, srcOffset, other.isActive, dstOffset, length);
 
-        BufferUtils.copyLongBuffer(this.behaviorFlags, other.behaviorFlags, copyLength);
+        BufferUtils.copyLongBuffer(this.behaviorFlags, srcOffset, other.behaviorFlags, dstOffset, length);
 
-        System.arraycopy(this.bodies, 0, other.bodies, 0, copyLength);
+        BufferUtils.copyIntBuffer(this.networkId, srcOffset, other.networkId, dstOffset, length);
+        BufferUtils.copyIntBuffer(this.stateTick, srcOffset, other.stateTick, dstOffset, length);
+
+        System.arraycopy(this.bodies, srcOffset, other.bodies, dstOffset, length);
     }
 
     /**
@@ -262,5 +295,48 @@ public class PhysicsStateContainer {
         this.isActive.put(index, (byte) 0);
 
         this.behaviorFlags.put(index, 0L);
+
+        this.networkId.put(index, -1);
+        this.stateTick.put(index, 0);
+    }
+
+    /**
+     * Copies the physics state of a single slot (transform, velocities, bounds, activity and tick)
+     * into a slot of another container.
+     * <p>
+     * Body references, behavior flags and network ids are intentionally not copied: they describe the slot
+     * owner and not the state, and history containers do not need them.
+     *
+     * @param srcIndex The slot to read from.
+     * @param dst      The destination container.
+     * @param dstIndex The slot to write to.
+     */
+    public void copyStateTo(int srcIndex, PhysicsStateContainer dst, int dstIndex) {
+        dst.posX.put(dstIndex, this.posX.get(srcIndex));
+        dst.posY.put(dstIndex, this.posY.get(srcIndex));
+        dst.posZ.put(dstIndex, this.posZ.get(srcIndex));
+
+        dst.rotX.put(dstIndex, this.rotX.get(srcIndex));
+        dst.rotY.put(dstIndex, this.rotY.get(srcIndex));
+        dst.rotZ.put(dstIndex, this.rotZ.get(srcIndex));
+        dst.rotW.put(dstIndex, this.rotW.get(srcIndex));
+
+        dst.velX.put(dstIndex, this.velX.get(srcIndex));
+        dst.velY.put(dstIndex, this.velY.get(srcIndex));
+        dst.velZ.put(dstIndex, this.velZ.get(srcIndex));
+
+        dst.angVelX.put(dstIndex, this.angVelX.get(srcIndex));
+        dst.angVelY.put(dstIndex, this.angVelY.get(srcIndex));
+        dst.angVelZ.put(dstIndex, this.angVelZ.get(srcIndex));
+
+        dst.aabbMinX.put(dstIndex, this.aabbMinX.get(srcIndex));
+        dst.aabbMinY.put(dstIndex, this.aabbMinY.get(srcIndex));
+        dst.aabbMinZ.put(dstIndex, this.aabbMinZ.get(srcIndex));
+        dst.aabbMaxX.put(dstIndex, this.aabbMaxX.get(srcIndex));
+        dst.aabbMaxY.put(dstIndex, this.aabbMaxY.get(srcIndex));
+        dst.aabbMaxZ.put(dstIndex, this.aabbMaxZ.get(srcIndex));
+
+        dst.isActive.put(dstIndex, this.isActive.get(srcIndex));
+        dst.stateTick.put(dstIndex, this.stateTick.get(srcIndex));
     }
 }

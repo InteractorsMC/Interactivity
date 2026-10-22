@@ -8,6 +8,7 @@
  */
 package org.clwn.interactivity.core.physics.world;
 
+import com.github.stephengold.joltjni.BodyInterface;
 import com.github.stephengold.joltjni.Jolt;
 import com.github.stephengold.joltjni.PhysicsSystem;
 import com.github.stephengold.joltjni.Vec3;
@@ -76,5 +77,12 @@ public class JoltBridgeImpl implements JoltBridge {
             Interactivity.LOGGER.error("Failed to create/add rigid body {}", body.getPhysicsId(), e);
             return -1;
         }
+    }
+
+    public void destroyJoltBody(int bodyId) {
+        BodyInterface bodyInterface = this.physicsSystem.getBodyInterface();
+
+        bodyInterface.removeBody(bodyId);
+        bodyInterface.destroyBody(bodyId);
     }
 }

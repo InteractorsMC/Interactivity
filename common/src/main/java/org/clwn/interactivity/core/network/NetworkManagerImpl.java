@@ -39,13 +39,15 @@ public class NetworkManagerImpl implements NetworkManager {
             configurePlayer(player);
         });
 
-        ServerLifecycleEvents.SERVER_STARTING_EVENT.subscribe(serverStartingEvent -> startListening());
-        ServerLifecycleEvents.SERVER_STOPPING_EVENT.subscribe(serverStoppingEvent -> stopListening());
-
         networkTransports = ServiceLoader.load(NetworkTransport.class)
                 .stream()
                 .map(ServiceLoader.Provider::get)
                 .toList();
+
+        // todo: client should start listening after configuration, but I haven't done this yet and there is no other transports, so it's just startListening()
+        // ServerLifecycleEvents.SERVER_STARTING_EVENT.subscribe(serverStartingEvent -> startListening());
+        // ServerLifecycleEvents.SERVER_STOPPING_EVENT.subscribe(serverStoppingEvent -> stopListening());
+        startListening();
     }
 
     @Override

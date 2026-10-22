@@ -22,7 +22,6 @@ import org.clwn.interactivity.api.client.physics.render.BodyRenderer;
 import org.clwn.interactivity.api.client.render.ExtractionContext;
 import org.clwn.interactivity.api.client.render.RenderContext;
 import org.clwn.interactivity.api.physics.body.Body;
-import org.clwn.interactivity.api.util.math.Conversions;
 
 public class BlockRenderer implements BodyRenderer<BlockRenderer.BlockRenderState> {
     @Override
@@ -36,6 +35,8 @@ public class BlockRenderer implements BodyRenderer<BlockRenderer.BlockRenderStat
 
     @Override
     public void submit(BlockRenderState state, RenderContext context) {
+        context.lowLevel().getPoseStack().translate(-0.5, -0.5, -0.5);
+
         Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(
                 context.lowLevel().getPoseStack().last(),
                 Minecraft.getInstance().renderBuffers().bufferSource().getBuffer(ItemBlockRenderTypes.getRenderType(Blocks.STONE.defaultBlockState(), false)),

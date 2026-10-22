@@ -55,6 +55,23 @@ public abstract class AbstractBodyDataStore implements PhysicsStateAccessor {
 
     public abstract PhysicsStateContainer getPhysicsStateContainer();
 
+    /**
+     * Previous states of the bodies in this store.
+     * <p>
+     * Disabled, if history size is {@code 0}.
+     */
+    public abstract HistoricalPhysicsStateContainer getHistory();
+
+    /**
+     * Returns the number of slot indices that were ever handed out, including slots that were freed afterwards.
+     * <p>
+     * Every loop over the store must iterate {@code 0 <= i < getSlotCount()} and skip slots whose
+     * {@code bodies[i]} is {@code null}.
+     */
+    public int getSlotCount() {
+        return count;
+    }
+
     public AbstractBodyDataStore() {
         uuidToIndex.defaultReturnValue(-1);
         allocate(INITIAL_CAPACITY);
@@ -81,13 +98,8 @@ public abstract class AbstractBodyDataStore implements PhysicsStateAccessor {
      * @return The assigned data store index.
      */
     public int addBody(Body body) {
-        if (count >= capacity) {
+        if (freeIndices.isEmpty() && count >= capacity) {
             allocate(capacity * 2);
-            // todo: add history container and store data inside using TICK % historySize (0 for server, 1 for no-prediction client, N for prediction client)
-            // this shouldn't use much memory since the data is mostly primitive types, but it will allow for rollback and prediction correction
-            // also store jolt state in native allocated memory since it's not needed in java
-            // if historySize is 0, history container should be either null or ignore any writes (need to decide later, but probably 2nd option)
-
         }
 
         // Reuse a freed index if available to keep arrays compact
@@ -136,12 +148,13 @@ public abstract class AbstractBodyDataStore implements PhysicsStateAccessor {
      * Resets all data fields at the specified index to their default values.
      * <p>
      * Delegates the clearing of physical state and object references to the
-     * active {@link PhysicsStateContainer}.
+     * active {@link PhysicsStateContainer} and its {@link HistoricalPhysicsStateContainer}.
      *
      * @param index The index to reset.
      */
     protected void resetIndex(int index) {
         getPhysicsStateContainer().reset(index);
+        getHistory().reset(index);
     }
 
     /**
@@ -159,6 +172,11 @@ public abstract class AbstractBodyDataStore implements PhysicsStateAccessor {
      * the structural mapping capacity.
      */
     public void clear() {
+        // allocate() keeps the existing data, so every used slot has to be reset explicitly
+        for (int i = 0; i < count; i++) {
+            resetIndex(i);
+        }
+
         uuidToIndex.clear();
         indexToUuid.clear();
         freeIndices.clear();

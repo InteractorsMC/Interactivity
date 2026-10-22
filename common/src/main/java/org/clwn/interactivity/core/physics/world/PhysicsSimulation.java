@@ -11,7 +11,6 @@ package org.clwn.interactivity.core.physics.world;
 import com.github.stephengold.joltjni.*;
 import lombok.Getter;
 import org.clwn.interactivity.core.config.InteractivityConfig;
-import org.clwn.interactivity.core.physics.PhysicsLayerRegistryImpl;
 
 /**
  * Encapsulates the native Jolt physics engine simulation and its core components.
@@ -19,38 +18,10 @@ import org.clwn.interactivity.core.physics.PhysicsLayerRegistryImpl;
  * and handles the lifecycle (initialization, updates, and cleanup) of the Jolt system.
  */
 public class PhysicsSimulation {
-    public record Config(
-            PhysicsLayerRegistryImpl physicsLayerRegistry,
-
-            int maxBodies,
-
-            int maxBodyPairs,
-
-            int maxContactConstraints,
-
-            int numPositionIterations,
-
-            int numVelocityIterations,
-
-            float speculativeContactDistance,
-
-            float baumgarteFactor,
-
-            float penetrationSlop,
-
-            float timeBeforeSleep,
-
-            float pointVelocitySleepThreshold,
-
-            float gravityY,
-
-            int tempAllocatorSize
-    ) {}
-
     /**
      * The configuration for this physics simulation instance.
      */
-    private final Config config;
+    private final PhysicsSimulationConfig config;
 
     /**
      * The native Jolt Physics System instance.
@@ -76,7 +47,7 @@ public class PhysicsSimulation {
      * @param config The physics configuration to apply.
      */
 
-    public PhysicsSimulation(Config config) {
+    public PhysicsSimulation(PhysicsSimulationConfig config) {
         this.config = config;
     }
 

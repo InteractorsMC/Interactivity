@@ -14,6 +14,7 @@ package org.clwn.interactivity.builtin.regsity;
 import org.clwn.interactivity.api.InteractivityAPI;
 import org.clwn.interactivity.api.physics.behavior.EventListenerBehavior;
 import org.clwn.interactivity.api.physics.behavior.RigidBehavior;
+import org.clwn.interactivity.api.physics.behavior.SummonableBehavior;
 import org.clwn.interactivity.api.physics.body.BodyType;
 import org.clwn.interactivity.builtin.body.block.BlockRigidBody;
 import org.clwn.interactivity.core.util.InteractivityIdentifier;
@@ -27,7 +28,8 @@ public final class BodyRegistry {
                 BlockRigidBody::new,
                 (bodyBuilder -> bodyBuilder.addBehaviors(
                         new RigidBehavior(BlockRigidBody::createJoltBody),
-                        new EventListenerBehavior()
+                        new EventListenerBehavior(),
+                        new SummonableBehavior()
                 ))
         );
     }

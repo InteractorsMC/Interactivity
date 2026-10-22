@@ -8,6 +8,7 @@ val parchmentMinecraft = project.property("parchment_minecraft") as String
 val parchmentVersion = project.property("parchment_version") as String
 val fabricLoaderVersion = project.property("fabric_loader_version") as String
 val fabricVersion = project.property("fabric_version") as String
+val joltJniVersion = project.findProperty("jolt_jni_version") as? String
 val modId = project.property("mod_id") as String
 
 dependencies {
@@ -20,6 +21,7 @@ dependencies {
     "modImplementation"("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
 
     include(project(":natives"))
+    include("interactorsmc:jolt-jni:$joltJniVersion@jar")
 
     // Dependencies
     val midnightlib = "eu.midnightdust:midnightlib:${project.property("midnightlib_version")}-fabric"

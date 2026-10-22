@@ -42,6 +42,7 @@ dependencies {
     implementation(project(":natives"))
     jarJar(project(":natives"))
     additionalRuntimeClasspath(project(":natives"))
+    // todo: add jolt-jni; add build-extensions for dependencies
 
     // Dependencies
     val midnightlib = "eu.midnightdust:midnightlib:${project.property("midnightlib_version")}-neoforge"

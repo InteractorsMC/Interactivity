@@ -42,6 +42,10 @@ public interface PhysicsLayerRegistry {
      */
     void setCollision(int layer1, int layer2, boolean enabled);
 
+    default void setBroadPhaseMapping(int objectLayer, BroadPhaseLayer broadPhaseLayer) {
+        setBroadPhaseMapping(objectLayer, broadPhaseLayer.getValue());
+    }
+
     /**
      * Assigns an object layer to a specific broad-phase layer.
      * This can be updated at runtime after initialization.

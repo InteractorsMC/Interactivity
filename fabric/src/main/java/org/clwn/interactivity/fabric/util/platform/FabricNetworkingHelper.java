@@ -1,9 +1,5 @@
 package org.clwn.interactivity.fabric.util.platform;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -15,6 +11,7 @@ import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
 import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.api.network.PacketContext;
 import org.clwn.interactivity.api.util.Side;
+import org.clwn.interactivity.core.util.platform.Services;
 import org.clwn.interactivity.core.util.platform.services.INetworkingHelper;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,7 +31,9 @@ public class FabricNetworkingHelper implements INetworkingHelper {
             }
             if (packetType == PacketType.BIDIRECTIONAL || packetType == PacketType.S2C) {
                 PayloadTypeRegistry.playS2C().register(type, codec);
-                registerClientListener(type, handler);
+                if (Services.PLATFORM.isClientEnvironment()) {
+                    FabricNetworkingHelperClient.registerClientListener(type, handler);
+                }
             }
         }
         if (stage == PacketStageType.COMMON || stage == PacketStageType.CONFIGURATION) {
@@ -44,15 +43,11 @@ public class FabricNetworkingHelper implements INetworkingHelper {
             }
             if (packetType == PacketType.BIDIRECTIONAL || packetType == PacketType.S2C) {
                 PayloadTypeRegistry.configurationS2C().register(type, codec);
-                registerClientListener(type, handler);
+                if (Services.PLATFORM.isClientEnvironment()) {
+                    FabricNetworkingHelperClient.registerClientListener(type, handler);
+                }
             }
         }
-    }
-
-
-    @Environment(EnvType.CLIENT)
-    private static <T extends CustomPacketPayload> void registerClientListener(CustomPacketPayload.Type<?> type, BiConsumer<PacketContext, T> handler) {
-        ClientPlayNetworking.registerGlobalReceiver(type, ((payload, context) -> handler.accept(new PacketContext(context.player(), Side.CLIENT), (T) payload)));
     }
 
     private static <T extends CustomPacketPayload> void registerServerListener(CustomPacketPayload.Type<?> type, BiConsumer<PacketContext, T> handler) {
@@ -74,15 +69,9 @@ public class FabricNetworkingHelper implements INetworkingHelper {
 
     @Override
     public void sendPacketToServer(CustomPacketPayload packet, PacketStageType stage) {
-        sendPacketToServerInternal(packet, stage);
-    }
-
-    @Environment(EnvType.CLIENT)
-    private static void sendPacketToServerInternal(CustomPacketPayload packet, PacketStageType stage) {
-        if ((stage == PacketStageType.COMMON && ClientPlayNetworking.canSend(packet.type())) || stage == PacketStageType.PLAY) {
-            ClientPlayNetworking.send(packet);
-        } else {
-            ClientConfigurationNetworking.send(packet);
+        if (Services.PLATFORM.isClientEnvironment()) {
+            FabricNetworkingHelperClient.sendPacketToServerInternal(packet, stage);
         }
     }
+
 }

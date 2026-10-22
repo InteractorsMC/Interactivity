@@ -12,9 +12,7 @@ import eu.midnightdust.lib.config.MidnightConfig;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.network.event.RegisterConfigurationTasksEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
@@ -29,11 +27,6 @@ import org.clwn.interactivity.neoforge.util.platform.NeoForgeNetworkingHelper;
 public class InteractivityNeoforge {
 
     public InteractivityNeoforge(IEventBus eventBus) {
-        ModLoadingContext.get().registerExtensionPoint(
-                IConfigScreenFactory.class,
-                () -> (client, parentScreen) -> MidnightConfig.getScreen(parentScreen, Interactivity.MOD_ID)
-        );
-
         // Use NeoForge to bootstrap the Common mod.
         Interactivity.LOGGER.info("Hello NeoForge world!");
         Interactivity.init();

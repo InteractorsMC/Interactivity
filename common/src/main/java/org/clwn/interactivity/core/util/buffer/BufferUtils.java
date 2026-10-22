@@ -93,4 +93,78 @@ public class BufferUtils {
         dest.clear();
     }
 
+    /**
+     * Copies a range of elements between two direct {@link DoubleBuffer}s at the given offsets.
+     * <p>
+     * Uses the absolute bulk {@code put}, so positions and limits of both buffers are neither read nor changed.
+     *
+     * @param src       The source buffer.
+     * @param srcOffset Index of the first element to read.
+     * @param dest      The destination buffer.
+     * @param destOffset Index of the first element to write.
+     * @param length    The number of elements to copy.
+     */
+    public static void copyDoubleBuffer(DoubleBuffer src, int srcOffset, DoubleBuffer dest, int destOffset, int length) {
+        dest.put(destOffset, src, srcOffset, length);
+    }
+
+    /**
+     * Copies a range of elements between two direct {@link FloatBuffer}s at the given offsets.
+     * <p>
+     * Uses the absolute bulk {@code put}, so positions and limits of both buffers are neither read nor changed.
+     *
+     * @param src       The source buffer.
+     * @param srcOffset Index of the first element to read.
+     * @param dest      The destination buffer.
+     * @param destOffset Index of the first element to write.
+     * @param length    The number of elements to copy.
+     */
+    public static void copyFloatBuffer(FloatBuffer src, int srcOffset, FloatBuffer dest, int destOffset, int length) {
+        dest.put(destOffset, src, srcOffset, length);
+    }
+
+    /**
+     * Copies a range of elements between two direct {@link ByteBuffer}s at the given offsets.
+     * <p>
+     * Uses the absolute bulk {@code put}, so positions and limits of both buffers are neither read nor changed.
+     *
+     * @param src       The source buffer.
+     * @param srcOffset Index of the first element to read.
+     * @param dest      The destination buffer.
+     * @param destOffset Index of the first element to write.
+     * @param length    The number of elements to copy.
+     */
+    public static void copyByteBuffer(ByteBuffer src, int srcOffset, ByteBuffer dest, int destOffset, int length) {
+        dest.put(destOffset, src, srcOffset, length);
+    }
+
+    /**
+     * Copies a range of elements between two direct {@link LongBuffer}s at the given offsets.
+     * <p>
+     * Uses the absolute bulk {@code put}, so positions and limits of both buffers are neither read nor changed.
+     *
+     * @param src       The source buffer.
+     * @param srcOffset Index of the first element to read.
+     * @param dest      The destination buffer.
+     * @param destOffset Index of the first element to write.
+     * @param length    The number of elements to copy.
+     */
+    public static void copyLongBuffer(LongBuffer src, int srcOffset, LongBuffer dest, int destOffset, int length) {
+        dest.put(destOffset, src, srcOffset, length);
+    }
+
+    /**
+     * Copies a range of elements between two direct {@link IntBuffer}s at the given offsets.
+     * <p>
+     * Uses the absolute bulk {@code put}, so positions and limits of both buffers are neither read nor changed.
+     *
+     * @param src       The source buffer.
+     * @param srcOffset Index of the first element to read.
+     * @param dest      The destination buffer.
+     * @param destOffset Index of the first element to write.
+     * @param length    The number of elements to copy.
+     */
+    public static void copyIntBuffer(IntBuffer src, int srcOffset, IntBuffer dest, int destOffset, int length) {
+        dest.put(destOffset, src, srcOffset, length);
+    }
 }

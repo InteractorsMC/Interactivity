@@ -10,7 +10,7 @@ package org.clwn.interactivity.api.physics.world;
 import net.minecraft.server.level.ServerLevel;
 import org.clwn.interactivity.api.physics.body.BodyManager;
 
-public interface ServerPhysicsWorld extends PhysicsWorld {
+public interface ServerPhysicsWorld extends SimulatedPhysicsWorld {
     ServerLevel getServerLevel();
     BodyManager getBodyManager();
 }

@@ -32,7 +32,7 @@ public class BlockRigidBody extends Body {
 
     public static int createJoltBody(Body body, RigidBodyFactory factory) {
         try (
-                ShapeSettings shapeSettings = new BoxShapeSettings(new Vec3(1f, 1f, 1f));
+                ShapeSettings shapeSettings = new BoxShapeSettings(new Vec3(0.5f, 0.5f, 0.5f));
                 BodyCreationSettings bcs = new BodyCreationSettings()
         ) {
             bcs.setMotionType(EMotionType.Dynamic);

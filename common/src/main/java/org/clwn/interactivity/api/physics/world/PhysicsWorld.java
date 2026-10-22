@@ -15,25 +15,16 @@ import java.util.concurrent.Executor;
 public interface PhysicsWorld extends Executor {
     /**
      * Returns current physics tick
+     * <p>
+     * For non-simulated worlds this is the latest tick received from the server.
+     *
      * @return current physics tick
      */
     int getTick();
 
     boolean isRunning();
 
-    void pauseSimulation();
-
-    void continueSimulation();
-
-    /**
-     * Checks if simulation is rolling back
-     * @return {@code true} if simulation is rolling back, {@code false} otherwise
-     */
-    boolean isRollingBack();
-
     Level getLevel();
 
     PhysicsStateAccessor getPhysicsStateAccessor();
-
-    JoltBridge getJoltBridge();
 }

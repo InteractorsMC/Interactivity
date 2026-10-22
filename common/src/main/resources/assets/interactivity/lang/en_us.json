@@ -15,6 +15,15 @@
   "interactivity.midnightconfig.udpPort": "UDP transport port",
   "interactivity.midnightconfig.udpPort.tooltip": "-1 — Use Minecraft server port\n0 — Disable UDP transport",
 
+  "interactivity.midnightconfig.category.render": "Rendering",
+  "interactivity.midnightconfig.renderSampler": "Body render sampler",
+  "interactivity.midnightconfig.renderSampler.tooltip": "How the pose of a body between two server updates is chosen. Interpolation is always slightly behind, extrapolation continues the movement when an update is late.",
+  "interactivity.midnightconfig.interpolationDelayTicks": "Interpolation delay (physics ticks)",
+  "interactivity.midnightconfig.interpolationDelayTicks.tooltip": "How many physics ticks bodies are shown behind the newest server update. Raise it if bodies stutter.",
+  "interactivity.midnightconfig.maxExtrapolationMs": "Maximum extrapolation (ms)",
+  "interactivity.midnightconfig.cullingInflation": "Culling inflation (blocks)",
+  "interactivity.midnightconfig.cullingInflation.tooltip": "Bodies are hidden when their bounding box, grown by this much, is outside of the screen.",
+
   "interactivity.midnightconfig.category.dev": "Developer",
   "interactivity.midnightconfig.uselessDevOption": "Useless developer option",
   "interactivity.midnightconfig.uselessDevOption.tooltip": "This option does nothing useful: turn it on and try to find out what it does!"

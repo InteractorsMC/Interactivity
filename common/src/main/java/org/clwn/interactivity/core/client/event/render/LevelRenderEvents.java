@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org.
  */
-package org.clwn.interactivity.core.event.render;
+package org.clwn.interactivity.core.client.event.render;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;

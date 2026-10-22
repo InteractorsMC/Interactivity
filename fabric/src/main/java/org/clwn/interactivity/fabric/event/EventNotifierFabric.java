@@ -9,9 +9,13 @@ package org.clwn.interactivity.fabric.event;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import org.clwn.interactivity.core.event.lifecycle.CommandRegistrationEvents;
 import org.clwn.interactivity.core.event.lifecycle.LevelLifecycleEvents;
+import org.clwn.interactivity.core.event.lifecycle.LevelTickEvents;
 import org.clwn.interactivity.core.event.lifecycle.ServerLifecycleEvents;
 
 public class EventNotifierFabric {
@@ -19,6 +23,11 @@ public class EventNotifierFabric {
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTING.register((server) -> ServerLifecycleEvents.SERVER_STARTING_EVENT.publish(new ServerLifecycleEvents.ServerEvent(server)));
 
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPING.register((server) -> ServerLifecycleEvents.SERVER_STOPPING_EVENT.publish(new ServerLifecycleEvents.ServerEvent(server)));
+
+        ServerTickEvents.END_WORLD_TICK.register((level) -> LevelTickEvents.END.publish(new LevelTickEvents.ServerLevelTickEvent(level)));
+
+        CommandRegistrationCallback.EVENT.register((dispatcher, buildContext, selection) ->
+                CommandRegistrationEvents.REGISTER_EVENT.publish(new CommandRegistrationEvents.CommandRegistrationContext(dispatcher, buildContext, selection)));
 
         ServerWorldEvents.LOAD.register((server, level) -> LevelLifecycleEvents.LEVEL_LOAD_EVENT.publish(new LevelLifecycleEvents.ServerLevelEvent(level)));
 

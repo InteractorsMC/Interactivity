@@ -7,6 +7,7 @@
  */
 package org.clwn.interactivity.core.network.packet.bi;
 
+import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -31,10 +32,15 @@ public record TCPNetworkTransferPacket(ResourceLocation identifier,
     public static final StreamCodec<FriendlyByteBuf, TCPNetworkTransferPacket> STREAM_CODEC = new StreamCodec<>() {
         @Override
         public @NotNull TCPNetworkTransferPacket decode(@NotNull FriendlyByteBuf buf) {
+            ResourceLocation identifier = buf.readResourceLocation();
+
+            byte[] data = new byte[buf.readableBytes()];
+            buf.readBytes(data);
+
             return new TCPNetworkTransferPacket(
-                    buf.readResourceLocation(),
+                    identifier,
                     null,
-                    buf
+                    new FriendlyByteBuf(Unpooled.wrappedBuffer(data))
             );
         }
 

@@ -13,6 +13,7 @@ import org.clwn.interactivity.api.client.InteractivityCoreClient;
 import org.clwn.interactivity.api.physics.behavior.EventListenerBehavior;
 import org.clwn.interactivity.api.physics.behavior.RigidBehavior;
 import org.clwn.interactivity.api.physics.behavior.SummonableBehavior;
+import org.clwn.interactivity.core.client.physics.ClientPhysicsPipelineImpl;
 import org.clwn.interactivity.core.config.InteractivityConfig;
 import org.clwn.interactivity.core.event.lifecycle.CommandRegistrationEvents;
 import org.clwn.interactivity.core.network.packet.PacketRegistry;
@@ -29,7 +30,12 @@ public class InteractivityCore {
 
         loadNatives();
 
-        PhysicsPipelineImpl.INSTANCE = new PhysicsPipelineImpl();
+        if (Services.PLATFORM.isClientEnvironment()) {
+            ClientPhysicsPipelineImpl.INSTANCE = new ClientPhysicsPipelineImpl();
+            PhysicsPipelineImpl.INSTANCE = ClientPhysicsPipelineImpl.INSTANCE;
+        } else {
+            PhysicsPipelineImpl.INSTANCE = new PhysicsPipelineImpl();
+        }
 
         registerBehaviors();
 

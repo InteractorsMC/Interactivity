@@ -42,7 +42,7 @@ final class BodyTypeBuilderImpl<T extends Body> implements BodyType.Builder<T> {
         return this;
     }
 
-    BodyTypeImpl<T> build(ResourceLocation typeId, BodyType.Factory<T> factory, BehaviorRegistryImpl behaviorRegistry) {
+    BodyTypeImpl<T> build(ResourceLocation typeId, Class<T> bodyClass, BodyType.Factory<T> factory, BehaviorRegistryImpl behaviorRegistry) {
         if (typeId == null) {
             throw new IllegalArgumentException("typeId cannot be null");
         }
@@ -58,6 +58,6 @@ final class BodyTypeBuilderImpl<T extends Body> implements BodyType.Builder<T> {
             behaviorMask |= behaviorRegistry.getMask(behaviorClass);
         }
 
-        return new BodyTypeImpl<>(typeId, factory, behaviors, behaviorMask);
+        return new BodyTypeImpl<>(typeId, bodyClass, factory, behaviors, behaviorMask);
     }
 }

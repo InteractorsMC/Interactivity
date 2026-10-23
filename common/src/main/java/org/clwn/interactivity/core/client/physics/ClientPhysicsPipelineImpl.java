@@ -10,20 +10,21 @@ package org.clwn.interactivity.core.client.physics;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import org.clwn.interactivity.Interactivity;
+import org.clwn.interactivity.api.client.physics.ClientPhysicsPipeline;
 import org.clwn.interactivity.api.physics.world.PhysicsWorld;
 import org.clwn.interactivity.core.client.event.lifecycle.ClientLevelLifecycleEvents;
 import org.clwn.interactivity.core.client.physics.world.ClientPhysicsWorldInternal;
 import org.clwn.interactivity.core.client.physics.world.EstimatedClientPhysicsWorldImpl;
 import org.clwn.interactivity.core.physics.PhysicsPipelineImpl;
 
-public final class ClientPhysicsPipelineHelper {
-    private final PhysicsPipelineImpl physicsPipeline;
+public final class ClientPhysicsPipelineImpl extends PhysicsPipelineImpl implements ClientPhysicsPipeline {
+    public static ClientPhysicsPipelineImpl INSTANCE;
 
-    public ClientPhysicsPipelineHelper(PhysicsPipelineImpl physicsPipeline) {
-        this.physicsPipeline = physicsPipeline;
+    public ClientPhysicsPipelineImpl() {
+        super();
 
         ClientLevelLifecycleEvents.LEVEL_LOAD_EVENT.subscribe(event -> createClientPhysicsWorld(event.level()));
-        ClientLevelLifecycleEvents.LEVEL_UNLOAD_EVENT.subscribe(event -> physicsPipeline.removePhysicsWorld(event.level()));
+        ClientLevelLifecycleEvents.LEVEL_UNLOAD_EVENT.subscribe(event -> removePhysicsWorld(event.level()));
     }
 
     private void createClientPhysicsWorld(ClientLevel level) {
@@ -31,16 +32,17 @@ public final class ClientPhysicsPipelineHelper {
 
         // todo: use the simulated world when client-side prediction is enabled and implemented
         EstimatedClientPhysicsWorldImpl world = new EstimatedClientPhysicsWorldImpl(level);
-        physicsPipeline.registerWorld(level, world);
+        registerWorld(level, world);
     }
 
-    public static ClientPhysicsWorldInternal getCurrentPhysicsWorld() {
+    @Override
+    public ClientPhysicsWorldInternal getCurrentPhysicsWorld() {
         ClientLevel level = Minecraft.getInstance().level;
         if (level == null) {
             return null;
         }
 
-        PhysicsWorld world = PhysicsPipelineImpl.INSTANCE.getPhysicsWorld(level);
+        PhysicsWorld world = getPhysicsWorld(level);
         return world instanceof ClientPhysicsWorldInternal clientPhysicsWorld ? clientPhysicsWorld : null;
     }
 }

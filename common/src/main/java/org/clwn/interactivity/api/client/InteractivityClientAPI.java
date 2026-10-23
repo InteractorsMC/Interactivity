@@ -7,8 +7,10 @@
  */
 package org.clwn.interactivity.api.client;
 
+import org.clwn.interactivity.api.client.physics.ClientPhysicsPipeline;
 import org.clwn.interactivity.api.client.physics.render.BodyRendererRegistry;
 import org.clwn.interactivity.core.client.InteractivityClientAPIImpl;
+import org.jetbrains.annotations.Nullable;
 
 public interface InteractivityClientAPI {
     static InteractivityClientAPI getInstance() {
@@ -16,4 +18,10 @@ public interface InteractivityClientAPI {
     }
 
     BodyRendererRegistry getBodyRendererRegistry();
+
+    /**
+     *
+     * @return {@code ClientPhysicsPipeline} object if environment is client, {@code null} otherwise
+     */
+    @Nullable ClientPhysicsPipeline getClientPhysicsPipeline();
 }

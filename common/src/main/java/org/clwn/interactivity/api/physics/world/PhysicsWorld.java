@@ -9,6 +9,7 @@ package org.clwn.interactivity.api.physics.world;
 
 import net.minecraft.world.level.Level;
 import org.clwn.interactivity.api.physics.body.PhysicsStateAccessor;
+import org.clwn.interactivity.api.util.Side;
 
 import java.util.concurrent.Executor;
 
@@ -22,9 +23,14 @@ public interface PhysicsWorld extends Executor {
      */
     int getTick();
 
+    boolean isSimulated();
+
     boolean isRunning();
 
     Level getLevel();
 
     PhysicsStateAccessor getPhysicsStateAccessor();
+
+    Side getSide();
+
 }

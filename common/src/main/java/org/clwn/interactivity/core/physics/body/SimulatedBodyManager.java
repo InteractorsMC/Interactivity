@@ -7,6 +7,7 @@
  */
 package org.clwn.interactivity.core.physics.body;
 
+import com.github.stephengold.joltjni.Quat;
 import com.github.stephengold.joltjni.RVec3;
 import com.github.stephengold.joltjni.Vec3;
 import com.github.stephengold.joltjni.enumerate.EActivation;
@@ -16,9 +17,11 @@ import com.github.stephengold.joltjni.readonly.RVec3Arg;
 import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.physics.body.BodyType;
+import org.clwn.interactivity.api.physics.body.RemovalReason;
 import org.clwn.interactivity.core.physics.body.store.SimulatedBodyDataStore;
 import org.clwn.interactivity.core.physics.body.store.SimulatedPhysicsStateContainer;
 import org.clwn.interactivity.core.physics.body.type.BodyTypeImpl;
+import org.clwn.interactivity.core.physics.system.BodyEventDispatcher;
 import org.clwn.interactivity.core.physics.world.SimulatedPhysicsWorldImpl;
 
 import java.util.UUID;
@@ -63,9 +66,10 @@ public abstract class SimulatedBodyManager extends AbstractBodyManager {
     }
 
     @Override
-    public void removeBody(Body body) {
+    public void removeBody(Body body, RemovalReason removalReason) {
+        // todo: use removal reason in logic (save manager)
         UUID uuid = body.getUuid();
-        simulatedWorld.execute(() -> removeBodyInternal(uuid));
+        simulatedWorld.execute(() -> removeBodyInternal(uuid, removalReason));
     }
 
     private void spawnBodyInternal(Body body, double px, double py, double pz, float qx, float qy, float qz, float qw,
@@ -98,7 +102,7 @@ public abstract class SimulatedBodyManager extends AbstractBodyManager {
         int bodyId = simulatedWorld.getJoltBridge().createAndAddJoltRigidBody(
                 body,
                 new RVec3(px, py, pz),
-                new com.github.stephengold.joltjni.Quat(qx, qy, qz, qw),
+                new Quat(qx, qy, qz, qw),
                 new Vec3(lvx, lvy, lvz),
                 new Vec3(avx, avy, avz),
                 EActivation.Activate,
@@ -116,7 +120,7 @@ public abstract class SimulatedBodyManager extends AbstractBodyManager {
         onBodyAdd(body, index);
     }
 
-    private void removeBodyInternal(UUID uuid) {
+    private void removeBodyInternal(UUID uuid, RemovalReason removalReason) {
         SimulatedBodyDataStore store = getBodyDataStore();
 
         int index = store.getIndexByUuid(uuid);
@@ -127,7 +131,7 @@ public abstract class SimulatedBodyManager extends AbstractBodyManager {
         SimulatedPhysicsStateContainer container = store.getPhysicsStateContainer();
         Body body = container.bodies[index];
 
-        onBodyRemove(body, index);
+        onBodyRemove(body, index, removalReason);
 
         int bodyId = container.joltBodyId.get(index);
         if (bodyId != SimulatedPhysicsStateContainer.INVALID_JOLT_BODY_ID) {
@@ -137,9 +141,15 @@ public abstract class SimulatedBodyManager extends AbstractBodyManager {
         store.removeBody(uuid);
     }
 
-    protected void onBodyAdd(Body body, int index) {
+    public void onPhysicsTick() {
+        // todo: check isActive state and send event
     }
 
-    protected void onBodyRemove(Body body, int index) {
+    protected void onBodyAdd(Body body, int index) {
+        BodyEventDispatcher.onBodyAdded(body);
+    }
+
+    protected void onBodyRemove(Body body, int index, RemovalReason removalReason) {
+        BodyEventDispatcher.onBodyRemoved(body, removalReason);
     }
 }

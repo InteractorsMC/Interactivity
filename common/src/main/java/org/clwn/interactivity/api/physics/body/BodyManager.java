@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 
 public interface BodyManager {
     <T extends Body> T spawnBody(BodyType<T> bodyType, RVec3Arg position, QuatArg rotation, Consumer<T> configurator);
-    void removeBody(Body body);
+    void removeBody(Body body, RemovalReason removalReason);
 
     Body getBody(UUID id);
 }

@@ -9,6 +9,7 @@ package org.clwn.interactivity.core.physics.body;
 
 import lombok.Getter;
 import org.clwn.interactivity.api.physics.body.Body;
+import org.clwn.interactivity.api.physics.body.RemovalReason;
 import org.clwn.interactivity.core.physics.body.store.ServerBodyDataStore;
 import org.clwn.interactivity.core.physics.body.store.SimulatedPhysicsStateContainer;
 import org.clwn.interactivity.core.physics.network.NetworkDispatcher;
@@ -28,6 +29,8 @@ public class ServerBodyManager extends SimulatedBodyManager {
 
     @Override
     protected void onBodyAdd(Body body, int index) {
+        super.onBodyAdd(body, index);
+
         SimulatedPhysicsStateContainer container = bodyDataStore.getPhysicsStateContainer();
 
         int networkId = NetworkIdAllocator.next();
@@ -40,7 +43,9 @@ public class ServerBodyManager extends SimulatedBodyManager {
     }
 
     @Override
-    protected void onBodyRemove(Body body, int index) {
+    protected void onBodyRemove(Body body, int index, RemovalReason removalReason) {
+        super.onBodyRemove(body, index, removalReason);
+
         SimulatedPhysicsStateContainer container = bodyDataStore.getPhysicsStateContainer();
 
         serverWorld.getNetworkDispatcher().onBodyRemove(container.networkId.get(index), container.chunkKey.get(index));

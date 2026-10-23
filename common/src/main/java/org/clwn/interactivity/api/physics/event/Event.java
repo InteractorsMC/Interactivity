@@ -7,10 +7,15 @@
  */
 package org.clwn.interactivity.api.physics.event;
 
+import lombok.Getter;
 import org.clwn.interactivity.api.physics.world.PhysicsWorld;
 
+// todo: body types and renderers registry could be refactored as events, and current Event could be changed to PhysicsWorldEvent, and event will be moved to api.event and core.event.external. I'm really not sure about this, but I will take a look at that when I will have time.
 public abstract class Event {
-    public Event(PhysicsWorld physicsWorld) {
+    @Getter
+    protected final PhysicsWorld physicsWorld;
 
+    public Event(PhysicsWorld physicsWorld) {
+        this.physicsWorld = physicsWorld;
     }
 }

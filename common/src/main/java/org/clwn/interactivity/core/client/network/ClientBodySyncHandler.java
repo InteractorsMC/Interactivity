@@ -13,7 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.physics.body.BodyType;
-import org.clwn.interactivity.core.client.physics.ClientPhysicsPipelineHelper;
+import org.clwn.interactivity.core.client.physics.ClientPhysicsPipelineImpl;
 import org.clwn.interactivity.core.client.physics.body.ClientBodyManager;
 import org.clwn.interactivity.core.client.physics.world.ClientPhysicsWorldInternal;
 import org.clwn.interactivity.core.network.packet.s2c.S2CBodyRemovePacket;
@@ -37,7 +37,7 @@ public final class ClientBodySyncHandler {
     }
 
     public static void handleSpawn(S2CBodySpawnPacket packet) {
-        ClientPhysicsWorldInternal world = ClientPhysicsPipelineHelper.getCurrentPhysicsWorld();
+        ClientPhysicsWorldInternal world = ClientPhysicsPipelineImpl.INSTANCE.getCurrentPhysicsWorld();
 
         // In-flight packet of a level the client has already left
         if (world == null || !world.getClientLevel().dimension().equals(packet.dimension())) {
@@ -64,7 +64,7 @@ public final class ClientBodySyncHandler {
     }
 
     public static void handleRemove(S2CBodyRemovePacket packet) {
-        ClientPhysicsWorldInternal world = ClientPhysicsPipelineHelper.getCurrentPhysicsWorld();
+        ClientPhysicsWorldInternal world = ClientPhysicsPipelineImpl.INSTANCE.getCurrentPhysicsWorld();
 
         if (world == null || !world.getClientLevel().dimension().equals(packet.dimension())) {
             return;
@@ -76,7 +76,7 @@ public final class ClientBodySyncHandler {
     }
 
     public static void handleStates(int tick, int count, byte[] data, int length) {
-        ClientPhysicsWorldInternal world = ClientPhysicsPipelineHelper.getCurrentPhysicsWorld();
+        ClientPhysicsWorldInternal world = ClientPhysicsPipelineImpl.INSTANCE.getCurrentPhysicsWorld();
         if (world == null) {
             return;
         }

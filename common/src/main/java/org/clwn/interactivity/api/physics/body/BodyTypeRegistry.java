@@ -16,6 +16,7 @@ import java.util.function.Consumer;
 public interface BodyTypeRegistry {
     <T extends Body> BodyType<T> registerBodyType(
             ResourceLocation typeId,
+            Class<T> bodyClass,
             BodyType.Factory<T> factory,
             Consumer<BodyType.Builder<T>> configure
     );

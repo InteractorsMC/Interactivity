@@ -27,13 +27,18 @@ public final class BodyTypeImpl<T extends Body> implements BodyType<T> {
     @Getter
     private final long behaviorMask;
 
+    @Getter
+    private final Class<T> bodyClass;
+
     BodyTypeImpl(
             ResourceLocation typeId,
+            Class<T> bodyClass,
             BodyType.Factory<T> factory,
             Map<Class<? extends Behavior>, Behavior> behaviors,
             long behaviorMask
     ) {
         this.typeId = typeId;
+        this.bodyClass = bodyClass;
         this.factory = factory;
         this.behaviors = Map.copyOf(new LinkedHashMap<>(behaviors));
         this.behaviorMask = behaviorMask;

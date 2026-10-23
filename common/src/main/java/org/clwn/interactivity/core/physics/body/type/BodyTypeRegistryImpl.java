@@ -8,10 +8,12 @@
 package org.clwn.interactivity.core.physics.body.type;
 
 import net.minecraft.resources.ResourceLocation;
+import org.clwn.interactivity.api.physics.behavior.EventListenerBehavior;
 import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.physics.body.BodyType;
 import org.clwn.interactivity.api.physics.body.BodyTypeRegistry;
 import org.clwn.interactivity.core.physics.behavior.BehaviorRegistryImpl;
+import org.clwn.interactivity.core.physics.event.EventBusImpl;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -33,6 +35,7 @@ public final class BodyTypeRegistryImpl implements BodyTypeRegistry {
     @Override
     public synchronized <T extends Body> BodyType<T> registerBodyType(
             ResourceLocation typeId,
+            Class<T> bodyClass,
             BodyType.Factory<T> factory,
             Consumer<BodyType.Builder<T>> configure
     ) {
@@ -52,8 +55,13 @@ public final class BodyTypeRegistryImpl implements BodyTypeRegistry {
         BodyTypeBuilderImpl<T> builder = new BodyTypeBuilderImpl<>();
         configure.accept(builder);
 
-        BodyTypeImpl<T> bodyType = builder.build(typeId, factory, behaviorRegistry);
+        BodyTypeImpl<T> bodyType = builder.build(typeId, bodyClass, factory, behaviorRegistry);
         bodyTypes.put(typeId, bodyType);
+
+        if (bodyType.hasBehavior(EventListenerBehavior.class)) {
+            EventBusImpl.INSTANCE.registerBodyType(bodyType);
+        }
+
         return bodyType;
     }
 

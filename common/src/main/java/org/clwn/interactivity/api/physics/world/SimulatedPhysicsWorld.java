@@ -22,4 +22,9 @@ public interface SimulatedPhysicsWorld extends PhysicsWorld {
     boolean isRollingBack();
 
     JoltBridge getJoltBridge();
+
+    @Override
+    default boolean isSimulated() {
+        return true;
+    }
 }

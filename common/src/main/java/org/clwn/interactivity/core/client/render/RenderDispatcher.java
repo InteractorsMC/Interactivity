@@ -15,7 +15,7 @@ import org.clwn.interactivity.api.client.physics.render.BodyRenderer;
 import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.core.client.event.render.LevelExtractionEvents;
 import org.clwn.interactivity.core.client.event.render.LevelRenderEvents;
-import org.clwn.interactivity.core.client.physics.ClientPhysicsPipelineHelper;
+import org.clwn.interactivity.core.client.physics.ClientPhysicsPipelineImpl;
 import org.clwn.interactivity.core.client.physics.render.BodyRendererRegistryImpl;
 import org.clwn.interactivity.core.client.physics.world.ClientPhysicsWorldInternal;
 import org.clwn.interactivity.core.client.render.sampler.ExtrapolationSampler;
@@ -69,7 +69,7 @@ public class RenderDispatcher {
     private void extract(LevelExtractionEvents.LevelExtractionContext context) {
         activeSlotCount = 0;
 
-        ClientPhysicsWorldInternal world = ClientPhysicsPipelineHelper.getCurrentPhysicsWorld();
+        ClientPhysicsWorldInternal world = ClientPhysicsPipelineImpl.INSTANCE.getCurrentPhysicsWorld();
         if (world == null || !world.getClock().isSynchronised()) {
             return;
         }

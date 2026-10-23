@@ -8,7 +8,7 @@
 - [X] Basic physics with network sync
 - [X] Custom registries containing body types, renderer, behavior system
 - [X] Adding custom bodies to physics world
-- [ ] Event system
+- [X] Event system
 - [ ] Built-in physics gun
 - [ ] Terrain generation
 - [ ] Constraints system

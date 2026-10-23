@@ -12,6 +12,7 @@ import com.github.stephengold.joltjni.readonly.RVec3Arg;
 import lombok.Getter;
 import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.physics.body.BodyType;
+import org.clwn.interactivity.api.physics.body.RemovalReason;
 import org.clwn.interactivity.core.client.physics.body.store.EstimatedClientBodyDataStore;
 import org.clwn.interactivity.core.client.physics.world.EstimatedClientPhysicsWorldImpl;
 import org.clwn.interactivity.core.physics.body.AbstractBodyManager;
@@ -91,7 +92,7 @@ public class EstimatedClientBodyManager extends AbstractBodyManager implements C
     }
 
     @Override
-    public void removeBody(Body body) {
+    public void removeBody(Body body, RemovalReason removalReason) {
         throw new UnsupportedOperationException("Bodies of a non-simulated client world can only be removed by the server");
     }
 }

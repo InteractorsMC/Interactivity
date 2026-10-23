@@ -10,4 +10,8 @@ package org.clwn.interactivity.api.client.physics.world;
 import org.clwn.interactivity.api.physics.world.PhysicsWorld;
 
 public interface EstimatedClientPhysicsWorld extends PhysicsWorld, ClientPhysicsWorld {
+    @Override
+    default boolean isSimulated() {
+        return false;
+    }
 }

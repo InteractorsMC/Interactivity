@@ -14,7 +14,7 @@ import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.api.physics.world.SimulatedPhysicsWorld;
 import org.clwn.interactivity.core.config.InteractivityConfig;
 import org.clwn.interactivity.core.physics.body.SimulatedBodyManager;
-import org.clwn.interactivity.core.physics.system.PhysicsWorldEventDispatcher;
+import org.clwn.interactivity.core.physics.system.SimulationEventDispatcher;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Queue;
@@ -94,7 +94,7 @@ public abstract class SimulatedPhysicsWorldImpl extends PhysicsWorldImpl impleme
         // noinspection NonAtomicOperationOnVolatileField
         tick++;
 
-        PhysicsWorldEventDispatcher.prePhysicsTick(this);
+        SimulationEventDispatcher.prePhysicsTick(this, fixedTimeStep);
 
         int error = this.physicsSimulation.simulate(fixedTimeStep, 1);
 
@@ -110,9 +110,10 @@ public abstract class SimulatedPhysicsWorldImpl extends PhysicsWorldImpl impleme
 
         this.batchPhysicsSync.sync();
 
-        PhysicsWorldEventDispatcher.postPhysicsTick(this);
+        SimulationEventDispatcher.postPhysicsTick(this, fixedTimeStep);
 
         try {
+            getBodyManager().onPhysicsTick();
             afterSync(tick);
         } catch (Exception e) {
             Interactivity.LOGGER.error("Exception after physics sync", e);

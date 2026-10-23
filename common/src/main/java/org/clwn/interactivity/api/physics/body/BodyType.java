@@ -20,6 +20,8 @@ import java.util.UUID;
 public interface BodyType<T extends Body> {
     ResourceLocation getTypeId();
 
+    Class<T> getBodyClass();
+
     T create(PhysicsWorld world, UUID uuid);
 
     Set<Behavior> getBehaviors();

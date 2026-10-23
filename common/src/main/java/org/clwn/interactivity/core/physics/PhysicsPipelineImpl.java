@@ -16,14 +16,12 @@ import net.minecraft.world.level.Level;
 import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.api.physics.PhysicsPipeline;
 import org.clwn.interactivity.api.physics.world.PhysicsWorld;
-import org.clwn.interactivity.core.client.physics.ClientPhysicsPipelineHelper;
 import org.clwn.interactivity.core.event.lifecycle.LevelLifecycleEvents;
 import org.clwn.interactivity.core.event.lifecycle.LevelTickEvents;
 import org.clwn.interactivity.core.network.packet.s2c.S2CPhysicsConfigPacket;
 import org.clwn.interactivity.core.physics.world.PhysicsSimulationConfig;
 import org.clwn.interactivity.core.physics.world.PhysicsWorldImpl;
 import org.clwn.interactivity.core.physics.world.ServerPhysicsWorldImpl;
-import org.clwn.interactivity.core.util.platform.Services;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -57,10 +55,6 @@ public class PhysicsPipelineImpl implements PhysicsPipeline {
 
         this.physicsLayerRegistry = new PhysicsLayerRegistryImpl();
         this.physicsSimulationConfig = new PhysicsSimulationConfig(this.physicsLayerRegistry);
-
-        if (Services.PLATFORM.isClientEnvironment()) {
-            new ClientPhysicsPipelineHelper(this);
-        }
     }
 
     // todo: reset config on client on disconnect

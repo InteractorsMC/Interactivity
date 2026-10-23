@@ -16,11 +16,13 @@ import com.github.stephengold.joltjni.BoxShapeSettings;
 import com.github.stephengold.joltjni.ShapeSettings;
 import com.github.stephengold.joltjni.Vec3;
 import com.github.stephengold.joltjni.enumerate.EMotionType;
+import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.api.physics.ObjectLayer;
-import org.clwn.interactivity.api.physics.PhysicsLayerRegistry;
 import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.physics.body.BodyType;
 import org.clwn.interactivity.api.physics.body.RigidBodyFactory;
+import org.clwn.interactivity.api.physics.event.BodyEvent;
+import org.clwn.interactivity.api.physics.event.SubscribeEvent;
 import org.clwn.interactivity.api.physics.world.PhysicsWorld;
 
 import java.util.UUID;
@@ -39,5 +41,10 @@ public class BlockRigidBody extends Body {
             bcs.setObjectLayer(ObjectLayer.MOVING.getValue());
             return factory.create(shapeSettings, bcs);
         }
+    }
+
+    @SubscribeEvent
+    public void onBodyEvent(BodyEvent bodyEvent) {
+        Interactivity.LOGGER.info("Body event {} called for {}", bodyEvent.getClass().getSimpleName(), bodyEvent.getBody().getClass().getSimpleName());
     }
 }

@@ -8,12 +8,12 @@
 package org.clwn.interactivity.core.client.physics.world;
 
 import net.minecraft.client.multiplayer.ClientLevel;
-import org.clwn.interactivity.api.physics.world.PhysicsWorld;
+import org.clwn.interactivity.api.client.physics.world.ClientPhysicsWorld;
 import org.clwn.interactivity.core.client.physics.ClientPhysicsClock;
 import org.clwn.interactivity.core.client.physics.body.ClientBodyManager;
 import org.clwn.interactivity.core.physics.body.AbstractBodyManager;
 
-public interface ClientPhysicsWorldInternal extends PhysicsWorld {
+public interface ClientPhysicsWorldInternal extends ClientPhysicsWorld {
     ClientLevel getClientLevel();
 
     ClientPhysicsClock getClock();

@@ -16,7 +16,6 @@ import org.clwn.interactivity.api.network.NetworkPacket;
 import org.clwn.interactivity.api.network.NetworkTransport;
 import org.clwn.interactivity.api.network.PacketContext;
 import org.clwn.interactivity.core.event.lifecycle.PlayerLifecycleEvents;
-import org.clwn.interactivity.core.event.lifecycle.ServerLifecycleEvents;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;

@@ -25,6 +25,7 @@ public final class BodyRegistry {
     public static void register() {
         BLOCK_BODY = InteractivityAPI.getInstance().getBodyTypeRegistry().registerBodyType(
                 InteractivityIdentifier.getIdentifier("block"),
+                BlockRigidBody.class,
                 BlockRigidBody::new,
                 (bodyBuilder -> bodyBuilder.addBehaviors(
                         new RigidBehavior(BlockRigidBody::createJoltBody),

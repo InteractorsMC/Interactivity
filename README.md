@@ -9,8 +9,8 @@
 - [X] Custom registries containing body types, renderer, behavior system
 - [X] Adding custom bodies to physics world
 - [X] Event system
-- [ ] Built-in physics gun
-- [ ] Terrain generation
+- [X] Built-in physics gun
+- [X] Terrain generation
 - [ ] Constraints system
 - [ ] Save manager
 - [ ] Native ContactListeners

@@ -23,12 +23,9 @@ import net.minecraft.world.level.ChunkPos;
 import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.api.InteractivityAPI;
 import org.clwn.interactivity.api.physics.body.Body;
-import org.clwn.interactivity.core.event.lifecycle.PlayerLifecycleEvents;
 import org.clwn.interactivity.core.network.packet.s2c.S2CBodyRemovePacket;
 import org.clwn.interactivity.core.network.packet.s2c.S2CBodySpawnPacket;
 import org.clwn.interactivity.core.network.packet.s2c.S2CBodyStatesPacket;
-import org.clwn.interactivity.core.network.packet.s2c.S2CPhysicsConfigPacket;
-import org.clwn.interactivity.core.physics.PhysicsPipelineImpl;
 import org.clwn.interactivity.core.physics.body.store.SimulatedPhysicsStateContainer;
 import org.clwn.interactivity.core.physics.world.ServerPhysicsWorldImpl;
 import org.clwn.interactivity.core.util.platform.Services;
@@ -60,13 +57,6 @@ public class NetworkDispatcher {
     public NetworkDispatcher(ServerPhysicsWorldImpl world) {
         this.world = world;
         this.networkIdToIndex.defaultReturnValue(-1);
-
-        PlayerLifecycleEvents.PLAYER_JOIN_EVENT.subscribe(event -> Services.PLATFORM_NETWORK.sendPacketToPlayer(
-                event.player(),
-                new S2CPhysicsConfigPacket(PhysicsPipelineImpl.INSTANCE.getPhysicsSimulationConfig()),
-                INetworkingHelper.PacketStageType.PLAY,
-                null
-        ));
     }
 
     public static long chunkKeyOf(double x, double z) {

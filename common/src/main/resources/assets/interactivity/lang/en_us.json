@@ -11,6 +11,12 @@
   "interactivity.midnightconfig.maxCoresAmount": "Physics simulation cores",
   "interactivity.midnightconfig.maxCoresAmount.tooltip": "The maximum number of CPU cores to use for physics simulation per world. If more than available cores, uses all available cores. Default to maximum available cores.",
 
+  "interactivity.midnightconfig.category.terrain": "Terrain",
+  "interactivity.midnightconfig.terrainGenerationEnabled": "Generate terrain collision",
+  "interactivity.midnightconfig.terrainGenerationEnabled.tooltip": "Builds physics collision from the blocks of loaded chunks. Applies to worlds loaded after the change.",
+  "interactivity.midnightconfig.terrainPauseOnBlockUpdates": "Pause physics on block updates",
+  "interactivity.midnightconfig.terrainPauseOnBlockUpdates.tooltip": "Physics always pauses while a loaded chunk's collision is built. When enabled, it also pauses while collision is rebuilt after blocks change, so bodies never touch outdated terrain, at the cost of stutter during heavy block changes.",
+
   "interactivity.midnightconfig.category.network": "Network",
   "interactivity.midnightconfig.networkTransportComment": "Priorities for default networking transports. If you want to disable other transports, set their priority to -1.",
   "interactivity.midnightconfig.localTransport": "Local transport priority",
@@ -29,6 +35,8 @@
   "interactivity.midnightconfig.cullingInflation.tooltip": "Bodies are hidden when their bounding box, grown by this much, is outside of the screen.",
 
   "interactivity.midnightconfig.category.dev": "Developer",
+  "interactivity.midnightconfig.devGroundPlane": "Ground plane",
+  "interactivity.midnightconfig.devGroundPlane.tooltip": "Adds a static 64x64 floor with its top at y = 0. Applies to worlds loaded after the change.",
   "interactivity.midnightconfig.uselessDevOption": "Useless developer option",
   "interactivity.midnightconfig.uselessDevOption.tooltip": "This option does nothing useful: turn it on and try to find out what it does!"
 }

@@ -17,8 +17,16 @@ import lombok.Getter;
 import net.minecraft.server.level.ServerLevel;
 import org.clwn.interactivity.api.physics.ObjectLayer;
 import org.clwn.interactivity.api.physics.world.ServerPhysicsWorld;
+import org.clwn.interactivity.core.config.InteractivityConfig;
+import org.clwn.interactivity.core.event.Event;
+import org.clwn.interactivity.core.event.lifecycle.BlockChangeEvents;
+import org.clwn.interactivity.core.event.lifecycle.ChunkLifecycleEvents;
+import org.clwn.interactivity.core.event.lifecycle.LevelTickEvents;
 import org.clwn.interactivity.core.physics.body.ServerBodyManager;
 import org.clwn.interactivity.core.physics.network.NetworkDispatcher;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ServerPhysicsWorldImpl extends SimulatedPhysicsWorldImpl implements ServerPhysicsWorld {
     @Getter
@@ -30,6 +38,8 @@ public class ServerPhysicsWorldImpl extends SimulatedPhysicsWorldImpl implements
     @Getter
     protected final NetworkDispatcher networkDispatcher;
 
+    private final List<Event.Subscription> subscriptions = new ArrayList<>();
+
     public ServerPhysicsWorldImpl(ServerLevel level, PhysicsSimulationConfig physicsSimulationConfig) {
         super(level, physicsSimulationConfig);
         this.serverLevel = level;
@@ -40,7 +50,38 @@ public class ServerPhysicsWorldImpl extends SimulatedPhysicsWorldImpl implements
     public void init() {
         super.init();
 
-        execute(this::createGroundPlane);
+        subscriptions.add(ChunkLifecycleEvents.CHUNK_LOAD_EVENT.subscribe(event -> {
+            if (event.level() == serverLevel) {
+                onChunkLoad(event.chunk());
+            }
+        }));
+        subscriptions.add(ChunkLifecycleEvents.CHUNK_UNLOAD_EVENT.subscribe(event -> {
+            if (event.level() == serverLevel) {
+                onChunkUnload(event.chunk());
+            }
+        }));
+        subscriptions.add(BlockChangeEvents.BLOCK_CHANGED_EVENT.subscribe(event -> {
+            if (event.level() == serverLevel) {
+                onBlockChanged(event.chunk(), event.pos(), event.oldState(), event.newState());
+            }
+        }));
+        subscriptions.add(LevelTickEvents.END.subscribe(event -> {
+            if (event.level() == serverLevel) {
+                onLevelTickEnd();
+            }
+        }));
+
+        if (InteractivityConfig.devGroundPlane) {
+            execute(this::createGroundPlane);
+        }
+    }
+
+    @Override
+    public void close() {
+        subscriptions.forEach(Event.Subscription::close);
+        subscriptions.clear();
+
+        super.close();
     }
 
     @Override
@@ -52,8 +93,6 @@ public class ServerPhysicsWorldImpl extends SimulatedPhysicsWorldImpl implements
      * Creates a static 64x64 floor so bodies have something to land on.
      * Its top face is at y = 0. It is a plain Jolt body, not a {@link org.clwn.interactivity.api.physics.body.Body},
      * so it is neither synchronized nor rendered.
-     * <p>
-     * todo: remove once terrain generation exists
      */
     private void createGroundPlane() {
         try (

@@ -11,6 +11,7 @@ import eu.midnightdust.lib.config.MidnightConfig;
 
 public class InteractivityConfig extends MidnightConfig {
     public static final String PHYSICS = "physics";
+    public static final String TERRAIN = "terrain";
     public static final String NETWORK = "network";
     public static final String RENDER = "render";
     public static final String DEV = "dev";
@@ -36,6 +37,11 @@ public class InteractivityConfig extends MidnightConfig {
     )
     public static int maxCoresAmount = AVAILABLE_CORES;
 
+    @Entry(category = TERRAIN)
+    public static boolean terrainGenerationEnabled = true;
+
+    @Entry(category = TERRAIN)
+    public static boolean terrainPauseOnBlockUpdates = false;
 
     @Comment(category = NETWORK)
     public static Comment networkTransportComment;
@@ -110,4 +116,7 @@ public class InteractivityConfig extends MidnightConfig {
 
     @Entry(category = DEV)
     public static boolean uselessDevOption = false;
+
+    @Entry(category = DEV)
+    public static boolean devGroundPlane = false;
 }

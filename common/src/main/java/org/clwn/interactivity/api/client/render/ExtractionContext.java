@@ -30,5 +30,7 @@ public interface ExtractionContext {
      * The (fractional) physics tick that is on screen this frame.
      */
     double getRenderTick();
+
+    int getPackedLight();
 }
 

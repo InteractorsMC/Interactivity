@@ -8,18 +8,17 @@
 package org.clwn.interactivity.neoforge.event;
 
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.level.ChunkEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.clwn.interactivity.Interactivity;
-import org.clwn.interactivity.core.event.lifecycle.CommandRegistrationEvents;
-import org.clwn.interactivity.core.event.lifecycle.LevelLifecycleEvents;
-import org.clwn.interactivity.core.event.lifecycle.LevelTickEvents;
-import org.clwn.interactivity.core.event.lifecycle.ServerLifecycleEvents;
+import org.clwn.interactivity.core.event.lifecycle.*;
 
 @EventBusSubscriber(modid = Interactivity.MOD_ID)
 public class EventNotifierNeoforge {
@@ -63,6 +62,20 @@ public class EventNotifierNeoforge {
             LevelLifecycleEvents.LEVEL_UNLOAD_EVENT.publish(new LevelLifecycleEvents.ServerLevelEvent(serverLevel));
         } else {
             Interactivity.LOGGER.info("Level unload event received for a non-server level: {}", event.getLevel()); // todo: remove
+        }
+    }
+
+    @SubscribeEvent
+    public static void chunkLoad(ChunkEvent.Load event) {
+        if (event.getLevel() instanceof ServerLevel serverLevel && event.getChunk() instanceof LevelChunk chunk) {
+            ChunkLifecycleEvents.CHUNK_LOAD_EVENT.publish(new ChunkLifecycleEvents.ServerChunkEvent(serverLevel, chunk));
+        }
+    }
+
+    @SubscribeEvent
+    public static void chunkUnload(ChunkEvent.Unload event) {
+        if (event.getLevel() instanceof ServerLevel serverLevel && event.getChunk() instanceof LevelChunk chunk) {
+            ChunkLifecycleEvents.CHUNK_UNLOAD_EVENT.publish(new ChunkLifecycleEvents.ServerChunkEvent(serverLevel, chunk));
         }
     }
 }

@@ -18,10 +18,13 @@ import org.clwn.interactivity.api.physics.PhysicsPipeline;
 import org.clwn.interactivity.api.physics.world.PhysicsWorld;
 import org.clwn.interactivity.core.event.lifecycle.LevelLifecycleEvents;
 import org.clwn.interactivity.core.event.lifecycle.LevelTickEvents;
+import org.clwn.interactivity.core.event.lifecycle.PlayerLifecycleEvents;
 import org.clwn.interactivity.core.network.packet.s2c.S2CPhysicsConfigPacket;
 import org.clwn.interactivity.core.physics.world.PhysicsSimulationConfig;
 import org.clwn.interactivity.core.physics.world.PhysicsWorldImpl;
 import org.clwn.interactivity.core.physics.world.ServerPhysicsWorldImpl;
+import org.clwn.interactivity.core.util.platform.Services;
+import org.clwn.interactivity.core.util.platform.services.INetworkingHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -41,6 +44,7 @@ public class PhysicsPipelineImpl implements PhysicsPipeline {
         LevelLifecycleEvents.LEVEL_LOAD_EVENT.subscribe((event) -> createServerPhysicsWorld(event.level()));
         LevelLifecycleEvents.LEVEL_UNLOAD_EVENT.subscribe((event) -> removePhysicsWorld(event.level()));
         LevelTickEvents.END.subscribe(this::publishPlayers);
+        PlayerLifecycleEvents.PLAYER_JOIN_EVENT.subscribe(this::notifyConfig);
 
         JoltPhysicsObject.startCleaner();
         Jolt.registerDefaultAllocator();
@@ -98,9 +102,19 @@ public class PhysicsPipelineImpl implements PhysicsPipeline {
         physicsWorld.close();
     }
 
+    // todo: this is not really appropriate place for networking
     private void publishPlayers(LevelTickEvents.ServerLevelTickEvent event) {
         if (physicsWorlds.get(event.level()) instanceof ServerPhysicsWorldImpl serverWorld) {
             serverWorld.getNetworkDispatcher().publishPlayers(event.level());
         }
+    }
+
+    private void notifyConfig(PlayerLifecycleEvents.PlayerJoinEvent event) {
+        Services.PLATFORM_NETWORK.sendPacketToPlayer(
+                event.player(),
+                new S2CPhysicsConfigPacket(physicsSimulationConfig),
+                INetworkingHelper.PacketStageType.PLAY,
+                null
+        );
     }
 }

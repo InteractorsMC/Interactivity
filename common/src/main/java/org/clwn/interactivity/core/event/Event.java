@@ -9,14 +9,22 @@ package org.clwn.interactivity.core.event;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 public final class Event<T> {
 
     private final List<Consumer<T>> listeners = new CopyOnWriteArrayList<>();
 
-    public void subscribe(Consumer<T> listener) {
+    public Subscription subscribe(Consumer<T> listener) {
         listeners.add(listener);
+
+        AtomicBoolean closed = new AtomicBoolean();
+        return () -> {
+            if (closed.compareAndSet(false, true)) {
+                unsubscribe(listener);
+            }
+        };
     }
 
     public void unsubscribe(Consumer<T> listener) {
@@ -27,5 +35,11 @@ public final class Event<T> {
         for (Consumer<T> listener : listeners) {
             listener.accept(event);
         }
+    }
+
+    @FunctionalInterface
+    public interface Subscription extends AutoCloseable {
+        @Override
+        void close();
     }
 }

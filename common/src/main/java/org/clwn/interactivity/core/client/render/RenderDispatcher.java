@@ -8,7 +8,9 @@
 package org.clwn.interactivity.core.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.clwn.interactivity.api.client.physics.render.BodyRenderer;
@@ -61,6 +63,8 @@ public class RenderDispatcher {
     private final ExtractionContextImpl extractionContext = new ExtractionContextImpl();
     private final RenderContextImpl renderContext = new RenderContextImpl();
 
+    private final BlockPos.MutableBlockPos reusableBlockPos = new BlockPos.MutableBlockPos();
+
     public RenderDispatcher() {
         LevelExtractionEvents.EXTRACTION_END.subscribe(this::extract);
         LevelRenderEvents.AFTER_ENTITIES.subscribe(this::render);
@@ -86,7 +90,8 @@ public class RenderDispatcher {
                 : interpolationSampler;
 
         Vec3 camera = context.camera().getPosition();
-        extractionContext.beginFrame(camera.x, camera.y, camera.z, renderTick);
+
+        extractionContext.beginFrame(camera.x, camera.y, camera.z, renderTick, 0);
 
         for (int i = 0; i < slotCount; i++) {
             RenderSlot slot = slots[i];
@@ -117,6 +122,7 @@ public class RenderDispatcher {
             }
 
             extractionContext.setPose(slot.pose);
+            extractionContext.setPackedLight(LevelRenderer.getLightColor(world.getLevel(), reusableBlockPos.set(slot.pose.x, slot.pose.y, slot.pose.z)));
             slot.renderer.extract(extractionContext, body, slot.state);
             slot.visible = true;
         }

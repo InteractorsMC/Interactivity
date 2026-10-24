@@ -61,8 +61,8 @@ endif()
 
 # Define Shared Library
 add_library(interactivity_natives SHARED
-    src/test_jni.cpp
     src/physics_sync.cpp
+    src/terrain_shape.cpp
 )
 
 target_include_directories(interactivity_natives PRIVATE

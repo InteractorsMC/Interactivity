@@ -9,6 +9,8 @@ package org.clwn.interactivity.core.physics.world;
 
 import lombok.Setter;
 
+import java.util.function.BooleanSupplier;
+
 /**
  * A class that runs the physics simulation in a separate thread.
  * <p>
@@ -24,17 +26,16 @@ public class PhysicsRunner implements Runnable {
     private static final double MAX_ACCUMULATED_TIME = 0.25;
     private static final int MAX_PHYSICS_STEPS_PER_FRAME = 8;
 
-    private boolean isRunning = true;
-    @Setter
-    private boolean isPaused;
+    private volatile boolean isRunning = true;
 
     private final Runnable physicsUpdater;
     private final Runnable queueExecutor;
+    private final BooleanSupplier pauseCondition;
 
-    public PhysicsRunner(Runnable physicsUpdater, Runnable queueExecutor, boolean isPaused, double fixedTimeStep) {
+    public PhysicsRunner(Runnable physicsUpdater, Runnable queueExecutor, BooleanSupplier pauseCondition, double fixedTimeStep) {
         this.physicsUpdater = physicsUpdater;
         this.queueExecutor = queueExecutor;
-        this.isPaused = isPaused;
+        this.pauseCondition = pauseCondition;
         this.fixedTimeStep = fixedTimeStep;
     }
 
@@ -53,14 +54,13 @@ public class PhysicsRunner implements Runnable {
             // Prevent a long pause/scheduling stall from producing a huge physics update.
             deltaTime = Math.min(deltaTime, MAX_ACCUMULATED_TIME);
 
-            if (!this.isPaused) {
+            if (!this.pauseCondition.getAsBoolean()) {
                 accumulator += deltaTime;
                 accumulator = Math.min(accumulator, MAX_ACCUMULATED_TIME);
 
                 int physicsSteps = 0;
 
-                while (accumulator >= fixedTimeStep && physicsSteps < MAX_PHYSICS_STEPS_PER_FRAME) {
-
+                while (accumulator >= fixedTimeStep && physicsSteps < MAX_PHYSICS_STEPS_PER_FRAME && !this.pauseCondition.getAsBoolean()) {
                     physicsUpdater.run();
 
                     accumulator -= fixedTimeStep;

@@ -10,13 +10,11 @@ package org.clwn.interactivity.fabric.event;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import org.clwn.interactivity.core.event.lifecycle.CommandRegistrationEvents;
-import org.clwn.interactivity.core.event.lifecycle.LevelLifecycleEvents;
-import org.clwn.interactivity.core.event.lifecycle.LevelTickEvents;
-import org.clwn.interactivity.core.event.lifecycle.ServerLifecycleEvents;
+import org.clwn.interactivity.core.event.lifecycle.*;
 
 public class EventNotifierFabric {
     public static void registerEvents() {
@@ -32,6 +30,11 @@ public class EventNotifierFabric {
         ServerWorldEvents.LOAD.register((server, level) -> LevelLifecycleEvents.LEVEL_LOAD_EVENT.publish(new LevelLifecycleEvents.ServerLevelEvent(level)));
 
         ServerWorldEvents.UNLOAD.register((server, level) -> LevelLifecycleEvents.LEVEL_UNLOAD_EVENT.publish(new LevelLifecycleEvents.ServerLevelEvent(level)));
+
+        ServerChunkEvents.CHUNK_LOAD.register((level, chunk) -> ChunkLifecycleEvents.CHUNK_LOAD_EVENT.publish(new ChunkLifecycleEvents.ServerChunkEvent(level, chunk)));
+
+        ServerChunkEvents.CHUNK_UNLOAD.register((level, chunk) -> ChunkLifecycleEvents.CHUNK_UNLOAD_EVENT.publish(new ChunkLifecycleEvents.ServerChunkEvent(level, chunk)));
+
 
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
             registerClientEvents();

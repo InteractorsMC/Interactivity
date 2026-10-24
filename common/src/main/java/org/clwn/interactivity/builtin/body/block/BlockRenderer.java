@@ -11,13 +11,10 @@
  */
 package org.clwn.interactivity.builtin.body.block;
 
-import lombok.Getter;
-import lombok.Setter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.phys.Vec3;
 import org.clwn.interactivity.api.client.physics.render.BodyRenderer;
 import org.clwn.interactivity.api.client.render.ExtractionContext;
 import org.clwn.interactivity.api.client.render.RenderContext;
@@ -26,11 +23,12 @@ import org.clwn.interactivity.api.physics.body.Body;
 public class BlockRenderer implements BodyRenderer<BlockRenderer.BlockRenderState> {
     @Override
     public BlockRenderState createState() {
-        return new BlockRenderState(Vec3.ZERO, Vec3.ZERO);
+        return new BlockRenderState(0);
     }
 
     @Override
     public void extract(ExtractionContext context, Body body, BlockRenderState state) {
+        state.packedLight = context.getPackedLight();
     }
 
     @Override
@@ -43,20 +41,16 @@ public class BlockRenderer implements BodyRenderer<BlockRenderer.BlockRenderStat
                 Blocks.STONE.defaultBlockState(),
                 Minecraft.getInstance().getBlockRenderer().getBlockModel(Blocks.STONE.defaultBlockState()),
                 255, 255, 255,
-                15728880,
+                state.packedLight,
                 OverlayTexture.NO_OVERLAY
         );
     }
 
     public static class BlockRenderState {
-        @Getter @Setter
-        public Vec3 position;
-        @Getter @Setter
-        public Vec3 rotation;
+        public int packedLight;
 
-        public BlockRenderState(Vec3 position, Vec3 rotation) {
-            this.position = position;
-            this.rotation = rotation;
+        public BlockRenderState(int packedLight) {
+            this.packedLight = packedLight;
         }
     }
 }

@@ -1,5 +1,6 @@
 package org.clwn.interactivity.core.physics.body.store;
 
+import com.github.stephengold.joltjni.Jolt;
 import lombok.Getter;
 import lombok.Setter;
 import org.clwn.interactivity.core.util.buffer.BufferUtils;
@@ -16,11 +17,6 @@ import java.nio.LongBuffer;
  * the Jolt body id, the chunk the body is currently tracked in, and the dirty tracking used by network synchronization.
  */
 public class SimulatedPhysicsStateContainer extends PhysicsStateContainer {
-    /**
-     * Value of {@link #joltBodyId} for slots that have no Jolt body (equals {@code JPH::BodyID::cInvalidBodyID}).
-     */
-    public static final int INVALID_JOLT_BODY_ID = -1;
-
     /**
      * Whether the slot is already listed in {@link #dirtyIndices} for the current tick.
      * <p>
@@ -42,7 +38,7 @@ public class SimulatedPhysicsStateContainer extends PhysicsStateContainer {
     private int dirtyCount;
 
     /**
-     * Jolt body id of each slot, {@link #INVALID_JOLT_BODY_ID} when the slot has no Jolt body yet.
+     * Jolt body id of each slot, {@link Jolt#cInvalidBodyId} when the slot has no Jolt body yet.
      */
     public final IntBuffer joltBodyId;
 
@@ -59,7 +55,7 @@ public class SimulatedPhysicsStateContainer extends PhysicsStateContainer {
         this.chunkKey = ByteBuffer.allocateDirect(capacity * Long.BYTES).order(ByteOrder.nativeOrder()).asLongBuffer();
 
         for (int i = 0; i < capacity; i++) {
-            this.joltBodyId.put(i, INVALID_JOLT_BODY_ID);
+            this.joltBodyId.put(i, Jolt.cInvalidBodyId);
             this.chunkKey.put(i, Long.MAX_VALUE);
         }
     }
@@ -88,7 +84,7 @@ public class SimulatedPhysicsStateContainer extends PhysicsStateContainer {
         super.reset(index);
 
         this.isDirty.put(index, (byte) 0);
-        this.joltBodyId.put(index, INVALID_JOLT_BODY_ID);
+        this.joltBodyId.put(index, Jolt.cInvalidBodyId);
         this.chunkKey.put(index, Long.MAX_VALUE);
     }
 }

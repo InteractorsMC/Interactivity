@@ -7,6 +7,7 @@
  */
 package org.clwn.interactivity.core.physics.body;
 
+import com.github.stephengold.joltjni.Jolt;
 import com.github.stephengold.joltjni.Quat;
 import com.github.stephengold.joltjni.RVec3;
 import com.github.stephengold.joltjni.Vec3;
@@ -134,7 +135,7 @@ public abstract class SimulatedBodyManager extends AbstractBodyManager {
         onBodyRemove(body, index, removalReason);
 
         int bodyId = container.joltBodyId.get(index);
-        if (bodyId != SimulatedPhysicsStateContainer.INVALID_JOLT_BODY_ID) {
+        if (bodyId != Jolt.cInvalidBodyId) {
             simulatedWorld.getJoltBridge().destroyJoltBody(bodyId);
         }
 

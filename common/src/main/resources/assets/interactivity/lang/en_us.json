@@ -1,4 +1,8 @@
 {
+  "itemGroup.interactivity": "Interactivity",
+  "item.interactivity.physics_gun": "Physics Gun",
+
+
   "interactivity.midnightconfig.title": "Interactivity",
 
   "interactivity.midnightconfig.category.physics": "Physics",

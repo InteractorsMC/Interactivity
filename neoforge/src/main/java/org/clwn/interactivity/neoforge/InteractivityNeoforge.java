@@ -8,18 +8,25 @@
 package org.clwn.interactivity.neoforge;
 
 
-import eu.midnightdust.lib.config.MidnightConfig;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.network.event.RegisterConfigurationTasksEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+import net.neoforged.neoforge.registries.RegisterEvent;
 import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.api.network.PacketContext;
 import org.clwn.interactivity.api.util.Side;
+import org.clwn.interactivity.builtin.item.physicsgun.PhysicsGunItem;
+import org.clwn.interactivity.core.util.InteractivityIdentifier;
 import org.clwn.interactivity.core.util.platform.services.INetworkingHelper;
 import org.clwn.interactivity.neoforge.util.platform.NeoForgeNetworkingHelper;
 
@@ -101,7 +108,21 @@ public class InteractivityNeoforge {
     }
 
     @SubscribeEvent
-    public static void notifyBusOnPlayerConfigure(RegisterConfigurationTasksEvent event) {
+    public static void registerContent(final RegisterEvent event) {
+        event.register(
+                Registries.ITEM,
+                InteractivityIdentifier.getIdentifier("physics_gun"),
+                () -> new PhysicsGunItem(new Item.Properties().stacksTo(1))
+        );
 
+        event.register(
+                Registries.CREATIVE_MODE_TAB,
+                InteractivityIdentifier.getIdentifier("main"),
+                () -> CreativeModeTab.builder()
+                        .title(Component.translatable("itemGroup.interactivity"))
+                        .icon(() -> new ItemStack(BuiltInRegistries.ITEM.get(InteractivityIdentifier.getIdentifier("physics_gun"))))
+                        .displayItems((parameters, output) -> output.accept(BuiltInRegistries.ITEM.get(InteractivityIdentifier.getIdentifier("physics_gun"))))
+                        .build()
+        );
     }
 }

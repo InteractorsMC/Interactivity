@@ -38,6 +38,7 @@ import org.jetbrains.annotations.Nullable;
  *     sampled pose, let the renderer submit, pop. Renderers therefore always draw in the local space of the body.</li>
  * </ol>
  */
+// todo: rendering have issues probably because issues with client clock that breaks after updating physics tick. I will work on that when I have time.
 public class RenderDispatcher {
     private static final class RenderSlot {
         Body body;

@@ -9,7 +9,8 @@ val parchmentVersion = project.property("parchment_version") as String
 val modId = project.property("mod_id") as String
 
 neoForge {
-    version.set(neoforgeVersion)
+    version = neoforgeVersion
+
     // Automatically enable neoforge AccessTransformers if the file exists
     val at = project(":common").file("src/main/resources/META-INF/accesstransformer.cfg")
     if (at.exists()) {
@@ -41,13 +42,15 @@ neoForge {
 dependencies {
     implementation(project(":natives"))
     jarJar(project(":natives"))
-    additionalRuntimeClasspath(project(":natives"))
+    "additionalRuntimeClasspath"(project(":natives"))
     // todo: add jolt-jni; add build-extensions for dependencies
 
     // Dependencies
     val midnightlib = "eu.midnightdust:midnightlib:${project.property("midnightlib_version")}-neoforge"
     implementation(midnightlib)
     jarJar(midnightlib)
+
+    // todo: optimization mods
 }
 
 

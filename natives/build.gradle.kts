@@ -116,6 +116,7 @@ val skipNatives = project.hasProperty("skipNatives")
 
 fun isCMakeAvailable(): Boolean {
     return try {
+        // todo: make compatible with configuration cache
         val process = ProcessBuilder("cmake", "--version").start()
         process.waitFor() == 0
     } catch (e: Exception) {

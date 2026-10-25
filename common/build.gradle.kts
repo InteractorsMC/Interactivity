@@ -3,21 +3,16 @@ plugins {
     id("net.neoforged.moddev")
 }
 
-val neoFormVersionVal = project.property("neo_form_version") as String
-val parchmentMinecraft = project.property("parchment_minecraft") as String
-val parchmentVersion = project.property("parchment_version") as String
-val modId = project.property("mod_id") as String
-
 neoForge {
-    neoFormVersion = neoFormVersionVal
+    neoFormVersion = commonMod.dep("neoform")
     // Automatically enable AccessTransformers if the file exists
     val at = file("src/main/resources/META-INF/accesstransformer.cfg")
     if (at.exists()) {
         accessTransformers.from(at.absolutePath)
     }
     parchment {
-        minecraftVersion = parchmentMinecraft
-        mappingsVersion = parchmentVersion
+        minecraftVersion = commonMod.dep("parchment.mc")
+        mappingsVersion = commonMod.dep("parchment.version")
     }
 
     runs {
@@ -28,7 +23,7 @@ neoForge {
             // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
             programArguments.addAll(
                 listOf(
-                    "--mod", modId,
+                    "--mod", commonMod.id,
                     "--all",
                     "--output", file("src/generated/resources/").absolutePath,
                     "--existing", file("src/main/resources/").absolutePath
@@ -47,7 +42,7 @@ dependencies {
     annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5")
 
     // Dependencies
-    val midnightlib = "eu.midnightdust:midnightlib:${project.property("midnightlib_version")}-fabric"
+    val midnightlib = "eu.midnightdust:midnightlib:${commonMod.dep("midnightlib")}-fabric"
     compileOnly(midnightlib)
 }
 

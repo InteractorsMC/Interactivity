@@ -4,18 +4,11 @@ plugins {
     id("interactivity-base")
 }
 
-val modId = project.property("mod_id") as String
-val modName = project.property("mod_name") as String
-val modAuthor = project.property("mod_author") as String
-val minecraftVersion = project.property("minecraft_version") as String
-val minecraftVersionRange = project.property("minecraft_version_range") as String
-val javaVersion = project.property("java_version") as String
-val fabricVersion = project.property("fabric_version") as String
-val fabricLoaderVersion = project.property("fabric_loader_version") as String
-val neoforgeVersion = project.property("neoforge_version") as String
-val neoforgeLoaderVersionRange = project.property("neoforge_loader_version_range") as String
-val license = project.property("license") as String
-val credits = project.findProperty("credits") as? String ?: ""
+val modId = commonMod.id
+val modName = commonMod.name
+val modAuthor = commonMod.author
+val minecraftVersion = commonMod.dep("minecraft")
+val javaVersion = commonMod.prop("java.version")
 
 base {
     archivesName.set("$modId-${project.name}-$minecraftVersion")
@@ -112,17 +105,17 @@ tasks.named<ProcessResources>("processResources") {
         "version" to project.version,
         "group" to project.group, // Else we target the task's group.
         "minecraft_version" to minecraftVersion,
-        "minecraft_version_range" to minecraftVersionRange,
-        "fabric_version" to fabricVersion,
-        "fabric_loader_version" to fabricLoaderVersion,
+        "minecraft_version_range" to commonMod.dep("minecraft.range"),
+        "fabric_version" to commonMod.dep("fabric_api"),
+        "fabric_loader_version" to commonMod.dep("fabric_loader"),
         "mod_name" to modName,
         "mod_author" to modAuthor,
         "mod_id" to modId,
-        "license" to license,
-        "description" to (project.description ?: ""),
-        "neoforge_version" to neoforgeVersion,
-        "neoforge_loader_version_range" to neoforgeLoaderVersionRange,
-        "credits" to credits,
+        "license" to commonMod.license,
+        "description" to commonMod.description,
+        "neoforge_version" to commonMod.dep("neoforge"),
+        "neoforge_version_range" to commonMod.dep("neoforge.range"),
+        "credits" to commonMod.credits,
         "java_version" to javaVersion
     )
 

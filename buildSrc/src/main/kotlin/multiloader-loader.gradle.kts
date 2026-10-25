@@ -10,12 +10,11 @@ val commonResources = configurations.create("commonResources") {
 }
 
 val group = project.group.toString()
-val modId = project.property("mod_id") as String
 
 dependencies {
     val commonProject = project(":common")
     commonProject.capabilities {
-        requireCapability("$group:$modId")
+        requireCapability("$group:${commonMod.id}")
     }
     compileOnly(commonProject)
 

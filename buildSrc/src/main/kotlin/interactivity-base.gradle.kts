@@ -1,11 +1,12 @@
-val joltJniVersion = project.findProperty("jolt_jni_version") as? String
+group = commonMod.group
+version = commonMod.version
 
 repositories {
     mavenCentral()
 
     ivy {
         name = "InteractorsJoltJni"
-        url = uri("https://github.com/InteractorsMC/jolt-jni/releases/download/$joltJniVersion/")
+        url = uri("https://github.com/InteractorsMC/jolt-jni/releases/download/${commonMod.dep("jolt_jni")}/")
         patternLayout {
             artifact("[artifact]-[revision](-[classifier]).[ext]")
         }

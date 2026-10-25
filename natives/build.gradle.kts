@@ -4,12 +4,12 @@ plugins {
     id("interactivity-base")
 }
 
-val modId = project.property("mod_id") as String
-val modName = project.property("mod_name") as String
-val modAuthor = project.property("mod_author") as String
-val javaVersion = project.property("java_version") as String
+val modId = commonMod.id
+val modName = commonMod.name
+val modAuthor = commonMod.author
+val javaVersion = commonMod.prop("java.version")
 
-val joltJniVersion = project.findProperty("jolt_jni_version") as? String
+val joltJniVersion = commonMod.dep("jolt_jni")
 
 base {
     archivesName.set("$modId-natives")

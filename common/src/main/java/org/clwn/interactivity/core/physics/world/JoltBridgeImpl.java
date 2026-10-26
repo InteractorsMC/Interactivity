@@ -14,6 +14,8 @@ import com.github.stephengold.joltjni.PhysicsSystem;
 import com.github.stephengold.joltjni.Vec3;
 import com.github.stephengold.joltjni.enumerate.EActivation;
 import com.github.stephengold.joltjni.enumerate.EMotionType;
+import com.github.stephengold.joltjni.readonly.ConstBroadPhaseQuery;
+import com.github.stephengold.joltjni.readonly.ConstNarrowPhaseQuery;
 import com.github.stephengold.joltjni.readonly.QuatArg;
 import com.github.stephengold.joltjni.readonly.RVec3Arg;
 import lombok.Getter;
@@ -84,5 +86,25 @@ public class JoltBridgeImpl implements JoltBridge {
 
         bodyInterface.removeBody(bodyId);
         bodyInterface.destroyBody(bodyId);
+    }
+
+    @Override
+    public BodyInterface getBodyInterface() {
+        return this.physicsSystem.getBodyInterface();
+    }
+
+    @Override
+    public BodyInterface getBodyInterfaceNoLock() {
+        return this.physicsSystem.getBodyInterfaceNoLock();
+    }
+
+    @Override
+    public ConstBroadPhaseQuery getBroadPhaseQuery() {
+        return this.physicsSystem.getBroadPhaseQuery();
+    }
+
+    @Override
+    public ConstNarrowPhaseQuery getNarrowPhaseQuery() {
+        return this.physicsSystem.getNarrowPhaseQuery();
     }
 }

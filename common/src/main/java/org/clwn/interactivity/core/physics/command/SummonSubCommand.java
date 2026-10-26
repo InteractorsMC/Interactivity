@@ -19,6 +19,7 @@ import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.physics.body.BodyType;
 import org.clwn.interactivity.core.physics.body.ServerBodyManager;
 import org.clwn.interactivity.core.physics.body.type.BodyTypeRegistryImpl;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -30,7 +31,7 @@ public final class SummonSubCommand {
      */
     private static final double STACK_SPACING = 1.5;
 
-    private static final SuggestionProvider<CommandSourceStack> SUMMONABLE_TYPES = (context, builder) ->
+    static final SuggestionProvider<CommandSourceStack> SUMMONABLE_TYPES = (context, builder) ->
             SharedSuggestionProvider.suggestResource(
                     BodyTypeRegistryImpl.INSTANCE.getAll().stream()
                             .filter(type -> type.hasBehavior(SummonableBehavior.class))
@@ -64,17 +65,26 @@ public final class SummonSubCommand {
         CommandSourceStack source = context.getSource();
         ResourceLocation typeId = ResourceLocationArgument.getId(context, "type");
 
-        Optional<BodyType<? extends Body>> type = BodyTypeRegistryImpl.INSTANCE.get(typeId);
-        if (type.isEmpty() || !type.get().hasBehavior(SummonableBehavior.class)) {
-            source.sendFailure(Component.literal("Unknown or not summonable body type: " + typeId));
+        BodyType<? extends Body> type = getSummonableType(source, typeId);
+        if (type == null) {
             return 0;
         }
+
         for (int i = 0; i < count; i++) {
-            spawn(InteractivityCommand.getPhysicsWorld(source).getBodyManager(), type.get(), position.x, position.y + i * STACK_SPACING, position.z);
+            spawn(InteractivityCommand.getPhysicsWorld(source).getBodyManager(), type, position.x, position.y + i * STACK_SPACING, position.z);
         }
 
         source.sendSuccess(() -> Component.literal("Summoned " + count + " " + typeId), true);
         return count;
+    }
+
+    static @Nullable BodyType<? extends Body> getSummonableType(CommandSourceStack source, ResourceLocation typeId) {
+        Optional<BodyType<? extends Body>> type = BodyTypeRegistryImpl.INSTANCE.get(typeId);
+        if (type.isEmpty() || !type.get().hasBehavior(SummonableBehavior.class)) {
+            source.sendFailure(Component.literal("Unknown or not summonable body type: " + typeId));
+            return null;
+        }
+        return type.get();
     }
 
     private static <T extends Body> void spawn(ServerBodyManager bodyManager, BodyType<T> type, double x, double y, double z) {

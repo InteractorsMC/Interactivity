@@ -144,6 +144,7 @@ public abstract class SimulatedBodyManager extends AbstractBodyManager {
         Body body = container.bodies[index];
 
         onBodyRemove(body, index, removalReason);
+        simulatedWorld.getConstraintManager().onBodyRemoving(uuid);
 
         int bodyId = container.joltBodyId.get(index);
         if (bodyId != Jolt.cInvalidBodyId) {
@@ -151,6 +152,12 @@ public abstract class SimulatedBodyManager extends AbstractBodyManager {
         }
 
         store.removeBody(uuid);
+    }
+
+    public int getJoltBodyId(UUID id) {
+        int index = getBodyDataStore().getIndexByUuid(id);
+        return index == -1 ? Jolt.cInvalidBodyId : getBodyDataStore().getPhysicsStateContainer().joltBodyId.get(index);
+
     }
 
     public void onPhysicsTick() {

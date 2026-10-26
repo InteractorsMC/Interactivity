@@ -24,6 +24,7 @@ public final class InteractivityCommand {
                 .requires(source -> source.hasPermission(2))
                 .then(SummonSubCommand.getCommand())
                 .then(KillSubCommand.getCommand())
+                .then(ConstraintSubCommand.getCommand())
         );
     }
 

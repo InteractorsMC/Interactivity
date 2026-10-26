@@ -17,6 +17,7 @@ import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.api.physics.world.SimulatedPhysicsWorld;
 import org.clwn.interactivity.core.config.InteractivityConfig;
 import org.clwn.interactivity.core.physics.body.SimulatedBodyManager;
+import org.clwn.interactivity.core.physics.constraint.ConstraintManagerImpl;
 import org.clwn.interactivity.core.physics.system.SimulationEventDispatcher;
 import org.clwn.interactivity.core.physics.terrain.TerrainBlockClassifier;
 import org.clwn.interactivity.core.physics.terrain.TerrainModule;
@@ -51,6 +52,9 @@ public abstract class SimulatedPhysicsWorldImpl extends PhysicsWorldImpl impleme
 
     @Getter
     protected final @Nullable TerrainModule terrainModule;
+
+    @Getter
+    protected final ConstraintManagerImpl constraintManager = new ConstraintManagerImpl(this);
 
 
     public SimulatedPhysicsWorldImpl(Level level, PhysicsSimulationConfig physicsSimulationConfig) {
@@ -111,6 +115,7 @@ public abstract class SimulatedPhysicsWorldImpl extends PhysicsWorldImpl impleme
             }
         }
 
+        constraintManager.close();
         physicsSimulation.close();
     }
 

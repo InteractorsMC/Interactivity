@@ -16,8 +16,6 @@ import com.github.stephengold.joltjni.ShapeSettings;
 public interface RigidBodyFactory {
     /**
      * Creates a Jolt body from the given collision shape and adds it to the physics world.
-     * The implementation of this method (within VxServerBodyManager) is responsible for
-     * the proper resource management of the Jolt objects.
      *
      * @param shape        The collision shape wrapper describing the geometry.
      * @param bodySettings The settings for the physical properties.

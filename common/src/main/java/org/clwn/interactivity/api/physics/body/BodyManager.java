@@ -9,6 +9,7 @@ package org.clwn.interactivity.api.physics.body;
 
 import com.github.stephengold.joltjni.readonly.QuatArg;
 import com.github.stephengold.joltjni.readonly.RVec3Arg;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -18,4 +19,19 @@ public interface BodyManager {
     void removeBody(Body body, RemovalReason removalReason);
 
     Body getBody(UUID id);
+
+    @ApiStatus.Experimental
+    default int getJoltBodyId(Body body) {
+        return getJoltBodyId(body.getUuid());
+    }
+
+    /**
+     * Retrieves Jolt Body id that can be used in {@link org.clwn.interactivity.api.physics.world.JoltBridge}.
+     * <p>
+     * The existence of this method has not been definitively established, so it may be removed at any time.
+     * @param id Body id
+     * @return Jolt Body id, if body exists in simulation, {@link com.github.stephengold.joltjni.Jolt#cInvalidBodyId} otherwise
+     */
+    @ApiStatus.Experimental
+    int getJoltBodyId(UUID id);
 }

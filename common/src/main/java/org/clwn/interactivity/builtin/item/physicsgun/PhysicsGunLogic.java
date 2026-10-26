@@ -13,7 +13,6 @@ package org.clwn.interactivity.builtin.item.physicsgun;
 
 import com.github.stephengold.joltjni.BodyInterface;
 import com.github.stephengold.joltjni.Jolt;
-import com.github.stephengold.joltjni.PhysicsSystem;
 import com.github.stephengold.joltjni.RRayCast;
 import com.github.stephengold.joltjni.RVec3;
 import com.github.stephengold.joltjni.RayCastResult;
@@ -24,6 +23,7 @@ import net.minecraft.world.phys.Vec3;
 import org.clwn.interactivity.api.InteractivityAPI;
 import org.clwn.interactivity.api.physics.event.PhysicsTickEvent;
 import org.clwn.interactivity.api.physics.event.SubscribeEvent;
+import org.clwn.interactivity.api.physics.world.JoltBridge;
 import org.clwn.interactivity.api.physics.world.PhysicsWorld;
 import org.clwn.interactivity.api.physics.world.ServerPhysicsWorld;
 
@@ -131,8 +131,6 @@ public final class PhysicsGunLogic {
         if (GRABS.isEmpty() || !(event.getPhysicsWorld() instanceof ServerPhysicsWorld world)) {
             return;
         }
-
-        PhysicsSystem system = world.getJoltBridge().getPhysicsSystem();
         long now = System.nanoTime();
 
         for (Map.Entry<UUID, Grab> entry : GRABS.entrySet()) {
@@ -148,13 +146,13 @@ public final class PhysicsGunLogic {
 
             if (grab.pickPending) {
                 grab.pickPending = false;
-                if (!pick(system, grab)) {
+                if (!pick(world.getJoltBridge(), grab)) {
                     GRABS.remove(entry.getKey(), grab);
                     continue;
                 }
             }
 
-            if (!hold(system, grab)) {
+            if (!hold(world.getJoltBridge(), grab)) {
                 GRABS.remove(entry.getKey(), grab);
             }
         }
@@ -163,7 +161,7 @@ public final class PhysicsGunLogic {
     /**
      * Casts a ray from the eyes of the player and remembers the dynamic body it hit.
      */
-    private static boolean pick(PhysicsSystem system, Grab grab) {
+    private static boolean pick(JoltBridge joltBridge, Grab grab) {
         Aim aim = grab.aim;
         Vec3 eye = aim.eye();
         Vec3 look = aim.look();
@@ -175,12 +173,12 @@ public final class PhysicsGunLogic {
                 );
                 RayCastResult result = new RayCastResult()
         ) {
-            if (!system.getNarrowPhaseQuery().castRay(ray, result)) {
+            if (!joltBridge.getNarrowPhaseQuery().castRay(ray, result)) {
                 return false;
             }
 
             int bodyId = result.getBodyId();
-            if (system.getBodyInterface().getMotionType(bodyId) != EMotionType.Dynamic) {
+            if (joltBridge.getBodyInterface().getMotionType(bodyId) != EMotionType.Dynamic) {
                 return false;
             }
 
@@ -195,8 +193,8 @@ public final class PhysicsGunLogic {
      *
      * @return {@code false} if the body is gone and the grab should be dropped
      */
-    private static boolean hold(PhysicsSystem system, Grab grab) {
-        BodyInterface bodyInterface = system.getBodyInterface();
+    private static boolean hold(JoltBridge joltBridge, Grab grab) {
+        BodyInterface bodyInterface = joltBridge.getBodyInterface();
         int bodyId = grab.bodyId;
 
         if (!bodyInterface.isAdded(bodyId)) {

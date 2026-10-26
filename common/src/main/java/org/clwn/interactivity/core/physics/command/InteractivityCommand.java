@@ -10,6 +10,11 @@ package org.clwn.interactivity.core.physics.command;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
+import org.clwn.interactivity.api.physics.world.PhysicsWorld;
+import org.clwn.interactivity.core.physics.PhysicsPipelineImpl;
+import org.clwn.interactivity.core.physics.world.ServerPhysicsWorldImpl;
+import org.jetbrains.annotations.Nullable;
 
 public final class InteractivityCommand {
     private InteractivityCommand() {}
@@ -18,6 +23,16 @@ public final class InteractivityCommand {
         dispatcher.register(Commands.literal("interactivity")
                 .requires(source -> source.hasPermission(2))
                 .then(SummonSubCommand.getCommand())
+                .then(KillSubCommand.getCommand())
         );
+    }
+
+    static @Nullable ServerPhysicsWorldImpl getPhysicsWorld(CommandSourceStack source) {
+        PhysicsWorld world = PhysicsPipelineImpl.INSTANCE == null ? null : PhysicsPipelineImpl.INSTANCE.getPhysicsWorld(source.getLevel());
+        if (!(world instanceof ServerPhysicsWorldImpl serverWorld)) {
+            source.sendFailure(Component.literal("There is no physics world in this dimension"));
+            return null;
+        }
+        return serverWorld;
     }
 }

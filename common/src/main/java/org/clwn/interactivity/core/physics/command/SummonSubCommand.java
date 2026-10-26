@@ -17,11 +17,8 @@ import net.minecraft.world.phys.Vec3;
 import org.clwn.interactivity.api.physics.behavior.SummonableBehavior;
 import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.physics.body.BodyType;
-import org.clwn.interactivity.api.physics.world.PhysicsWorld;
-import org.clwn.interactivity.core.physics.PhysicsPipelineImpl;
 import org.clwn.interactivity.core.physics.body.ServerBodyManager;
 import org.clwn.interactivity.core.physics.body.type.BodyTypeRegistryImpl;
-import org.clwn.interactivity.core.physics.world.ServerPhysicsWorldImpl;
 
 import java.util.Optional;
 
@@ -72,15 +69,8 @@ public final class SummonSubCommand {
             source.sendFailure(Component.literal("Unknown or not summonable body type: " + typeId));
             return 0;
         }
-
-        PhysicsWorld world = PhysicsPipelineImpl.INSTANCE == null ? null : PhysicsPipelineImpl.INSTANCE.getPhysicsWorld(source.getLevel());
-        if (!(world instanceof ServerPhysicsWorldImpl serverWorld)) {
-            source.sendFailure(Component.literal("There is no physics world in this dimension"));
-            return 0;
-        }
-
         for (int i = 0; i < count; i++) {
-            spawn(serverWorld.getBodyManager(), type.get(), position.x, position.y + i * STACK_SPACING, position.z);
+            spawn(InteractivityCommand.getPhysicsWorld(source).getBodyManager(), type.get(), position.x, position.y + i * STACK_SPACING, position.z);
         }
 
         source.sendSuccess(() -> Component.literal("Summoned " + count + " " + typeId), true);

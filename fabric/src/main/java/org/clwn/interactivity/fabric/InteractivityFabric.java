@@ -8,7 +8,9 @@
 package org.clwn.interactivity.fabric;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -16,6 +18,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.builtin.item.physicsgun.PhysicsGunItem;
+import org.clwn.interactivity.core.physics.command.argument.BodySelectorArgument;
 import org.clwn.interactivity.core.util.InteractivityIdentifier;
 import org.clwn.interactivity.fabric.event.EventNotifierFabric;
 
@@ -41,6 +44,12 @@ public class InteractivityFabric implements ModInitializer {
                         .icon(() -> new ItemStack(physicsGun))
                         .displayItems((parameters, output) -> output.accept(physicsGun))
                         .build()
+        );
+
+        ArgumentTypeRegistry.registerArgumentType(
+                InteractivityIdentifier.getIdentifier("body_selector"),
+                BodySelectorArgument.class,
+                SingletonArgumentInfo.contextFree(BodySelectorArgument::bodies)
         );
     }
 }

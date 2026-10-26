@@ -8,6 +8,8 @@
 package org.clwn.interactivity.neoforge;
 
 
+import net.minecraft.commands.synchronization.ArgumentTypeInfos;
+import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -26,6 +28,7 @@ import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.api.network.PacketContext;
 import org.clwn.interactivity.api.util.Side;
 import org.clwn.interactivity.builtin.item.physicsgun.PhysicsGunItem;
+import org.clwn.interactivity.core.physics.command.argument.BodySelectorArgument;
 import org.clwn.interactivity.core.util.InteractivityIdentifier;
 import org.clwn.interactivity.core.util.platform.services.INetworkingHelper;
 import org.clwn.interactivity.neoforge.util.platform.NeoForgeNetworkingHelper;
@@ -124,5 +127,15 @@ public class InteractivityNeoforge {
                         .displayItems((parameters, output) -> output.accept(BuiltInRegistries.ITEM.get(InteractivityIdentifier.getIdentifier("physics_gun"))))
                         .build()
         );
+
+        event.register(
+                Registries.COMMAND_ARGUMENT_TYPE,
+                InteractivityIdentifier.getIdentifier("body_selector"),
+                () -> ArgumentTypeInfos.registerByClass(
+                        BodySelectorArgument.class,
+                        SingletonArgumentInfo.contextFree(BodySelectorArgument::bodies)
+                )
+        );
+
     }
 }

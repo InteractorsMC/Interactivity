@@ -7,10 +7,7 @@
  */
 package org.clwn.interactivity.core.physics.body;
 
-import com.github.stephengold.joltjni.Jolt;
-import com.github.stephengold.joltjni.Quat;
-import com.github.stephengold.joltjni.RVec3;
-import com.github.stephengold.joltjni.Vec3;
+import com.github.stephengold.joltjni.*;
 import com.github.stephengold.joltjni.enumerate.EActivation;
 import com.github.stephengold.joltjni.enumerate.EMotionType;
 import com.github.stephengold.joltjni.readonly.QuatArg;
@@ -117,6 +114,20 @@ public abstract class SimulatedBodyManager extends AbstractBodyManager {
         }
 
         container.joltBodyId.put(index, bodyId);
+
+        try (
+                TransformedShape shape = simulatedWorld.getJoltBridge().getPhysicsSystem().getBodyInterface().getTransformedShape(bodyId);
+                AaBox bounds = shape.getWorldSpaceBounds()
+        ) {
+            Vec3 min = bounds.getMin();
+            Vec3 max = bounds.getMax();
+            container.aabbMinX.put(index, min.getX());
+            container.aabbMinY.put(index, min.getY());
+            container.aabbMinZ.put(index, min.getZ());
+            container.aabbMaxX.put(index, max.getX());
+            container.aabbMaxY.put(index, max.getY());
+            container.aabbMaxZ.put(index, max.getZ());
+        }
 
         onBodyAdd(body, index);
     }

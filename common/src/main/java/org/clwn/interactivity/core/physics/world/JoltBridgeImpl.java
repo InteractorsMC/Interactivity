@@ -8,16 +8,10 @@
  */
 package org.clwn.interactivity.core.physics.world;
 
-import com.github.stephengold.joltjni.BodyInterface;
-import com.github.stephengold.joltjni.Jolt;
-import com.github.stephengold.joltjni.PhysicsSystem;
-import com.github.stephengold.joltjni.Vec3;
+import com.github.stephengold.joltjni.*;
 import com.github.stephengold.joltjni.enumerate.EActivation;
 import com.github.stephengold.joltjni.enumerate.EMotionType;
-import com.github.stephengold.joltjni.readonly.ConstBroadPhaseQuery;
-import com.github.stephengold.joltjni.readonly.ConstNarrowPhaseQuery;
-import com.github.stephengold.joltjni.readonly.QuatArg;
-import com.github.stephengold.joltjni.readonly.RVec3Arg;
+import com.github.stephengold.joltjni.readonly.*;
 import lombok.Getter;
 import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.api.physics.behavior.RigidBehavior;
@@ -96,6 +90,16 @@ public class JoltBridgeImpl implements JoltBridge {
     @Override
     public BodyInterface getBodyInterfaceNoLock() {
         return this.physicsSystem.getBodyInterfaceNoLock();
+    }
+
+    @Override
+    public ConstBodyLockInterface getBodyLockInterface() {
+        return this.physicsSystem.getBodyLockInterface();
+    }
+
+    @Override
+    public ConstBodyLockInterfaceNoLock getBodyLockInterfaceNoLock() {
+        return this.physicsSystem.getBodyLockInterfaceNoLock();
     }
 
     @Override

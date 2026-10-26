@@ -15,6 +15,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.clwn.interactivity.api.client.physics.render.BodyRenderer;
 import org.clwn.interactivity.api.physics.body.Body;
+import org.clwn.interactivity.core.client.debug.ShapeDebugRenderer;
 import org.clwn.interactivity.core.client.event.render.LevelExtractionEvents;
 import org.clwn.interactivity.core.client.event.render.LevelRenderEvents;
 import org.clwn.interactivity.core.client.physics.ClientPhysicsPipelineImpl;
@@ -72,6 +73,10 @@ public class RenderDispatcher {
     }
 
     private void extract(LevelExtractionEvents.LevelExtractionContext context) {
+        if (ShapeDebugRenderer.INSTANCE.isEnabled()) {
+            ShapeDebugRenderer.INSTANCE.newFrame();
+        }
+
         activeSlotCount = 0;
 
         ClientPhysicsWorldInternal world = ClientPhysicsPipelineImpl.INSTANCE.getCurrentPhysicsWorld();
@@ -126,6 +131,10 @@ public class RenderDispatcher {
             extractionContext.setPackedLight(LevelRenderer.getLightColor(world.getLevel(), reusableBlockPos.set(slot.pose.x, slot.pose.y, slot.pose.z)));
             slot.renderer.extract(extractionContext, body, slot.state);
             slot.visible = true;
+
+            if (ShapeDebugRenderer.INSTANCE.isEnabled()) {
+                ShapeDebugRenderer.INSTANCE.extract(extractionContext, body);
+            }
         }
     }
 
@@ -149,6 +158,10 @@ public class RenderDispatcher {
             slot.renderer.submit(slot.state, renderContext);
 
             poseStack.popPose();
+        }
+
+        if (ShapeDebugRenderer.INSTANCE.isEnabled()) {
+            ShapeDebugRenderer.INSTANCE.submit(renderContext); // this is some pure shitcode
         }
     }
 

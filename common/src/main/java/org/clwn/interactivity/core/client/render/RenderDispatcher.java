@@ -69,7 +69,7 @@ public class RenderDispatcher {
 
     public RenderDispatcher() {
         LevelExtractionEvents.EXTRACTION_END.subscribe(this::extract);
-        LevelRenderEvents.AFTER_ENTITIES.subscribe(this::render);
+        LevelRenderEvents.ENTITY_PASS.subscribe(this::render);
     }
 
     private void extract(LevelExtractionEvents.LevelExtractionContext context) {
@@ -138,9 +138,9 @@ public class RenderDispatcher {
         }
     }
 
-    private void render(LevelRenderEvents.LevelRenderContext context) {
-        PoseStack poseStack = new PoseStack();
-        renderContext.begin(poseStack, context.gameRenderer());
+    private void render(LevelRenderEvents.EntityPassContext context) {
+        PoseStack poseStack = context.poseStack();
+        renderContext.begin(poseStack, context.bufferSource());
 
         Vec3 camera = context.camera().getPosition();
 
@@ -160,7 +160,7 @@ public class RenderDispatcher {
             poseStack.popPose();
         }
 
-        if (ShapeDebugRenderer.INSTANCE.isEnabled()) {
+        if (context.pass() == LevelRenderEvents.Pass.MAIN && ShapeDebugRenderer.INSTANCE.isEnabled()) {
             ShapeDebugRenderer.INSTANCE.submit(renderContext); // this is some pure shitcode
         }
     }

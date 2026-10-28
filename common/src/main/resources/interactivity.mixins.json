@@ -3,7 +3,7 @@
   "minVersion": "0.8",
   "package": "org.clwn.interactivity.core.mixin",
   "refmap": "${mod_id}.refmap.json",
-  "compatibilityLevel": "JAVA_18",
+  "compatibilityLevel": "JAVA_21",
   "mixins": [
     "event.lifecycle.LevelChunkMixin",
     "event.lifecycle.PlayerListMixin"

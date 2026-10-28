@@ -8,7 +8,9 @@
 package org.clwn.interactivity.core.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import org.clwn.interactivity.api.client.render.HighLevelRenderContext;
 import org.clwn.interactivity.api.client.render.LowLevelRenderContext;
 import org.clwn.interactivity.api.client.render.RenderContext;
@@ -17,9 +19,10 @@ final class RenderContextImpl implements RenderContext {
     private final HighLevelRenderContext highLevel = new HighLevelRenderContext() {};
     private final LowLevel lowLevel = new LowLevel();
 
-    void begin(PoseStack poseStack, GameRenderer gameRenderer) {
+    void begin(PoseStack poseStack, MultiBufferSource bufferSource) {
         lowLevel.poseStack = poseStack;
-        lowLevel.gameRenderer = gameRenderer;
+        lowLevel.bufferSource = bufferSource;
+        lowLevel.gameRenderer = Minecraft.getInstance().gameRenderer;
     }
 
     @Override
@@ -35,6 +38,7 @@ final class RenderContextImpl implements RenderContext {
     private static final class LowLevel implements LowLevelRenderContext {
         private GameRenderer gameRenderer;
         private PoseStack poseStack;
+        private MultiBufferSource bufferSource;
 
         @Override
         public GameRenderer getGameRenderer() {
@@ -44,6 +48,11 @@ final class RenderContextImpl implements RenderContext {
         @Override
         public PoseStack getPoseStack() {
             return poseStack;
+        }
+
+        @Override
+        public MultiBufferSource getBufferSource() {
+            return bufferSource;
         }
     }
 }

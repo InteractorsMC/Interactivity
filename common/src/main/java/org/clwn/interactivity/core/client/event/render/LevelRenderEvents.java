@@ -7,17 +7,22 @@
  */
 package org.clwn.interactivity.core.client.event.render;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import org.clwn.interactivity.core.event.Event;
 import org.joml.Matrix4f;
 
 public class LevelRenderEvents {
-    public static final Event<LevelRenderContext> AFTER_ENTITIES = new Event<>();
+    public static final Event<EntityPassContext> ENTITY_PASS = new Event<>();
 
-    public record LevelRenderContext(LevelRenderer levelRenderer, GameRenderer gameRenderer, Camera camera, Matrix4f projectionMatrix, DeltaTracker deltaTracker) {
-
+    public enum Pass {
+        MAIN,
+        SECONDARY
     }
+
+    public record EntityPassContext(Pass pass, PoseStack poseStack, MultiBufferSource bufferSource, Camera camera) {}
 }

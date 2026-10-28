@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "org.clwn.interactivity.core.mixin.compat.iris",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [],
+  "client": [
+    "ShadowRendererMixin"
+  ],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
+

@@ -8,8 +8,10 @@
  */
 package org.clwn.interactivity.core.mixin.event.render;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
@@ -49,6 +51,8 @@ public class LevelRendererMixin {
             Matrix4f frustumMatrix,
             Matrix4f projectionMatrix, CallbackInfo ci
     ) {
-        LevelRenderEvents.AFTER_ENTITIES.publish(new LevelRenderEvents.LevelRenderContext((LevelRenderer) (Object) this, gameRenderer, camera, projectionMatrix, deltaTracker));
+        LevelRenderEvents.ENTITY_PASS.publish(new LevelRenderEvents.EntityPassContext(
+                LevelRenderEvents.Pass.MAIN, new PoseStack(), Minecraft.getInstance().renderBuffers().bufferSource(), camera
+        ));
     }
 }

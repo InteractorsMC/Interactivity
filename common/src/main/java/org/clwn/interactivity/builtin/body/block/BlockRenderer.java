@@ -45,7 +45,7 @@ public class BlockRenderer implements BodyRenderer<BlockRenderer.BlockRenderStat
 
         Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(
                 context.lowLevel().getPoseStack().last(),
-                Minecraft.getInstance().renderBuffers().bufferSource().getBuffer(ItemBlockRenderTypes.getRenderType(state.blockState, false)),
+                context.lowLevel().getBufferSource().getBuffer(ItemBlockRenderTypes.getRenderType(state.blockState, false)),
                 state.blockState,
                 Minecraft.getInstance().getBlockRenderer().getBlockModel(state.blockState),
                 state.r, state.g, state.b,

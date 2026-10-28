@@ -15,6 +15,10 @@ import org.clwn.interactivity.core.physics.body.store.ServerBodyDataStore;
 import org.clwn.interactivity.core.physics.body.store.SimulatedPhysicsStateContainer;
 import org.clwn.interactivity.core.physics.network.NetworkIdAllocator;
 import org.clwn.interactivity.core.physics.world.ServerPhysicsWorldImpl;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ServerBodyManager extends SimulatedBodyManager {
     @Getter
@@ -22,6 +26,8 @@ public class ServerBodyManager extends SimulatedBodyManager {
 
     @Getter
     private final BodyChunkTracker chunkTracker = new BodyChunkTracker();
+
+    private final Queue<Body> dirtyDataBodies = new ConcurrentLinkedQueue<>();
 
     private final ServerPhysicsWorldImpl serverWorld;
 
@@ -48,5 +54,14 @@ public class ServerBodyManager extends SimulatedBodyManager {
 
         chunkTracker.onBodyRemoved(index, container);
         serverWorld.getSaveManager().onBodyRemoved(body, removalReason);
+    }
+
+    @Override
+    public void requestDataSync(Body body) {
+        dirtyDataBodies.add(body);
+    }
+
+    public @Nullable Body pollDirtyDataBody() {
+        return dirtyDataBodies.poll();
     }
 }

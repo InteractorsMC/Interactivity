@@ -8,6 +8,7 @@
 package org.clwn.interactivity.core.physics.persistence;
 
 import net.minecraft.resources.ResourceLocation;
+import org.clwn.interactivity.api.physics.behavior.DataSyncBehavior;
 
 import java.util.UUID;
 
@@ -26,6 +27,7 @@ public record GroupRecord(long[] footprint, BodyRecord[] bodies, ConstraintRecor
      * @param linearVelocity  x, y, z
      * @param angularVelocity x, y, z
      * @param awake           {@code false} if the body was asleep
+     * @param data            output of the {@link DataSyncBehavior} writer
      */
     public record BodyRecord(
             UUID uuid,
@@ -34,7 +36,8 @@ public record GroupRecord(long[] footprint, BodyRecord[] bodies, ConstraintRecor
             float[] rotation,
             float[] linearVelocity,
             float[] angularVelocity,
-            boolean awake
+            boolean awake,
+            byte[] data
     ) {
     }
 

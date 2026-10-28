@@ -10,10 +10,7 @@ package org.clwn.interactivity.core.network.packet;
 
 import org.clwn.interactivity.api.InteractivityAPI;
 import org.clwn.interactivity.core.client.network.ClientBodySyncHandler;
-import org.clwn.interactivity.core.network.packet.s2c.S2CBodyRemovePacket;
-import org.clwn.interactivity.core.network.packet.s2c.S2CBodySpawnPacket;
-import org.clwn.interactivity.core.network.packet.s2c.S2CBodyStatesPacket;
-import org.clwn.interactivity.core.network.packet.s2c.S2CPhysicsConfigPacket;
+import org.clwn.interactivity.core.network.packet.s2c.*;
 import org.clwn.interactivity.core.util.platform.Services;
 import org.clwn.interactivity.core.util.platform.services.INetworkingHelper;
 
@@ -41,6 +38,14 @@ public class PacketRegistry {
                 S2CBodyRemovePacket.TYPE,
                 S2CBodyRemovePacket.STREAM_CODEC,
                 (context, packet) -> ClientBodySyncHandler.handleRemove(packet)
+        );
+
+        Services.PLATFORM_NETWORK.registerPacket(
+                INetworkingHelper.PacketStageType.PLAY,
+                INetworkingHelper.PacketType.S2C,
+                S2CBodyDataPacket.TYPE,
+                S2CBodyDataPacket.STREAM_CODEC,
+                (context, packet) -> ClientBodySyncHandler.handleData(packet)
         );
 
         InteractivityAPI.getInstance().getNetworkManager().registerS2C(S2CBodyStatesPacket.IDENTIFIER, S2CBodyStatesPacket::decode);

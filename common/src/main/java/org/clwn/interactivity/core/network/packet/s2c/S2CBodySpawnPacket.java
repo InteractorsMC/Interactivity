@@ -13,6 +13,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import org.clwn.interactivity.core.physics.network.BodyStateCodec;
 import org.clwn.interactivity.core.util.InteractivityIdentifier;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,7 +23,8 @@ import org.jetbrains.annotations.NotNull;
  * @param dimension dimension the bodies are in; the client ignores the packet if its level is another one
  * @param tick      physics tick the states belong to
  * @param count     number of entries in {@code data}
- * @param data      per entry: UUID, body type id, then the state (see {@link org.clwn.interactivity.core.physics.network.BodyStateCodec})
+ * @param data      per entry: UUID, body type id, then the state (see {@link BodyStateCodec}),
+ *                  then the data (length varint + bytes, see {@link })
  */
 public record S2CBodySpawnPacket(ResourceKey<Level> dimension, int tick, int count, byte[] data) implements CustomPacketPayload {
     public static final Type<S2CBodySpawnPacket> TYPE =

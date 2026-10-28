@@ -26,6 +26,7 @@ import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.physics.body.BodyType;
 import org.clwn.interactivity.api.physics.body.RemovalReason;
 import org.clwn.interactivity.core.physics.body.BodyChunkListener;
+import org.clwn.interactivity.core.physics.body.BodyDataCodec;
 import org.clwn.interactivity.core.physics.body.ServerBodyManager;
 import org.clwn.interactivity.core.physics.body.store.SimulatedBodyDataStore;
 import org.clwn.interactivity.core.physics.body.store.SimulatedPhysicsStateContainer;
@@ -450,6 +451,7 @@ public class SaveManager implements BodyChunkListener {
             BodyType<? extends Body> type = BodyTypeRegistryImpl.INSTANCE.get(record.type()).orElseThrow();
 
             Body body = type.create(world, record.uuid());
+            BodyDataCodec.read(body, record.data());
             double[] position = record.position();
             float[] rotation = record.rotation();
             float[] linearVelocity = record.linearVelocity();
@@ -627,7 +629,8 @@ public class SaveManager implements BodyChunkListener {
                     new float[]{container.rotX.get(index), container.rotY.get(index), container.rotZ.get(index), container.rotW.get(index)},
                     new float[]{container.velX.get(index), container.velY.get(index), container.velZ.get(index)},
                     new float[]{container.angVelX.get(index), container.angVelY.get(index), container.angVelZ.get(index)},
-                    container.isActive.get(index) == 1
+                    container.isActive.get(index) == 1,
+                    BodyDataCodec.write(body)
             ));
             footprint.add(container.chunkKey.get(index));
         }

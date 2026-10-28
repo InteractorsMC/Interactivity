@@ -6,6 +6,7 @@ import org.clwn.interactivity.core.physics.body.SimulatedBodyManager;
 import org.clwn.interactivity.core.physics.body.store.SimulatedBodyDataStore;
 import org.clwn.interactivity.core.physics.network.BodyStateCodec;
 import org.clwn.interactivity.core.physics.world.SimulatedPhysicsWorldImpl;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -21,7 +22,7 @@ public class SimulatedClientBodyManager extends SimulatedBodyManager implements 
     }
 
     @Override
-    public void addRemote(int networkId, UUID uuid, BodyType<? extends Body> type, BodyStateCodec.Record state, int tick) {
+    public void addRemote(int networkId, UUID uuid, BodyType<? extends Body> type, BodyStateCodec.Record state, byte[] data, int tick) {
 
     }
 
@@ -33,5 +34,10 @@ public class SimulatedClientBodyManager extends SimulatedBodyManager implements 
     @Override
     public void applyState(BodyStateCodec.Record state, int tick) {
 
+    }
+
+    @Override
+    public @Nullable Body getBodyByNetworkId(int networkId) {
+        return null;
     }
 }

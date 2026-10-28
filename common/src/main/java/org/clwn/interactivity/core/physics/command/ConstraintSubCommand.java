@@ -30,6 +30,8 @@ import org.clwn.interactivity.api.physics.constraint.ConstraintManager;
 import org.clwn.interactivity.api.physics.constraint.ConstraintType;
 import org.clwn.interactivity.core.physics.command.argument.BodySelector;
 import org.clwn.interactivity.core.physics.command.argument.BodySelectorArgument;
+import org.clwn.interactivity.core.physics.command.argument.BodySpec;
+import org.clwn.interactivity.core.physics.command.argument.BodySpecArgument;
 import org.clwn.interactivity.core.physics.constraint.ConstraintImpl;
 import org.clwn.interactivity.core.physics.constraint.ConstraintManagerImpl;
 import org.clwn.interactivity.core.physics.world.ServerPhysicsWorldImpl;
@@ -69,8 +71,7 @@ public final class ConstraintSubCommand {
         LiteralArgumentBuilder<CommandSourceStack> chain = Commands.literal("chain");
         for (ChainLink link : ChainLink.values()) {
             chain.then(Commands.literal(link.getName())
-                    .then(Commands.argument("type", ResourceLocationArgument.id())
-                            .suggests(SummonSubCommand.SUMMONABLE_TYPES)
+                    .then(Commands.argument("body", BodySpecArgument.bodySpec())
                             .executes(context -> chain(context, link, context.getSource().getPosition(), DEFAULT_CHAIN_LENGTH))
                             .then(Commands.argument("pos", Vec3Argument.vec3())
                                     .executes(context -> chain(context, link, Vec3Argument.getVec3(context, "pos"), DEFAULT_CHAIN_LENGTH))
@@ -91,8 +92,9 @@ public final class ConstraintSubCommand {
 
     private static int chain(CommandContext<CommandSourceStack> context, ChainLink link, Vec3 position, int count) {
         CommandSourceStack source = context.getSource();
+        BodySpec spec = BodySpecArgument.getBodySpec(context, "body");
 
-        BodyType<? extends Body> type = SummonSubCommand.getSummonableType(source, ResourceLocationArgument.getId(context, "type"));
+        BodyType<? extends Body> type = SummonSubCommand.getSummonableType(source, spec);
         if (type == null) {
             return 0;
         }
@@ -102,13 +104,19 @@ public final class ConstraintSubCommand {
             return 0;
         }
 
-        spawnChain(world, type, link, position, count);
+        try {
+            spawnChain(world, type, spec, link, position, count);
+        } catch (IllegalArgumentException e) {
+            // Thrown by the first link, before anything was spawned
+            source.sendFailure(Component.literal("Invalid summon data: " + e.getMessage()));
+            return 0;
+        }
 
         source.sendSuccess(() -> Component.literal("Created a " + link.getName() + " chain of " + count + " " + type.getTypeId()), true);
         return count;
     }
 
-    private static <T extends Body> void spawnChain(ServerPhysicsWorldImpl world, BodyType<T> type, ChainLink link, Vec3 position, int count) {
+    private static <T extends Body> void spawnChain(ServerPhysicsWorldImpl world, BodyType<T> type, BodySpec spec, ChainLink link, Vec3 position, int count) {
         ConstraintManager constraintManager = world.getConstraintManager();
 
         Body previous = null;
@@ -116,7 +124,7 @@ public final class ConstraintSubCommand {
             RVec3 centre = new RVec3(position.x + i * CHAIN_SPACING, position.y, position.z);
             RVec3 previousCentre = new RVec3(centre.xx() - CHAIN_SPACING, centre.yy(), centre.zz());
 
-            T body = world.getBodyManager().spawnBody(type, centre, Quat.sIdentity(), b -> {});
+            T body = world.getBodyManager().spawnBody(type, centre, Quat.sIdentity(), b -> SummonSubCommand.configure(b, spec));
             if (previous == null) {
                 link.create(constraintManager, body, null, centre, previousCentre);
             } else {

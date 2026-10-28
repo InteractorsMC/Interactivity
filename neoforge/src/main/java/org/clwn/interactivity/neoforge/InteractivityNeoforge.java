@@ -29,6 +29,7 @@ import org.clwn.interactivity.api.network.PacketContext;
 import org.clwn.interactivity.api.util.Side;
 import org.clwn.interactivity.builtin.item.physicsgun.PhysicsGunItem;
 import org.clwn.interactivity.core.physics.command.argument.BodySelectorArgument;
+import org.clwn.interactivity.core.physics.command.argument.BodySpecArgument;
 import org.clwn.interactivity.core.util.InteractivityIdentifier;
 import org.clwn.interactivity.core.util.platform.services.INetworkingHelper;
 import org.clwn.interactivity.neoforge.util.platform.NeoForgeNetworkingHelper;
@@ -137,5 +138,10 @@ public class InteractivityNeoforge {
                 )
         );
 
+        event.register(
+                Registries.COMMAND_ARGUMENT_TYPE,
+                InteractivityIdentifier.getIdentifier("body_spec"),
+                () -> ArgumentTypeInfos.registerByClass(BodySpecArgument.class, SingletonArgumentInfo.contextFree(BodySpecArgument::bodySpec))
+        );
     }
 }

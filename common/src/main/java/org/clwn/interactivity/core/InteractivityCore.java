@@ -56,5 +56,6 @@ public class InteractivityCore {
         BehaviorRegistryImpl.INSTANCE.registerBehavior(EventListenerBehavior.class);
         BehaviorRegistryImpl.INSTANCE.registerBehavior(SummonableBehavior.class);
         BehaviorRegistryImpl.INSTANCE.registerBehavior(PersistenceBehavior.class);
+        BehaviorRegistryImpl.INSTANCE.registerBehavior(DataSyncBehavior.class);
     }
 }

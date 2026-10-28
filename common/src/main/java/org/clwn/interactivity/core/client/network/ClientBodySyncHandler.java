@@ -16,10 +16,12 @@ import org.clwn.interactivity.api.physics.body.BodyType;
 import org.clwn.interactivity.core.client.physics.ClientPhysicsPipelineImpl;
 import org.clwn.interactivity.core.client.physics.body.ClientBodyManager;
 import org.clwn.interactivity.core.client.physics.world.ClientPhysicsWorldInternal;
+import org.clwn.interactivity.core.network.packet.s2c.S2CBodyDataPacket;
 import org.clwn.interactivity.core.network.packet.s2c.S2CBodyRemovePacket;
 import org.clwn.interactivity.core.network.packet.s2c.S2CBodySpawnPacket;
 import org.clwn.interactivity.core.network.packet.s2c.S2CPhysicsConfigPacket;
 import org.clwn.interactivity.core.physics.PhysicsPipelineImpl;
+import org.clwn.interactivity.core.physics.body.BodyDataCodec;
 import org.clwn.interactivity.core.physics.body.type.BodyTypeRegistryImpl;
 import org.clwn.interactivity.core.physics.network.BodyStateCodec;
 
@@ -52,6 +54,7 @@ public final class ClientBodySyncHandler {
             UUID uuid = buf.readUUID();
             ResourceLocation typeId = buf.readResourceLocation();
             state.read(buf);
+            byte[] data = buf.readByteArray();
 
             Optional<BodyType<? extends Body>> type = BodyTypeRegistryImpl.INSTANCE.get(typeId);
             if (type.isEmpty()) {
@@ -59,7 +62,7 @@ public final class ClientBodySyncHandler {
                 continue;
             }
 
-            manager.addRemote(state.networkId, uuid, type.get(), state, packet.tick());
+            manager.addRemote(state.networkId, uuid, type.get(), state, data, packet.tick());
         }
     }
 
@@ -72,6 +75,27 @@ public final class ClientBodySyncHandler {
 
         for (int networkId : packet.networkIds()) {
             world.getBodyManager().removeRemote(networkId);
+        }
+    }
+
+    public static void handleData(S2CBodyDataPacket packet) {
+        ClientPhysicsWorldInternal world = ClientPhysicsPipelineImpl.INSTANCE.getCurrentPhysicsWorld();
+
+        if (world == null || !world.getClientLevel().dimension().equals(packet.dimension())) {
+            return;
+        }
+
+        ClientBodyManager manager = world.getBodyManager();
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.wrappedBuffer(packet.data()));
+
+        for (int i = 0; i < packet.count(); i++) {
+            int networkId = buf.readVarInt();
+            byte[] data = buf.readByteArray();
+
+            Body body = manager.getBodyByNetworkId(networkId);
+            if (body != null) {
+                BodyDataCodec.read(body, data);
+            }
         }
     }
 

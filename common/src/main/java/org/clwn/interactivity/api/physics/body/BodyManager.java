@@ -24,6 +24,8 @@ public interface BodyManager {
 
     Body getBody(UUID id);
 
+    void requestDataSync(Body body);
+
     @ApiStatus.Experimental
     default int getJoltBodyId(Body body) {
         return getJoltBodyId(body.getUuid());

@@ -13,6 +13,7 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntIterator;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.longs.LongIterator;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ChunkTrackingView;
@@ -21,12 +22,16 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
 import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.api.InteractivityAPI;
+import org.clwn.interactivity.api.physics.behavior.DataSyncBehavior;
 import org.clwn.interactivity.api.physics.body.Body;
+import org.clwn.interactivity.core.network.packet.s2c.S2CBodyDataPacket;
 import org.clwn.interactivity.core.network.packet.s2c.S2CBodyRemovePacket;
 import org.clwn.interactivity.core.network.packet.s2c.S2CBodySpawnPacket;
 import org.clwn.interactivity.core.network.packet.s2c.S2CBodyStatesPacket;
 import org.clwn.interactivity.core.physics.body.BodyChunkListener;
+import org.clwn.interactivity.core.physics.body.BodyDataCodec;
 import org.clwn.interactivity.core.physics.body.BodySpatialIndex;
+import org.clwn.interactivity.core.physics.body.ServerBodyManager;
 import org.clwn.interactivity.core.physics.body.store.SimulatedPhysicsStateContainer;
 import org.clwn.interactivity.core.physics.world.ServerPhysicsWorldImpl;
 import org.clwn.interactivity.core.util.platform.Services;
@@ -37,6 +42,7 @@ import java.util.*;
 public class NetworkDispatcher implements BodyChunkListener {
     private static final int MAX_SPAWNS_PER_PACKET = 128;
     private static final int MAX_REMOVES_PER_PACKET = 1024;
+    private static final int MAX_DATA_BYTES_PER_PACKET = 1024;
 
     private final ServerPhysicsWorldImpl world;
 
@@ -52,6 +58,9 @@ public class NetworkDispatcher implements BodyChunkListener {
     private int[] recordStart = new int[1024];
     private int[] recordLength = new int[1024];
     private int recordCount;
+    private final IntArrayList dataNetworkIds = new IntArrayList();
+    private final List<byte[]> dataRecords = new ArrayList<>();
+
 
     public NetworkDispatcher(ServerPhysicsWorldImpl world) {
         this.world = world;
@@ -97,6 +106,8 @@ public class NetworkDispatcher implements BodyChunkListener {
     public void update(int tick, SimulatedPhysicsStateContainer container) {
         updatePlayers();
 
+        collectChangedData(container);
+
         if (trackers.isEmpty()) {
             return;
         }
@@ -107,6 +118,7 @@ public class NetworkDispatcher implements BodyChunkListener {
             sendSpawns(tracker, tick, container);
             sendRemovals(tracker);
             sendStates(tracker, tick);
+            sendData(tracker);
         }
     }
 
@@ -192,6 +204,30 @@ public class NetworkDispatcher implements BodyChunkListener {
         }
     }
 
+    private void collectChangedData(SimulatedPhysicsStateContainer container) {
+        dataNetworkIds.clear();
+        dataRecords.clear();
+
+        ServerBodyManager bodyManager = world.getBodyManager();
+        ReferenceOpenHashSet<Body> seen = new ReferenceOpenHashSet<>();
+
+        Body body;
+        while ((body = bodyManager.pollDirtyDataBody()) != null) {
+            if (!seen.add(body) || !body.getType().hasBehavior(DataSyncBehavior.class)) {
+                continue;
+            }
+
+            // Removed, or not added yet (then its spawn carries the data)
+            int index = bodyManager.getBodyDataStore().getIndexByUuid(body.getUuid());
+            if (index == -1 || container.bodies[index] != body) {
+                continue;
+            }
+
+            dataNetworkIds.add(container.networkId.get(index));
+            dataRecords.add(BodyDataCodec.write(body));
+        }
+    }
+
     private void encodeChangedBodies(SimulatedPhysicsStateContainer container) {
         recordBuffer.clear();
         recordCount = 0;
@@ -246,6 +282,7 @@ public class NetworkDispatcher implements BodyChunkListener {
             out.writeUUID(body.getUuid());
             out.writeResourceLocation(body.getType().getTypeId());
             BodyStateCodec.write(out, container, index);
+            out.writeByteArray(BodyDataCodec.write(body));
 
             tracker.spawnedThisTick.add(networkId);
             count++;
@@ -293,6 +330,45 @@ public class NetworkDispatcher implements BodyChunkListener {
         }
 
         tracker.pendingRemove.clear();
+    }
+
+    private void sendData(PlayerTracker tracker) {
+        if (dataRecords.isEmpty()) {
+            return;
+        }
+
+        FriendlyByteBuf out = new FriendlyByteBuf(Unpooled.buffer());
+        int count = 0;
+
+        for (int i = 0; i < dataRecords.size(); i++) {
+            int networkId = dataNetworkIds.getInt(i);
+
+            // Bodies spawned this tick got their data with the spawn
+            if (!tracker.tracked.contains(networkId) || tracker.spawnedThisTick.contains(networkId)) {
+                continue;
+            }
+
+            out.writeVarInt(networkId);
+            out.writeByteArray(dataRecords.get(i));
+            count++;
+
+            if (out.readableBytes() >= MAX_DATA_BYTES_PER_PACKET) {
+                sendDataPacket(tracker.player, count, out);
+                out = new FriendlyByteBuf(Unpooled.buffer());
+                count = 0;
+            }
+        }
+
+        if (count > 0) {
+            sendDataPacket(tracker.player, count, out);
+        }
+    }
+
+    private void sendDataPacket(ServerPlayer player, int count, FriendlyByteBuf out) {
+        byte[] data = new byte[out.readableBytes()];
+        out.readBytes(data);
+
+        sendMinecraftPacket(player, new S2CBodyDataPacket(world.getServerLevel().dimension(), count, data));
     }
 
     private void sendStates(PlayerTracker tracker, int tick) {

@@ -11,6 +11,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
@@ -19,6 +20,8 @@ import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.physics.body.BodyType;
 import org.clwn.interactivity.core.physics.body.ServerBodyManager;
 import org.clwn.interactivity.core.physics.body.type.BodyTypeRegistryImpl;
+import org.clwn.interactivity.core.physics.command.argument.BodySpec;
+import org.clwn.interactivity.core.physics.command.argument.BodySpecArgument;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -31,22 +34,13 @@ public final class SummonSubCommand {
      */
     private static final double STACK_SPACING = 1.5;
 
-    static final SuggestionProvider<CommandSourceStack> SUMMONABLE_TYPES = (context, builder) ->
-            SharedSuggestionProvider.suggestResource(
-                    BodyTypeRegistryImpl.INSTANCE.getAll().stream()
-                            .filter(type -> type.hasBehavior(SummonableBehavior.class))
-                            .map(BodyType::getTypeId),
-                    builder
-            );
-
     private SummonSubCommand() {
 
     }
 
     public static LiteralArgumentBuilder<CommandSourceStack> getCommand() {
         return Commands.literal("summon")
-                .then(Commands.argument("type", ResourceLocationArgument.id())
-                        .suggests(SUMMONABLE_TYPES)
+                .then(Commands.argument("body", BodySpecArgument.bodySpec())
                         .executes(context -> summon(context, context.getSource().getPosition(), 1))
                         .then(Commands.argument("pos", Vec3Argument.vec3())
                                 .executes(context -> summon(context, Vec3Argument.getVec3(context, "pos"), 1))
@@ -63,31 +57,52 @@ public final class SummonSubCommand {
 
     private static int summon(CommandContext<CommandSourceStack> context, Vec3 position, int count) {
         CommandSourceStack source = context.getSource();
-        ResourceLocation typeId = ResourceLocationArgument.getId(context, "type");
+        BodySpec spec = BodySpecArgument.getBodySpec(context, "body");
 
-        BodyType<? extends Body> type = getSummonableType(source, typeId);
+        BodyType<? extends Body> type = getSummonableType(source, spec);
         if (type == null) {
             return 0;
         }
 
-        for (int i = 0; i < count; i++) {
-            spawn(InteractivityCommand.getPhysicsWorld(source).getBodyManager(), type, position.x, position.y + i * STACK_SPACING, position.z);
+        try {
+            for (int i = 0; i < count; i++) {
+                RVec3 bodyPosition = new RVec3(position.x, position.y + i * STACK_SPACING, position.z);
+                InteractivityCommand.getPhysicsWorld(source).getBodyManager().spawnBody(type, bodyPosition, Quat.sIdentity(), body -> configure(body, spec));
+            }
+        } catch (IllegalArgumentException e) {
+            // Thrown by the first body, before anything was spawned
+            source.sendFailure(Component.literal("Invalid summon data: " + e.getMessage()));
+            return 0;
         }
 
-        source.sendSuccess(() -> Component.literal("Summoned " + count + " " + typeId), true);
+        source.sendSuccess(() -> Component.literal("Summoned " + count + " " + type.getTypeId()), true);
         return count;
     }
 
-    static @Nullable BodyType<? extends Body> getSummonableType(CommandSourceStack source, ResourceLocation typeId) {
-        Optional<BodyType<? extends Body>> type = BodyTypeRegistryImpl.INSTANCE.get(typeId);
-        if (type.isEmpty() || !type.get().hasBehavior(SummonableBehavior.class)) {
-            source.sendFailure(Component.literal("Unknown or not summonable body type: " + typeId));
+    static @Nullable BodyType<? extends Body> getSummonableType(CommandSourceStack source, BodySpec spec) {
+        Optional<BodyType<? extends Body>> type = BodyTypeRegistryImpl.INSTANCE.get(spec.type());
+        Optional<SummonableBehavior> summonable = type.flatMap(bodyType -> bodyType.getBehavior(SummonableBehavior.class));
+        if (summonable.isEmpty()) {
+            source.sendFailure(Component.literal("Unknown or not summonable body type: " + spec.type()));
             return null;
         }
+
+        if (spec.data() != null && summonable.get().configurator() == null) {
+            source.sendFailure(Component.literal("Body type " + spec.type() + " does not accept summon data"));
+            return null;
+        }
+
         return type.get();
     }
 
-    private static <T extends Body> void spawn(ServerBodyManager bodyManager, BodyType<T> type, double x, double y, double z) {
-        bodyManager.spawnBody(type, new RVec3(x, y, z), Quat.sIdentity(), body -> {});
+    static void configure(Body body, BodySpec spec) {
+        CompoundTag data = spec.data();
+        if (data == null) {
+            return;
+        }
+
+        body.getType().getBehavior(SummonableBehavior.class)
+                .map(SummonableBehavior::configurator)
+                .ifPresent(configurator -> configurator.configure(body, data.copy()));
     }
 }

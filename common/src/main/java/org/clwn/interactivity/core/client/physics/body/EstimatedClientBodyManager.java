@@ -17,9 +17,11 @@ import org.clwn.interactivity.api.physics.body.RemovalReason;
 import org.clwn.interactivity.core.client.physics.body.store.EstimatedClientBodyDataStore;
 import org.clwn.interactivity.core.client.physics.world.EstimatedClientPhysicsWorldImpl;
 import org.clwn.interactivity.core.physics.body.AbstractBodyManager;
+import org.clwn.interactivity.core.physics.body.BodyDataCodec;
 import org.clwn.interactivity.core.physics.body.store.PhysicsStateContainer;
 import org.clwn.interactivity.core.physics.body.type.BodyTypeImpl;
 import org.clwn.interactivity.core.physics.network.BodyStateCodec;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -36,12 +38,13 @@ public class EstimatedClientBodyManager extends AbstractBodyManager implements C
     }
 
     @Override
-    public void addRemote(int networkId, UUID uuid, BodyType<? extends Body> type, BodyStateCodec.Record state, int tick) {
+    public void addRemote(int networkId, UUID uuid, BodyType<? extends Body> type, BodyStateCodec.Record state, byte[] data, int tick) {
         if (bodyDataStore.getIndexByNetworkId(networkId) != -1) {
             removeRemote(networkId);
         }
 
         Body body = type.create(physicsWorld, uuid);
+        BodyDataCodec.read(body, data);
 
         int index = bodyDataStore.addBody(body);
         PhysicsStateContainer container = bodyDataStore.getPhysicsStateContainer();
@@ -85,6 +88,12 @@ public class EstimatedClientBodyManager extends AbstractBodyManager implements C
 
         state.applyTo(container, index);
         container.stateTick.put(index, tick);
+    }
+
+    @Override
+    public @Nullable Body getBodyByNetworkId(int networkId) {
+        int index = bodyDataStore.getIndexByNetworkId(networkId);
+        return index == -1 ? null : bodyDataStore.getPhysicsStateContainer().bodies[index];
     }
 
     @Override

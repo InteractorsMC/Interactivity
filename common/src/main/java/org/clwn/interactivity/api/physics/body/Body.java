@@ -10,6 +10,7 @@ package org.clwn.interactivity.api.physics.body;
 import lombok.Getter;
 import lombok.Setter;
 import org.clwn.interactivity.api.physics.world.PhysicsWorld;
+import org.clwn.interactivity.api.physics.world.ServerPhysicsWorld;
 import org.clwn.interactivity.api.util.math.Quat;
 import org.clwn.interactivity.api.util.math.Vec3d;
 import org.clwn.interactivity.api.util.math.Vec3f;
@@ -49,5 +50,11 @@ public abstract class Body {
 
     public Vec3f getAngularVelocity() {
         return this.physicsWorld.getPhysicsStateAccessor().getAngularVelocity(this.uuid);
+    }
+
+    public void requestDataSync() {
+        if (this.physicsWorld instanceof ServerPhysicsWorld serverWorld) {
+            serverWorld.getBodyManager().requestDataSync(this);
+        }
     }
 }

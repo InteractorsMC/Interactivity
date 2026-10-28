@@ -19,6 +19,11 @@ public abstract class AbstractBodyManager implements BodyManager {
     public abstract AbstractBodyDataStore getBodyDataStore();
 
     @Override
+    public void requestDataSync(Body body) {
+        // Only the server sends body data
+    }
+
+    @Override
     public @Nullable Body getBody(UUID id) {
         AbstractBodyDataStore store = getBodyDataStore();
         int index = store.getIndexByUuid(id);

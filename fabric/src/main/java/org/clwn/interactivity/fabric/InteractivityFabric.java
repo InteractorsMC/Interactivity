@@ -19,6 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.builtin.item.physicsgun.PhysicsGunItem;
 import org.clwn.interactivity.core.physics.command.argument.BodySelectorArgument;
+import org.clwn.interactivity.core.physics.command.argument.BodySpecArgument;
 import org.clwn.interactivity.core.util.InteractivityIdentifier;
 import org.clwn.interactivity.fabric.event.EventNotifierFabric;
 
@@ -50,6 +51,12 @@ public class InteractivityFabric implements ModInitializer {
                 InteractivityIdentifier.getIdentifier("body_selector"),
                 BodySelectorArgument.class,
                 SingletonArgumentInfo.contextFree(BodySelectorArgument::bodies)
+        );
+
+        ArgumentTypeRegistry.registerArgumentType(
+                InteractivityIdentifier.getIdentifier("body_spec"),
+                BodySpecArgument.class,
+                SingletonArgumentInfo.contextFree(BodySpecArgument::bodySpec)
         );
     }
 }

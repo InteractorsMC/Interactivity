@@ -24,8 +24,6 @@ import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.util.math.Conversions;
 
 public class BlockRenderer implements BodyRenderer<BlockRenderer.BlockRenderState> {
-    private static final BlockState blockState = Blocks.STONE.defaultBlockState();
-
     @Override
     public BlockRenderState createState() {
         return new BlockRenderState();
@@ -33,7 +31,8 @@ public class BlockRenderer implements BodyRenderer<BlockRenderer.BlockRenderStat
 
     @Override
     public void extract(ExtractionContext context, Body body, BlockRenderState state) {
-        int color = Minecraft.getInstance().getBlockColors().getColor(blockState, body.getPhysicsWorld().getLevel(), BlockPos.containing(Conversions.toMinecraft(body.getPosition())), 0);
+        state.blockState = ((BlockRigidBody) body).getBlockState();
+        int color = Minecraft.getInstance().getBlockColors().getColor(state.blockState, body.getPhysicsWorld().getLevel(), BlockPos.containing(Conversions.toMinecraft(body.getPosition())), 0);
         state.r = (color >> 16 & 255) / 255.0f;
         state.g = (color >> 8 & 255) / 255.0f;
         state.b = (color & 255) / 255.0f;
@@ -46,9 +45,9 @@ public class BlockRenderer implements BodyRenderer<BlockRenderer.BlockRenderStat
 
         Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(
                 context.lowLevel().getPoseStack().last(),
-                Minecraft.getInstance().renderBuffers().bufferSource().getBuffer(ItemBlockRenderTypes.getRenderType(blockState, false)),
-                blockState,
-                Minecraft.getInstance().getBlockRenderer().getBlockModel(blockState),
+                Minecraft.getInstance().renderBuffers().bufferSource().getBuffer(ItemBlockRenderTypes.getRenderType(state.blockState, false)),
+                state.blockState,
+                Minecraft.getInstance().getBlockRenderer().getBlockModel(state.blockState),
                 state.r, state.g, state.b,
                 state.packedLight,
                 OverlayTexture.NO_OVERLAY
@@ -60,6 +59,7 @@ public class BlockRenderer implements BodyRenderer<BlockRenderer.BlockRenderStat
         public float g;
         public float b;
         public int packedLight;
+        public BlockState blockState;
 
         public BlockRenderState() {}
     }

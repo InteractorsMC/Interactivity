@@ -7,8 +7,14 @@
  */
 package org.clwn.interactivity.api.physics.behavior;
 
+import org.clwn.interactivity.api.physics.body.BodySummonConfigurator;
+import org.jetbrains.annotations.Nullable;
+
 /**
  * Lets operators summon bodies of this type.
  */
-public record SummonableBehavior() implements Behavior {
+public record SummonableBehavior(@Nullable BodySummonConfigurator configurator) implements Behavior {
+    public SummonableBehavior() {
+        this(null);
+    }
 }

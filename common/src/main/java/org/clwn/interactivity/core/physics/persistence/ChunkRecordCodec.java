@@ -94,6 +94,7 @@ public final class ChunkRecordCodec {
             writeFloats(buf, body.linearVelocity());
             writeFloats(buf, body.angularVelocity());
             buf.writeByte(body.awake() ? FLAG_AWAKE : 0);
+            buf.writeByteArray(body.data());
         }
 
         buf.writeVarInt(group.constraints().length);
@@ -128,7 +129,8 @@ public final class ChunkRecordCodec {
                     readFloats(buf, 4),
                     readFloats(buf, 3),
                     readFloats(buf, 3),
-                    (buf.readByte() & FLAG_AWAKE) != 0
+                    (buf.readByte() & FLAG_AWAKE) != 0,
+                    buf.readByteArray()
             );
         }
 

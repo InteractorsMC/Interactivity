@@ -10,8 +10,6 @@ import java.util.UUID;
 
 
 public abstract class AbstractBodyManager implements BodyManager {
-    // todo: save manager
-
     protected final PhysicsWorldImpl physicsWorld;
 
     public AbstractBodyManager(PhysicsWorldImpl physicsWorld) {

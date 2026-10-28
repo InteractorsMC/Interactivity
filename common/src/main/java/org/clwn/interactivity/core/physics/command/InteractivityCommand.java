@@ -25,6 +25,7 @@ public final class InteractivityCommand {
                 .then(SummonSubCommand.getCommand())
                 .then(KillSubCommand.getCommand())
                 .then(ConstraintSubCommand.getCommand())
+                .then(SaveSubCommand.getCommand())
         );
     }
 

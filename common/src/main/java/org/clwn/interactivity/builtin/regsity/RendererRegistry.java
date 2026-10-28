@@ -20,5 +20,9 @@ public class RendererRegistry {
                 BodyRegistry.BLOCK_BODY,
                 new BlockRenderer()
         );
+        InteractivityClientAPI.getInstance().getBodyRendererRegistry().register(
+                BodyRegistry.TEMPORARY_BLOCK_BODY,
+                new BlockRenderer()
+        );
     }
 }

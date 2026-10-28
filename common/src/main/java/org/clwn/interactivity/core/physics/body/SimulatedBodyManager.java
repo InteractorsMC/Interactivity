@@ -13,6 +13,7 @@ import com.github.stephengold.joltjni.enumerate.EMotionType;
 import com.github.stephengold.joltjni.readonly.QuatArg;
 import com.github.stephengold.joltjni.readonly.RVec3Arg;
 import org.clwn.interactivity.Interactivity;
+import org.clwn.interactivity.api.physics.body.AddReason;
 import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.physics.body.BodyType;
 import org.clwn.interactivity.api.physics.body.RemovalReason;
@@ -60,18 +61,31 @@ public abstract class SimulatedBodyManager extends AbstractBodyManager {
         float lvx = linearVelocity.getX(), lvy = linearVelocity.getY(), lvz = linearVelocity.getZ();
         float avx = angularVelocity.getX(), avy = angularVelocity.getY(), avz = angularVelocity.getZ();
 
-        simulatedWorld.execute(() -> spawnBodyInternal(body, px, py, pz, qx, qy, qz, qw, lvx, lvy, lvz, avx, avy, avz));
+        simulatedWorld.execute(() -> spawnBodyInternal(
+                body,
+                px, py, pz,
+                qx, qy, qz, qw,
+                lvx, lvy, lvz,
+                avx, avy, avz,
+                EActivation.Activate,
+                AddReason.SPAWNED
+        ));
     }
 
     @Override
-    public void removeBody(Body body, RemovalReason removalReason) {
-        // todo: use removal reason in logic (save manager)
-        UUID uuid = body.getUuid();
-        simulatedWorld.execute(() -> removeBodyInternal(uuid, removalReason));
+    public void removeBody(UUID id, RemovalReason removalReason) {
+        simulatedWorld.execute(() -> removeBodyInternal(id, removalReason));
     }
 
-    private void spawnBodyInternal(Body body, double px, double py, double pz, float qx, float qy, float qz, float qw,
-                        float lvx, float lvy, float lvz, float avx, float avy, float avz) {
+    public boolean spawnBodyInternal(
+            Body body,
+            double px, double py, double pz,
+            float qx, float qy, float qz, float qw,
+            float lvx, float lvy, float lvz,
+            float avx, float avy, float avz,
+            EActivation activation,
+            AddReason addReason
+    ) {
         // todo: support both rigid and soft bodies. While there is RigidBodyBehavior which controls creation, here we are assuming that all bodies are rigid
         SimulatedBodyDataStore store = getBodyDataStore();
 
@@ -91,7 +105,7 @@ public abstract class SimulatedBodyManager extends AbstractBodyManager {
         container.angVelX.put(index, avx);
         container.angVelY.put(index, avy);
         container.angVelZ.put(index, avz);
-        container.isActive.put(index, (byte) 1);
+        container.isActive.put(index, (byte) (activation == EActivation.Activate ? 1 : 0));
 
         // Apply all default behaviors from the body type
         container.behaviorFlags.put(index, ((BodyTypeImpl<?>) body.getType()).getBehaviorMask());
@@ -103,14 +117,14 @@ public abstract class SimulatedBodyManager extends AbstractBodyManager {
                 new Quat(qx, qy, qz, qw),
                 new Vec3(lvx, lvy, lvz),
                 new Vec3(avx, avy, avz),
-                EActivation.Activate,
+                activation,
                 EMotionType.Dynamic
         );
 
         if (bodyId == -1) {
             Interactivity.LOGGER.error("Failed to add body {} of type {}", body.getUuid(), body.getType().getTypeId());
             store.removeBody(body.getUuid());
-            return;
+            return false;
         }
 
         container.joltBodyId.put(index, bodyId);
@@ -129,10 +143,11 @@ public abstract class SimulatedBodyManager extends AbstractBodyManager {
             container.aabbMaxZ.put(index, max.getZ());
         }
 
-        onBodyAdd(body, index);
+        onBodyAdd(body, index, addReason);
+        return true;
     }
 
-    private void removeBodyInternal(UUID uuid, RemovalReason removalReason) {
+    public void removeBodyInternal(UUID uuid, RemovalReason removalReason) {
         SimulatedBodyDataStore store = getBodyDataStore();
 
         int index = store.getIndexByUuid(uuid);
@@ -160,12 +175,8 @@ public abstract class SimulatedBodyManager extends AbstractBodyManager {
 
     }
 
-    public void onPhysicsTick() {
-        // todo: check isActive state and send event
-    }
-
-    protected void onBodyAdd(Body body, int index) {
-        BodyEventDispatcher.onBodyAdded(body);
+    protected void onBodyAdd(Body body, int index, AddReason addReason) {
+        BodyEventDispatcher.onBodyAdded(body, addReason);
     }
 
     protected void onBodyRemove(Body body, int index, RemovalReason removalReason) {

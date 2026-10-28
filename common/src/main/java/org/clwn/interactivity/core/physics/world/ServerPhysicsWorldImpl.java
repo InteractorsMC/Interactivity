@@ -15,15 +15,21 @@ import com.github.stephengold.joltjni.enumerate.EActivation;
 import com.github.stephengold.joltjni.enumerate.EMotionType;
 import lombok.Getter;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.storage.LevelResource;
 import org.clwn.interactivity.api.physics.ObjectLayer;
 import org.clwn.interactivity.api.physics.world.ServerPhysicsWorld;
 import org.clwn.interactivity.core.config.InteractivityConfig;
 import org.clwn.interactivity.core.event.Event;
 import org.clwn.interactivity.core.event.lifecycle.BlockChangeEvents;
 import org.clwn.interactivity.core.event.lifecycle.ChunkLifecycleEvents;
+import org.clwn.interactivity.core.event.lifecycle.LevelSaveEvents;
 import org.clwn.interactivity.core.event.lifecycle.LevelTickEvents;
 import org.clwn.interactivity.core.physics.body.ServerBodyManager;
+import org.clwn.interactivity.core.physics.body.store.SimulatedPhysicsStateContainer;
 import org.clwn.interactivity.core.physics.network.NetworkDispatcher;
+import org.clwn.interactivity.core.physics.persistence.SaveManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,12 +44,23 @@ public class ServerPhysicsWorldImpl extends SimulatedPhysicsWorldImpl implements
     @Getter
     protected final NetworkDispatcher networkDispatcher;
 
+    @Getter
+    protected final SaveManager saveManager;
+
     private final List<Event.Subscription> subscriptions = new ArrayList<>();
 
     public ServerPhysicsWorldImpl(ServerLevel level, PhysicsSimulationConfig physicsSimulationConfig) {
         super(level, physicsSimulationConfig);
         this.serverLevel = level;
         this.networkDispatcher = new NetworkDispatcher(this);
+        this.saveManager = new SaveManager(this, DimensionType
+                .getStorageFolder(level.dimension(), level.getServer().getWorldPath(LevelResource.ROOT))
+                .resolve("interactivity")
+                .resolve("physics")
+        );
+
+        bodyManager.getChunkTracker().registerListener(networkDispatcher);
+        bodyManager.getChunkTracker().registerListener(saveManager);
     }
 
     @Override
@@ -70,6 +87,11 @@ public class ServerPhysicsWorldImpl extends SimulatedPhysicsWorldImpl implements
                 onLevelTickEnd();
             }
         }));
+        subscriptions.add(LevelSaveEvents.SAVE_EVENT.subscribe(event -> {
+            if (event.level() == serverLevel) {
+                saveManager.onLevelSave(event.flush());
+            }
+        }));
 
         if (InteractivityConfig.devGroundPlane) {
             execute(this::createGroundPlane);
@@ -81,12 +103,30 @@ public class ServerPhysicsWorldImpl extends SimulatedPhysicsWorldImpl implements
         subscriptions.forEach(Event.Subscription::close);
         subscriptions.clear();
 
+        saveManager.close(Thread.currentThread() == workingThread);
+
         super.close();
     }
 
     @Override
+    public void onChunkLoad(LevelChunk chunk) {
+        super.onChunkLoad(chunk);
+        saveManager.onChunkLoad(chunk.getPos().toLong());
+    }
+
+    @Override
+    public void onChunkUnload(LevelChunk chunk) {
+        saveManager.onChunkUnload(chunk.getPos().toLong());
+        super.onChunkUnload(chunk);
+    }
+
+    @Override
     protected void afterSync(int tick) {
-        networkDispatcher.update(tick, bodyManager.getBodyDataStore().getPhysicsStateContainer());
+        SimulatedPhysicsStateContainer container = bodyManager.getBodyDataStore().getPhysicsStateContainer();
+
+        bodyManager.getChunkTracker().update(container);
+        networkDispatcher.update(tick, container);
+        saveManager.afterTick();
     }
 
     /**

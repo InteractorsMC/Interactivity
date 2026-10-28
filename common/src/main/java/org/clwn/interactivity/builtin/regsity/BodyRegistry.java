@@ -13,6 +13,7 @@ package org.clwn.interactivity.builtin.regsity;
 
 import org.clwn.interactivity.api.InteractivityAPI;
 import org.clwn.interactivity.api.physics.behavior.EventListenerBehavior;
+import org.clwn.interactivity.api.physics.behavior.PersistenceBehavior;
 import org.clwn.interactivity.api.physics.behavior.RigidBehavior;
 import org.clwn.interactivity.api.physics.behavior.SummonableBehavior;
 import org.clwn.interactivity.api.physics.body.BodyType;
@@ -21,10 +22,23 @@ import org.clwn.interactivity.core.util.InteractivityIdentifier;
 
 public final class BodyRegistry {
     public static BodyType<BlockRigidBody> BLOCK_BODY;
+    public static BodyType<BlockRigidBody> TEMPORARY_BLOCK_BODY;
 
     public static void register() {
         BLOCK_BODY = InteractivityAPI.getInstance().getBodyTypeRegistry().registerBodyType(
                 InteractivityIdentifier.getIdentifier("block"),
+                BlockRigidBody.class,
+                BlockRigidBody::new,
+                (bodyBuilder -> bodyBuilder.addBehaviors(
+                        new RigidBehavior(BlockRigidBody::createJoltBody),
+                        new EventListenerBehavior(),
+                        new SummonableBehavior(),
+                        new PersistenceBehavior()
+                ))
+        );
+
+        TEMPORARY_BLOCK_BODY = InteractivityAPI.getInstance().getBodyTypeRegistry().registerBodyType(
+                InteractivityIdentifier.getIdentifier("temporary_block"),
                 BlockRigidBody.class,
                 BlockRigidBody::new,
                 (bodyBuilder -> bodyBuilder.addBehaviors(

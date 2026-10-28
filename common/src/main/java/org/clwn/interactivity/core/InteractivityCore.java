@@ -10,9 +10,7 @@ package org.clwn.interactivity.core;
 import eu.midnightdust.lib.config.MidnightConfig;
 import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.api.client.InteractivityCoreClient;
-import org.clwn.interactivity.api.physics.behavior.EventListenerBehavior;
-import org.clwn.interactivity.api.physics.behavior.RigidBehavior;
-import org.clwn.interactivity.api.physics.behavior.SummonableBehavior;
+import org.clwn.interactivity.api.physics.behavior.*;
 import org.clwn.interactivity.core.client.physics.ClientPhysicsPipelineImpl;
 import org.clwn.interactivity.core.config.InteractivityConfig;
 import org.clwn.interactivity.core.event.lifecycle.CommandRegistrationEvents;
@@ -57,5 +55,6 @@ public class InteractivityCore {
         BehaviorRegistryImpl.INSTANCE.registerBehavior(RigidBehavior.class);
         BehaviorRegistryImpl.INSTANCE.registerBehavior(EventListenerBehavior.class);
         BehaviorRegistryImpl.INSTANCE.registerBehavior(SummonableBehavior.class);
+        BehaviorRegistryImpl.INSTANCE.registerBehavior(PersistenceBehavior.class);
     }
 }

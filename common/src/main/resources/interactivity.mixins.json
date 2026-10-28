@@ -10,6 +10,7 @@
   ],
   "client": [
     "debug.DebugScreenOverlayMixin",
+    "event.lifecycle.ServerLevelMixin",
     "event.lifecycle.MinecraftMixin",
     "event.render.LevelRendererMixin",
     "useless.SplashManagerMixin"

@@ -174,7 +174,6 @@ public abstract class SimulatedPhysicsWorldImpl extends PhysicsWorldImpl impleme
         SimulationEventDispatcher.postPhysicsTick(this, fixedTimeStep);
 
         try {
-            getBodyManager().onPhysicsTick();
             afterSync(tick);
         } catch (Exception e) {
             Interactivity.LOGGER.error("Exception after physics sync", e);

@@ -1,6 +1,7 @@
 package org.clwn.interactivity.api.physics.event;
 
 import lombok.Getter;
+import org.clwn.interactivity.api.physics.body.AddReason;
 import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.physics.body.RemovalReason;
 
@@ -10,8 +11,12 @@ public abstract class BodyLifecycleEvent extends BodyEvent {
     }
 
     public static final class BodyAddedEvent extends BodyLifecycleEvent {
-        public BodyAddedEvent(Body body) {
+        @Getter
+        private final AddReason addReason;
+
+        public BodyAddedEvent(Body body, AddReason addReason) {
             super(body);
+            this.addReason = addReason;
         }
     }
 

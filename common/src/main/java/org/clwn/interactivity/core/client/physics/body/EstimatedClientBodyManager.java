@@ -93,7 +93,7 @@ public class EstimatedClientBodyManager extends AbstractBodyManager implements C
     }
 
     @Override
-    public void removeBody(Body body, RemovalReason removalReason) {
+    public void removeBody(UUID id, RemovalReason removalReason) {
         throw new UnsupportedOperationException("Bodies of a non-simulated client world can only be removed by the server");
     }
 

@@ -8,17 +8,20 @@
 package org.clwn.interactivity.core.physics.body;
 
 import lombok.Getter;
+import org.clwn.interactivity.api.physics.body.AddReason;
 import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.physics.body.RemovalReason;
 import org.clwn.interactivity.core.physics.body.store.ServerBodyDataStore;
 import org.clwn.interactivity.core.physics.body.store.SimulatedPhysicsStateContainer;
-import org.clwn.interactivity.core.physics.network.NetworkDispatcher;
 import org.clwn.interactivity.core.physics.network.NetworkIdAllocator;
 import org.clwn.interactivity.core.physics.world.ServerPhysicsWorldImpl;
 
 public class ServerBodyManager extends SimulatedBodyManager {
     @Getter
     protected final ServerBodyDataStore bodyDataStore = new ServerBodyDataStore();
+
+    @Getter
+    private final BodyChunkTracker chunkTracker = new BodyChunkTracker();
 
     private final ServerPhysicsWorldImpl serverWorld;
 
@@ -28,18 +31,13 @@ public class ServerBodyManager extends SimulatedBodyManager {
     }
 
     @Override
-    protected void onBodyAdd(Body body, int index) {
-        super.onBodyAdd(body, index);
+    protected void onBodyAdd(Body body, int index, AddReason addReason) {
+        super.onBodyAdd(body, index, addReason);
 
         SimulatedPhysicsStateContainer container = bodyDataStore.getPhysicsStateContainer();
 
-        int networkId = NetworkIdAllocator.next();
-        long chunkKey = NetworkDispatcher.chunkKeyOf(container.posX.get(index), container.posZ.get(index));
-
-        container.networkId.put(index, networkId);
-        container.chunkKey.put(index, chunkKey);
-
-        serverWorld.getNetworkDispatcher().onBodyAdded(networkId, chunkKey, index);
+        container.networkId.put(index, NetworkIdAllocator.next());
+        chunkTracker.onBodyAdded(index, container);
     }
 
     @Override
@@ -48,6 +46,7 @@ public class ServerBodyManager extends SimulatedBodyManager {
 
         SimulatedPhysicsStateContainer container = bodyDataStore.getPhysicsStateContainer();
 
-        serverWorld.getNetworkDispatcher().onBodyRemove(container.networkId.get(index), container.chunkKey.get(index));
+        chunkTracker.onBodyRemoved(index, container);
+        serverWorld.getSaveManager().onBodyRemoved(body, removalReason);
     }
 }

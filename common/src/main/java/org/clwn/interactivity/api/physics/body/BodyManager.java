@@ -16,7 +16,11 @@ import java.util.function.Consumer;
 
 public interface BodyManager {
     <T extends Body> T spawnBody(BodyType<T> bodyType, RVec3Arg position, QuatArg rotation, Consumer<T> configurator);
-    void removeBody(Body body, RemovalReason removalReason);
+
+    default void removeBody(Body body, RemovalReason removalReason) {
+        removeBody(body.getUuid(), removalReason);
+    }
+    void removeBody(UUID id, RemovalReason removalReason);
 
     Body getBody(UUID id);
 

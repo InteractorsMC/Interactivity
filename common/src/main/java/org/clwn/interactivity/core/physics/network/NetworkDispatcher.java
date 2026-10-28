@@ -18,7 +18,6 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ChunkTrackingView;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.ChunkPos;
 import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.api.InteractivityAPI;
@@ -26,6 +25,8 @@ import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.core.network.packet.s2c.S2CBodyRemovePacket;
 import org.clwn.interactivity.core.network.packet.s2c.S2CBodySpawnPacket;
 import org.clwn.interactivity.core.network.packet.s2c.S2CBodyStatesPacket;
+import org.clwn.interactivity.core.physics.body.BodyChunkListener;
+import org.clwn.interactivity.core.physics.body.BodySpatialIndex;
 import org.clwn.interactivity.core.physics.body.store.SimulatedPhysicsStateContainer;
 import org.clwn.interactivity.core.physics.world.ServerPhysicsWorldImpl;
 import org.clwn.interactivity.core.util.platform.Services;
@@ -33,7 +34,7 @@ import org.clwn.interactivity.core.util.platform.services.INetworkingHelper;
 
 import java.util.*;
 
-public class NetworkDispatcher {
+public class NetworkDispatcher implements BodyChunkListener {
     private static final int MAX_SPAWNS_PER_PACKET = 128;
     private static final int MAX_REMOVES_PER_PACKET = 1024;
 
@@ -44,8 +45,6 @@ public class NetworkDispatcher {
     private final Map<UUID, PlayerTracker> trackers = new HashMap<>();
 
     private final Int2IntOpenHashMap networkIdToIndex = new Int2IntOpenHashMap();
-
-    private final BodySpatialIndex spatialIndex = new BodySpatialIndex();
 
     // Encoded records of the bodies that changed this tick, shared by all players
     private final FriendlyByteBuf recordBuffer = new FriendlyByteBuf(Unpooled.buffer(64 * 1024));
@@ -59,10 +58,6 @@ public class NetworkDispatcher {
         this.networkIdToIndex.defaultReturnValue(-1);
     }
 
-    public static long chunkKeyOf(double x, double z) {
-        return ChunkPos.asLong(Mth.floor(x) >> 4, Mth.floor(z) >> 4);
-    }
-
     public void publishPlayers(ServerLevel level) {
         List<ServerPlayer> players = level.players();
         List<PlayerView> views = new ArrayList<>(players.size());
@@ -74,9 +69,10 @@ public class NetworkDispatcher {
         this.playerSnapshot = views;
     }
 
-    public void onBodyAdded(int networkId, long chunkKey, int index) {
+    @Override
+    public void onBodyAdded(int index, long chunkKey) {
+        int networkId = world.getBodyManager().getBodyDataStore().getPhysicsStateContainer().networkId.get(index);
         networkIdToIndex.put(networkId, index);
-        spatialIndex.add(chunkKey, networkId);
 
         int chunkX = ChunkPos.getX(chunkKey);
         int chunkZ = ChunkPos.getZ(chunkKey);
@@ -88,9 +84,10 @@ public class NetworkDispatcher {
         }
     }
 
-    public void onBodyRemove(int networkId, long chunkKey) {
+    @Override
+    public void onBodyRemoved(int index, long chunkKey) {
+        int networkId = world.getBodyManager().getBodyDataStore().getPhysicsStateContainer().networkId.get(index);
         networkIdToIndex.remove(networkId);
-        spatialIndex.remove(chunkKey, networkId);
 
         for (PlayerTracker tracker : trackers.values()) {
             tracker.untrack(networkId);
@@ -99,7 +96,6 @@ public class NetworkDispatcher {
 
     public void update(int tick, SimulatedPhysicsStateContainer container) {
         updatePlayers();
-        updateBodyChunks(container);
 
         if (trackers.isEmpty()) {
             return;
@@ -145,6 +141,8 @@ public class NetworkDispatcher {
         ChunkTrackingView oldView = tracker.view;
         tracker.view = newView;
 
+        SimulatedPhysicsStateContainer container = world.getBodyManager().getBodyDataStore().getPhysicsStateContainer();
+        BodySpatialIndex spatialIndex = world.getBodyManager().getChunkTracker().getSpatialIndex();
         LongIterator chunks = spatialIndex.occupiedChunks().iterator();
         while (chunks.hasNext()) {
             long chunkKey = chunks.nextLong();
@@ -165,7 +163,7 @@ public class NetworkDispatcher {
 
             IntIterator iterator = bodies.iterator();
             while (iterator.hasNext()) {
-                int networkId = iterator.nextInt();
+                int networkId = container.networkId.get(iterator.nextInt());
 
                 if (isInView) {
                     tracker.track(networkId);
@@ -176,39 +174,20 @@ public class NetworkDispatcher {
         }
     }
 
-    private void updateBodyChunks(SimulatedPhysicsStateContainer container) {
-        int dirtyCount = container.getDirtyCount();
+    @Override
+    public void onBodyMoved(int index, long fromChunkKey, long toChunkKey) {
+        int networkId = world.getBodyManager().getBodyDataStore().getPhysicsStateContainer().networkId.get(index);
+        int chunkX = ChunkPos.getX(toChunkKey);
+        int chunkZ = ChunkPos.getZ(toChunkKey);
 
-        for (int k = 0; k < dirtyCount; k++) {
-            int index = container.dirtyIndices.get(k);
-            int networkId = container.networkId.get(index);
+        for (PlayerTracker tracker : trackers.values()) {
+            boolean tracked = tracker.tracked.contains(networkId);
+            boolean inView = tracker.view.contains(chunkX, chunkZ);
 
-            if (networkId < 0) {
-                continue;
-            }
-
-            long oldKey = container.chunkKey.get(index);
-            long newKey = chunkKeyOf(container.posX.get(index), container.posZ.get(index));
-
-            if (oldKey == newKey) {
-                continue;
-            }
-
-            container.chunkKey.put(index, newKey);
-            spatialIndex.move(networkId, oldKey, newKey);
-
-            int chunkX = ChunkPos.getX(newKey);
-            int chunkZ = ChunkPos.getZ(newKey);
-
-            for (PlayerTracker tracker : trackers.values()) {
-                boolean tracked = tracker.tracked.contains(networkId);
-                boolean inView = tracker.view.contains(chunkX, chunkZ);
-
-                if (inView && !tracked) {
-                    tracker.track(networkId);
-                } else if (!inView && tracked) {
-                    tracker.untrack(networkId);
-                }
+            if (inView && !tracked) {
+                tracker.track(networkId);
+            } else if (!inView && tracked) {
+                tracker.untrack(networkId);
             }
         }
     }

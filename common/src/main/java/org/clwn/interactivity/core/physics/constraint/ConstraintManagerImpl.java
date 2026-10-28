@@ -48,6 +48,40 @@ public class ConstraintManagerImpl implements ConstraintManager {
         return constraint;
     }
 
+    public @Nullable ConstraintImpl<?> restoreConstraint(UUID uuid, UUID body1, @Nullable UUID body2, TwoBodyConstraintSettings settings, byte[] state) {
+        TwoBodyConstraint created;
+        try {
+            created = createJoltConstraint(uuid, body1, body2, settings);
+        } catch (Exception e) {
+            Interactivity.LOGGER.error("Failed to restore constraint {}", uuid, e);
+            return null;
+        }
+        if (created == null) {
+            return null;
+        }
+
+        TwoBodyConstraintRef ref = created.toRef();
+        ConstraintType<?, ?> type = ConstraintType.bySubType(created.getSubType());
+        if (type == null) {
+            Interactivity.LOGGER.warn("Constraint {} was not restored: unsupported type {}", uuid, created.getSubType());
+            ref.close();
+            return null;
+        }
+
+        if (state.length > 0) {
+            try (StateRecorderImpl recorder = new StateRecorderImpl()) {
+                recorder.writeBytes(state);
+                created.restoreState(recorder);
+            } catch (Exception e) {
+                Interactivity.LOGGER.warn("Failed to restore the state of constraint {}, using defaults", uuid, e);
+            }
+        }
+
+        ConstraintImpl<?> constraint = new ConstraintImpl<>(this, uuid, type, body1, body2);
+        addToSimulation(constraint, ref, created);
+        return constraint;
+    }
+
     @Override
     public void removeConstraint(Constraint<?> constraint) {
         world.execute(() -> removeInternal((ConstraintImpl<?>) constraint));

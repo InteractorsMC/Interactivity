@@ -9,12 +9,8 @@ package org.clwn.interactivity.core.client.event.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
-import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import org.clwn.interactivity.core.event.Event;
-import org.joml.Matrix4f;
+import org.clwn.interactivity.core.event.internal.Event;
 
 public class LevelRenderEvents {
     public static final Event<EntityPassContext> ENTITY_PASS = new Event<>();

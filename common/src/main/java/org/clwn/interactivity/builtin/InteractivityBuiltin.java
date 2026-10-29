@@ -21,7 +21,7 @@ public final class InteractivityBuiltin {
     public static void init() {
         BodyRegistry.register();
 
-        InteractivityAPI.getInstance().getEventBus().registerListener(PhysicsGunLogic.class);
+        InteractivityAPI.getInstance().getEventBus().registerListener(PhysicsGunLogic.class, false);
 
         if (Services.PLATFORM.isClientEnvironment()) {
             RendererRegistry.register();

@@ -8,7 +8,7 @@
 package org.clwn.interactivity.core.physics.system;
 
 import org.clwn.interactivity.api.physics.event.PhysicsTickEvent;
-import org.clwn.interactivity.core.physics.event.EventBusImpl;
+import org.clwn.interactivity.core.event.external.EventBusImpl;
 import org.clwn.interactivity.core.physics.world.PhysicsWorldImpl;
 
 /**

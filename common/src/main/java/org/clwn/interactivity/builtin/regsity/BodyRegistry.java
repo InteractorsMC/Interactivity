@@ -28,7 +28,7 @@ public final class BodyRegistry {
                 BlockRigidBody::new,
                 (bodyBuilder -> bodyBuilder.addBehaviors(
                         new RigidBehavior(BlockRigidBody::createJoltBody),
-                        new EventListenerBehavior(),
+                        new EventListenerBehavior(true),
                         new SummonableBehavior(BlockRigidBody::configureSummon),
                         new DataSyncBehavior(BlockRigidBody::writeData, BlockRigidBody::readData),
                         new PersistenceBehavior()
@@ -41,7 +41,7 @@ public final class BodyRegistry {
                 BlockRigidBody::new,
                 (bodyBuilder -> bodyBuilder.addBehaviors(
                         new RigidBehavior(BlockRigidBody::createJoltBody),
-                        new EventListenerBehavior(),
+                        new EventListenerBehavior(true),
                         new SummonableBehavior(BlockRigidBody::configureSummon),
                         new DataSyncBehavior(BlockRigidBody::writeData, BlockRigidBody::readData)
                 ))

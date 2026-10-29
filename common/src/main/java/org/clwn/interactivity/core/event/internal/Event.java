@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org.
  */
-package org.clwn.interactivity.core.event;
+package org.clwn.interactivity.core.event.internal;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;

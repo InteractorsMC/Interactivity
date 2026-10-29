@@ -9,5 +9,5 @@ package org.clwn.interactivity.api.physics.behavior;
 
 
 /** Enables event-driven handling for a body type. */
-public record EventListenerBehavior() implements Behavior {
+public record EventListenerBehavior(boolean listensCustomEvents) implements Behavior {
 }

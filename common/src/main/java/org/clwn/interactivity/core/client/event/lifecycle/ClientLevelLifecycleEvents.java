@@ -8,7 +8,7 @@
 package org.clwn.interactivity.core.client.event.lifecycle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
-import org.clwn.interactivity.core.event.Event;
+import org.clwn.interactivity.core.event.internal.Event;
 
 public class ClientLevelLifecycleEvents {
     public static final Event<ClientLevelEvent> LEVEL_LOAD_EVENT = new Event<>();

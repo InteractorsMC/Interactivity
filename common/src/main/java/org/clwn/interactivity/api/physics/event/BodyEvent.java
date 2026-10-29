@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.physics.world.PhysicsWorld;
 
-public class BodyEvent extends Event {
+public class BodyEvent extends PhysicsWorldEvent {
     @Getter
     protected final Body body;
 

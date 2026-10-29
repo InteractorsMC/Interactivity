@@ -13,7 +13,7 @@ import org.clwn.interactivity.api.client.InteractivityCoreClient;
 import org.clwn.interactivity.api.physics.behavior.*;
 import org.clwn.interactivity.core.client.physics.ClientPhysicsPipelineImpl;
 import org.clwn.interactivity.core.config.InteractivityConfig;
-import org.clwn.interactivity.core.event.lifecycle.CommandRegistrationEvents;
+import org.clwn.interactivity.core.event.internal.lifecycle.CommandRegistrationEvents;
 import org.clwn.interactivity.core.network.packet.PacketRegistry;
 import org.clwn.interactivity.core.physics.PhysicsPipelineImpl;
 import org.clwn.interactivity.core.physics.behavior.BehaviorRegistryImpl;

@@ -22,7 +22,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
 import org.clwn.interactivity.api.InteractivityAPI;
 import org.clwn.interactivity.api.physics.event.PhysicsTickEvent;
-import org.clwn.interactivity.api.physics.event.SubscribeEvent;
+import org.clwn.interactivity.api.event.SubscribeEvent;
 import org.clwn.interactivity.api.physics.world.JoltBridge;
 import org.clwn.interactivity.api.physics.world.PhysicsWorld;
 import org.clwn.interactivity.api.physics.world.ServerPhysicsWorld;

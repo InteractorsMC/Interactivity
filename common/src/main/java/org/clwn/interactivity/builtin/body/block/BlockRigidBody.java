@@ -32,7 +32,7 @@ import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.physics.body.BodyType;
 import org.clwn.interactivity.api.physics.body.RigidBodyFactory;
 import org.clwn.interactivity.api.physics.event.BodyEvent;
-import org.clwn.interactivity.api.physics.event.SubscribeEvent;
+import org.clwn.interactivity.api.event.SubscribeEvent;
 import org.clwn.interactivity.api.physics.world.PhysicsWorld;
 
 import java.util.UUID;

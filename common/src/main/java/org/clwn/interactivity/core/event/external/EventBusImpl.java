@@ -1,14 +1,16 @@
-package org.clwn.interactivity.core.physics.event;
+package org.clwn.interactivity.core.event.external;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import org.clwn.interactivity.Interactivity;
+import org.clwn.interactivity.api.event.CustomEvent;
+import org.clwn.interactivity.api.event.Event;
+import org.clwn.interactivity.api.event.EventBus;
+import org.clwn.interactivity.api.event.SubscribeEvent;
 import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.physics.body.BodyType;
 import org.clwn.interactivity.api.physics.event.BodyEvent;
-import org.clwn.interactivity.api.physics.event.Event;
-import org.clwn.interactivity.api.physics.event.EventBus;
-import org.clwn.interactivity.api.physics.event.SubscribeEvent;
-import org.clwn.interactivity.core.physics.world.SimulatedPhysicsWorldImpl;
+import org.clwn.interactivity.api.physics.event.PhysicsWorldEvent;
+import org.clwn.interactivity.core.physics.world.PhysicsWorldImpl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -27,7 +29,8 @@ public final class EventBusImpl implements EventBus {
 
     private record RegisteredListener(
             Class<?> eventType,
-            Method method
+            Method method,
+            boolean listensCustomEvents
     ) {
     }
 
@@ -35,7 +38,7 @@ public final class EventBusImpl implements EventBus {
     }
 
     @Override
-    public void registerListener(Class<?> clazz) {
+    public void registerListener(Class<?> clazz, boolean listensCustomEvents) {
         for (Method method : clazz.getDeclaredMethods()) {
             if (!method.isAnnotationPresent(SubscribeEvent.class)) {
                 continue;
@@ -57,12 +60,13 @@ public final class EventBusImpl implements EventBus {
 
             eventListeners.add(new RegisteredListener(
                     method.getParameterTypes()[0],
-                    method
+                    method,
+                    listensCustomEvents
             ));
         }
     }
 
-    public <T extends Body> void registerBodyType(BodyType<T> bodyType) {
+    public <T extends Body> void registerBodyType(BodyType<T> bodyType, boolean listensCustomEvents) {
         List<RegisteredListener> listeners = new ArrayList<>();
         for (Method method : bodyType.getBodyClass().getDeclaredMethods()) {
             if (!method.isAnnotationPresent(SubscribeEvent.class)) {
@@ -77,7 +81,7 @@ public final class EventBusImpl implements EventBus {
                 );
             }
 
-            listeners.add(new RegisteredListener(method.getParameterTypes()[0], method));
+            listeners.add(new RegisteredListener(method.getParameterTypes()[0], method, listensCustomEvents));
         }
 
         bodyTypeEventListeners.put(bodyType, listeners);
@@ -105,33 +109,34 @@ public final class EventBusImpl implements EventBus {
         // todo: applicable listeners can be cached using Event -> listeners
 
         for (RegisteredListener listener : eventListeners) {
-            if (!listener.eventType().isAssignableFrom(event.getClass())) {
+            if (shouldSkipEvent(event, listener)) {
                 continue;
             }
 
             invokeListener(listener.method(), null, event);
         }
 
-        // todo: instanceof PhysicsEvent
-        if (event instanceof BodyEvent bodyEvent) {
-            publishToBody(bodyEvent.getBody(), event);
-            return;
-        }
+        if (event instanceof PhysicsWorldEvent physicsWorldEvent) {
+            if (event instanceof BodyEvent bodyEvent) {
+                publishToBody(bodyEvent.getBody(), physicsWorldEvent);
+                return;
+            }
 
-        if (event.getPhysicsWorld() instanceof SimulatedPhysicsWorldImpl physicsWorld) {
-            for (Body body : physicsWorld.getBodyManager().getBodyDataStore().getPhysicsStateContainer().bodies) {
-                if (body == null) {
-                    continue;
+            if (physicsWorldEvent.getPhysicsWorld() instanceof PhysicsWorldImpl physicsWorld) {
+                for (Body body : physicsWorld.getBodyManager().getBodyDataStore().getPhysicsStateContainer().bodies) {
+                    if (body == null) {
+                        continue;
+                    }
+
+                    publishToBody(body, physicsWorldEvent);
                 }
-
-                publishToBody(body, event);
             }
         }
     }
 
     private void publishToBody(
             Body body,
-            Event event
+            PhysicsWorldEvent event
     ) {
         List<RegisteredListener> listeners =
                 bodyTypeEventListeners.get(body.getType());
@@ -141,12 +146,18 @@ public final class EventBusImpl implements EventBus {
         }
 
         for (RegisteredListener listener : listeners) {
-            if (!listener.eventType().isAssignableFrom(event.getClass())) {
+            if (shouldSkipEvent(event, listener)) {
                 continue;
             }
 
             invokeListener(listener.method(), body, event);
         }
+    }
+
+    private static boolean shouldSkipEvent(Event event, RegisteredListener listener) {
+        return
+                !listener.eventType().isAssignableFrom(event.getClass())
+                        || (!listener.listensCustomEvents && event instanceof CustomEvent);
     }
 
     private static void invokeListener(Method method, Object target, Event event) {

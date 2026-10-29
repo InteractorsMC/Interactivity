@@ -14,7 +14,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import org.clwn.interactivity.core.event.lifecycle.*;
+import org.clwn.interactivity.core.event.internal.lifecycle.*;
 
 public class EventNotifierFabric {
     public static void registerEvents() {

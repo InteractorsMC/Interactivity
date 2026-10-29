@@ -18,7 +18,7 @@ import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.clwn.interactivity.Interactivity;
-import org.clwn.interactivity.core.event.lifecycle.*;
+import org.clwn.interactivity.core.event.internal.lifecycle.*;
 
 @EventBusSubscriber(modid = Interactivity.MOD_ID)
 public class EventNotifierNeoforge {

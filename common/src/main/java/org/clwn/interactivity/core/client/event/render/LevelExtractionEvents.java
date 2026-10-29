@@ -10,7 +10,7 @@ package org.clwn.interactivity.core.client.event.render;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.culling.Frustum;
-import org.clwn.interactivity.core.event.Event;
+import org.clwn.interactivity.core.event.internal.Event;
 
 public class LevelExtractionEvents {
     public static final Event<LevelExtractionContext> EXTRACTION_END = new Event<>();

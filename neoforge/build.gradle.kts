@@ -36,7 +36,6 @@ neoForge {
 
 dependencies {
     implementation(project(":natives"))
-    jarJar(project(":natives"))
     "additionalRuntimeClasspath"(project(":natives"))
 
     // Dependencies
@@ -49,3 +48,15 @@ dependencies {
 
 
 sourceSets["main"].resources.srcDir("src/generated/resources")
+
+tasks.shadowJar {
+    archiveClassifier.set("shadow-intermediate")
+}
+
+tasks.jar {
+    dependsOn(tasks.shadowJar)
+    from(zipTree(tasks.shadowJar.flatMap { it.archiveFile })) {
+        exclude("META-INF/MANIFEST.MF")
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}

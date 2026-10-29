@@ -12,9 +12,6 @@ dependencies {
     "modImplementation"("net.fabricmc:fabric-loader:${commonMod.dep("fabric_loader")}")
     "modImplementation"("net.fabricmc.fabric-api:fabric-api:${commonMod.dep("fabric_api")}")
 
-    include(project(":natives"))
-    include("interactorsmc:jolt-jni:${commonMod.dep("jolt_jni")}@jar")
-
     // Dependencies
     val midnightlib = "eu.midnightdust:midnightlib:${commonMod.dep("midnightlib")}-fabric"
     "modImplementation"(midnightlib)
@@ -56,4 +53,14 @@ loom {
             runDir("runs/server")
         }
     }
+}
+
+tasks.shadowJar {
+    archiveClassifier.set("dev-shadow")
+}
+
+// Remap the shadowed jar instead of the plain one
+tasks.remapJar {
+    dependsOn(tasks.shadowJar)
+    inputFile.set(tasks.shadowJar.flatMap { it.archiveFile })
 }

@@ -11,7 +11,7 @@ import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.players.PlayerList;
-import org.clwn.interactivity.core.event.lifecycle.PlayerLifecycleEvents;
+import org.clwn.interactivity.core.event.internal.lifecycle.PlayerLifecycleEvents;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

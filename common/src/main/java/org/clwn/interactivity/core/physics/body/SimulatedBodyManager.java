@@ -176,10 +176,10 @@ public abstract class SimulatedBodyManager extends AbstractBodyManager {
     }
 
     protected void onBodyAdd(Body body, int index, AddReason addReason) {
-        BodyEventDispatcher.onBodyAdded(body, addReason);
+        super.onBodyAdd(body, index, addReason);
     }
 
     protected void onBodyRemove(Body body, int index, RemovalReason removalReason) {
-        BodyEventDispatcher.onBodyRemoved(body, removalReason);
+        super.onBodyRemove(body, index, removalReason);
     }
 }

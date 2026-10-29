@@ -9,7 +9,7 @@ package org.clwn.interactivity.core.mixin.event.lifecycle;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ProgressListener;
-import org.clwn.interactivity.core.event.lifecycle.LevelSaveEvents;
+import org.clwn.interactivity.core.event.internal.lifecycle.LevelSaveEvents;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

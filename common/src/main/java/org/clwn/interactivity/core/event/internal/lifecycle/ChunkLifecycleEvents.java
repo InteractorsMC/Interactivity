@@ -5,11 +5,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org.
  */
-package org.clwn.interactivity.core.event.lifecycle;
+package org.clwn.interactivity.core.event.internal.lifecycle;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.chunk.LevelChunk;
-import org.clwn.interactivity.core.event.Event;
+import org.clwn.interactivity.core.event.internal.Event;
 
 /**
  * Server chunk lifecycle. Both events are published on the server thread.

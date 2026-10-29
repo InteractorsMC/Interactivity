@@ -13,7 +13,7 @@ import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.physics.body.BodyType;
 import org.clwn.interactivity.api.physics.body.BodyTypeRegistry;
 import org.clwn.interactivity.core.physics.behavior.BehaviorRegistryImpl;
-import org.clwn.interactivity.core.physics.event.EventBusImpl;
+import org.clwn.interactivity.core.event.external.EventBusImpl;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -58,9 +58,10 @@ public final class BodyTypeRegistryImpl implements BodyTypeRegistry {
         BodyTypeImpl<T> bodyType = builder.build(typeId, bodyClass, factory, behaviorRegistry);
         bodyTypes.put(typeId, bodyType);
 
-        if (bodyType.hasBehavior(EventListenerBehavior.class)) {
-            EventBusImpl.INSTANCE.registerBodyType(bodyType);
-        }
+        Optional<EventListenerBehavior> eventListenerBehavior = bodyType.getBehavior(EventListenerBehavior.class);
+        eventListenerBehavior.ifPresent(listenerBehavior ->
+                EventBusImpl.INSTANCE.registerBodyType(bodyType, listenerBehavior.listensCustomEvents())
+        );
 
         return bodyType;
     }

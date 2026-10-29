@@ -3,7 +3,7 @@ package org.clwn.interactivity.api.physics.event;
 import lombok.Getter;
 import org.clwn.interactivity.api.physics.world.PhysicsWorld;
 
-public abstract class PhysicsTickEvent extends Event {
+public abstract class PhysicsTickEvent extends PhysicsWorldEvent {
     @Getter
     protected final float deltaTime;
 

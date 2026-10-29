@@ -9,6 +9,7 @@ package org.clwn.interactivity.api;
 
 import org.clwn.interactivity.api.network.NetworkManager;
 import org.clwn.interactivity.api.physics.PhysicsPipeline;
+import org.clwn.interactivity.api.physics.behavior.BehaviorRegistry;
 import org.clwn.interactivity.api.physics.body.BodyTypeRegistry;
 import org.clwn.interactivity.api.physics.event.EventBus;
 import org.clwn.interactivity.core.InteractivityAPIImpl;
@@ -20,6 +21,7 @@ public interface InteractivityAPI {
 
     PhysicsPipeline getPhysicsPipeline();
 
+    BehaviorRegistry getBehaviorRegistry();
     BodyTypeRegistry getBodyTypeRegistry();
 
     NetworkManager getNetworkManager();

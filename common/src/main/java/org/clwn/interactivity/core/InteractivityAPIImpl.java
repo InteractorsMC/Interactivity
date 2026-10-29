@@ -10,8 +10,10 @@ package org.clwn.interactivity.core;
 import org.clwn.interactivity.api.InteractivityAPI;
 import org.clwn.interactivity.api.network.NetworkManager;
 import org.clwn.interactivity.api.physics.PhysicsPipeline;
+import org.clwn.interactivity.api.physics.behavior.BehaviorRegistry;
 import org.clwn.interactivity.api.physics.body.BodyTypeRegistry;
 import org.clwn.interactivity.api.physics.event.EventBus;
+import org.clwn.interactivity.core.physics.behavior.BehaviorRegistryImpl;
 import org.clwn.interactivity.core.physics.event.EventBusImpl;
 import org.clwn.interactivity.core.network.NetworkManagerImpl;
 import org.clwn.interactivity.core.physics.PhysicsPipelineImpl;
@@ -22,7 +24,6 @@ public class InteractivityAPIImpl implements InteractivityAPI {
 
     private InteractivityAPIImpl() {
     }
-
 
     @Override
     public PhysicsPipeline getPhysicsPipeline() {
@@ -42,5 +43,10 @@ public class InteractivityAPIImpl implements InteractivityAPI {
     @Override
     public EventBus getEventBus() {
         return EventBusImpl.INSTANCE;
+    }
+
+    @Override
+    public BehaviorRegistry getBehaviorRegistry() {
+        return BehaviorRegistryImpl.INSTANCE;
     }
 }

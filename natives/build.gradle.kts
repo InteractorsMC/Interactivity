@@ -1,6 +1,7 @@
 plugins {
     `java-library`
     `maven-publish`
+    id("com.gradleup.shadow")
     id("interactivity-base")
 }
 
@@ -215,6 +216,7 @@ tasks.processResources {
 }
 
 tasks.named<Jar>("jar") {
+    archiveClassifier.set("slim")
     manifest {
         attributes(
             mapOf(
@@ -227,4 +229,15 @@ tasks.named<Jar>("jar") {
             )
         )
     }
+}
+
+tasks.shadowJar {
+    archiveClassifier.set("")
+    configurations = listOf(project.configurations.runtimeClasspath.get())
+    mergeServiceFiles()
+    exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
+}
+
+tasks.assemble {
+    dependsOn(tasks.shadowJar)
 }

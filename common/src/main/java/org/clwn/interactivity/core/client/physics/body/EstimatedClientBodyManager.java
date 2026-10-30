@@ -10,6 +10,7 @@ package org.clwn.interactivity.core.client.physics.body;
 import com.github.stephengold.joltjni.Jolt;
 import com.github.stephengold.joltjni.readonly.QuatArg;
 import com.github.stephengold.joltjni.readonly.RVec3Arg;
+import com.github.stephengold.joltjni.readonly.Vec3Arg;
 import lombok.Getter;
 import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.physics.body.BodyType;
@@ -98,6 +99,11 @@ public class EstimatedClientBodyManager extends AbstractBodyManager implements C
 
     @Override
     public <T extends Body> T spawnBody(BodyType<T> bodyType, RVec3Arg position, QuatArg rotation, Consumer<T> configurator) {
+        throw new UnsupportedOperationException("Bodies of a non-simulated client world can only be spawned by the server");
+    }
+
+    @Override
+    public <T extends Body> void spawnConstructedBody(T body, RVec3Arg position, QuatArg rotation, Vec3Arg linearVelocity, Vec3Arg angularVelocity) {
         throw new UnsupportedOperationException("Bodies of a non-simulated client world can only be spawned by the server");
     }
 

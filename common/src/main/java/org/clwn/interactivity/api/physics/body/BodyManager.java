@@ -9,6 +9,7 @@ package org.clwn.interactivity.api.physics.body;
 
 import com.github.stephengold.joltjni.readonly.QuatArg;
 import com.github.stephengold.joltjni.readonly.RVec3Arg;
+import com.github.stephengold.joltjni.readonly.Vec3Arg;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.UUID;
@@ -16,6 +17,8 @@ import java.util.function.Consumer;
 
 public interface BodyManager {
     <T extends Body> T spawnBody(BodyType<T> bodyType, RVec3Arg position, QuatArg rotation, Consumer<T> configurator);
+
+    <T extends Body> void spawnConstructedBody(T body, RVec3Arg position, QuatArg rotation, Vec3Arg linearVelocity, Vec3Arg angularVelocity);
 
     default void removeBody(Body body, RemovalReason removalReason) {
         removeBody(body.getUuid(), removalReason);

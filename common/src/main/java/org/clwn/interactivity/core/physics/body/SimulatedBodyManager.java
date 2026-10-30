@@ -12,6 +12,7 @@ import com.github.stephengold.joltjni.enumerate.EActivation;
 import com.github.stephengold.joltjni.enumerate.EMotionType;
 import com.github.stephengold.joltjni.readonly.QuatArg;
 import com.github.stephengold.joltjni.readonly.RVec3Arg;
+import com.github.stephengold.joltjni.readonly.Vec3Arg;
 import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.api.physics.body.AddReason;
 import org.clwn.interactivity.api.physics.body.Body;
@@ -20,7 +21,6 @@ import org.clwn.interactivity.api.physics.body.RemovalReason;
 import org.clwn.interactivity.core.physics.body.store.SimulatedBodyDataStore;
 import org.clwn.interactivity.core.physics.body.store.SimulatedPhysicsStateContainer;
 import org.clwn.interactivity.core.physics.body.type.BodyTypeImpl;
-import org.clwn.interactivity.core.physics.system.BodyEventDispatcher;
 import org.clwn.interactivity.core.physics.world.SimulatedPhysicsWorldImpl;
 
 import java.util.UUID;
@@ -55,7 +55,7 @@ public abstract class SimulatedBodyManager extends AbstractBodyManager {
      * Queues a fully constructed body for addition to the world.
      * The arguments are copied, so the caller may reuse them right after the call.
      */
-    public <T extends Body> void spawnConstructedBody(T body, RVec3Arg position, QuatArg rotation, Vec3 linearVelocity, Vec3 angularVelocity) {
+    public <T extends Body> void spawnConstructedBody(T body, RVec3Arg position, QuatArg rotation, Vec3Arg linearVelocity, Vec3Arg angularVelocity) {
         double px = position.xx(), py = position.yy(), pz = position.zz();
         float qx = rotation.getX(), qy = rotation.getY(), qz = rotation.getZ(), qw = rotation.getW();
         float lvx = linearVelocity.getX(), lvy = linearVelocity.getY(), lvz = linearVelocity.getZ();

@@ -90,14 +90,14 @@ public class InteractivityConfig extends MidnightConfig {
     }
 
     @Entry(category = RENDER)
-    public static RenderSamplerType renderSampler = RenderSamplerType.INTERPOLATION;
+    public static RenderSamplerType renderSampler = RenderSamplerType.EXTRAPOLATION;
 
     @Entry(
             category = RENDER,
             min = 0,
             max = 10
     )
-    public static double interpolationDelayTicks = 1.5;
+    public static double interpolationDelayTicks = 0.5;
 
     @Entry(
             category = RENDER,

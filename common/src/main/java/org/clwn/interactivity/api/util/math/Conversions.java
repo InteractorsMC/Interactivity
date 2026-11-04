@@ -16,9 +16,13 @@ import com.github.stephengold.joltjni.readonly.QuatArg;
 import com.github.stephengold.joltjni.readonly.RMat44Arg;
 import com.github.stephengold.joltjni.readonly.RVec3Arg;
 import com.github.stephengold.joltjni.readonly.Vec3Arg;
+import net.minecraft.core.Position;
 import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
 import org.joml.Vector3d;
+import org.joml.Vector3dc;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 /**
  * A utility class providing static methods for converting between various mathematical types
@@ -136,25 +140,25 @@ public final class Conversions {
     }
 
     /**
-     * Converts a Minecraft {@link net.minecraft.world.phys.Vec3} to a JOML {@link Vector3d}.
+     * Converts a Minecraft {@link Position} to a JOML {@link Vector3d}.
      * This method creates a new {@link Vector3d} instance.
      *
-     * @param in The source Minecraft {@link net.minecraft.world.phys.Vec3}.
+     * @param in The source Minecraft {@link Position}.
      * @return A new {@link Vector3d} instance with the converted values.
      */
-    public static Vector3d toJoml(net.minecraft.world.phys.Vec3 in) {
+    public static Vector3d toJoml(Position in) {
         return toJoml(in, new Vector3d());
     }
 
     /**
-     * Converts a Minecraft {@link net.minecraft.world.phys.Vec3} to a JOML {@link Vector3d}.
+     * Converts a Minecraft {@link Position} to a JOML {@link Vector3d}.
      * This method populates a pre-existing {@link Vector3d} instance for performance.
      *
-     * @param in  The source Minecraft {@link net.minecraft.world.phys.Vec3}.
+     * @param in  The source Minecraft {@link Position}.
      * @param out The target JOML {@link Vector3d} to store the result in.
      * @return The populated {@link Vector3d} (the same instance as {@code out}).
      */
-    public static Vector3d toJoml(net.minecraft.world.phys.Vec3 in, Vector3d out) {
+    public static Vector3d toJoml(Position in, Vector3d out) {
         return out.set(in.x(), in.y(), in.z());
     }
 
@@ -185,97 +189,97 @@ public final class Conversions {
     }
 
     /**
-     * Converts a JOML {@link Vector3f} to a Jolt {@link Vec3} (single-precision).
+     * Converts a JOML {@link Vector3fc} to a Jolt {@link Vec3} (single-precision).
      * This method creates a new {@link Vec3} instance.
      *
-     * @param in The source JOML {@link Vector3f}.
+     * @param in The source JOML {@link Vector3fc}.
      * @return A new {@link Vec3Arg} instance with the converted values.
      */
-    public static Vec3 toJolt(Vector3f in) {
+    public static Vec3 toJolt(Vector3fc in) {
         return toJolt(in, new Vec3());
     }
 
     /**
-     * Converts a JOML {@link Vector3f} to a Jolt {@link Vec3} (single-precision).
+     * Converts a JOML {@link Vector3fc} to a Jolt {@link Vec3} (single-precision).
      * This method populates a pre-existing {@link Vec3} instance for performance.
      *
-     * @param in  The source JOML {@link Vector3f}.
+     * @param in  The source JOML {@link Vector3fc}.
      * @param out The target Jolt {@link Vec3} to store the result in.
      * @return The populated {@link Vec3} (the same instance as {@code out}).
      */
-    public static Vec3 toJolt(Vector3f in, Vec3 out) {
-        out.set(in.x, in.y, in.z);
+    public static Vec3 toJolt(Vector3fc in, Vec3 out) {
+        out.set(in.x(), in.y(), in.z());
         return out;
     }
 
     /**
-     * Converts a JOML {@link Vector3d} to a Jolt {@link RVec3} (double-precision).
+     * Converts a JOML {@link Vector3dc} to a Jolt {@link RVec3} (double-precision).
      * This method creates a new {@link RVec3} instance.
      *
-     * @param in The source JOML {@link Vector3d}.
+     * @param in The source JOML {@link Vector3dc}.
      * @return A new {@link RVec3} instance with the converted values.
      */
-    public static RVec3 toJolt(Vector3d in) {
+    public static RVec3 toJolt(Vector3dc in) {
         return toJolt(in, new RVec3());
     }
 
     /**
-     * Converts a JOML {@link Vector3d} to a Jolt {@link RVec3} (double-precision).
+     * Converts a JOML {@link Vector3dc} to a Jolt {@link RVec3} (double-precision).
      * This method populates a pre-existing {@link RVec3} instance for performance.
      *
-     * @param in  The source JOML {@link Vector3d}.
+     * @param in  The source JOML {@link Vector3dc}.
      * @param out The target Jolt {@link RVec3} to store the result in.
      * @return The populated {@link RVec3} (the same instance as {@code out}).
      */
-    public static RVec3 toJolt(Vector3d in, RVec3 out) {
-        out.set(in.x, in.y, in.z);
+    public static RVec3 toJolt(Vector3dc in, RVec3 out) {
+        out.set(in.x(), in.y(), in.z());
         return out;
     }
 
     /**
-     * Converts a JOML {@link Quaternionf} to a Jolt {@link Quat} (single-precision).
+     * Converts a JOML {@link Quaternionfc} to a Jolt {@link Quat} (single-precision).
      * This method creates a new {@link Quat} instance.
      *
-     * @param in The source JOML {@link Quaternionf}.
+     * @param in The source JOML {@link Quaternionfc}.
      * @return A new {@link Quat} instance with the converted values.
      */
-    public static Quat toJolt(Quaternionf in) {
+    public static Quat toJolt(Quaternionfc in) {
         return toJolt(in, new Quat());
     }
 
     /**
-     * Converts a JOML {@link Quaternionf} to a Jolt {@link Quat} (single-precision).
+     * Converts a JOML {@link Quaternionfc} to a Jolt {@link Quat} (single-precision).
      * This method populates a pre-existing {@link Quat} instance for performance.
      *
-     * @param in  The source JOML {@link Quaternionf}.
+     * @param in  The source JOML {@link Quaternionfc}.
      * @param out The target Jolt {@link Quat} to store the result in.
      * @return The populated {@link Quat} (the same instance as {@code out}).
      */
-    public static Quat toJolt(Quaternionf in, Quat out) {
-        out.set(in.x, in.y, in.z, in.w);
+    public static Quat toJolt(Quaternionfc in, Quat out) {
+        out.set(in.x(), in.y(), in.z(), in.w());
         return out;
     }
 
     /**
-     * Converts a Minecraft {@link net.minecraft.world.phys.Vec3} to a Jolt {@link RVec3} (double-precision).
+     * Converts a Minecraft {@link Position} to a Jolt {@link RVec3} (double-precision).
      * This method creates a new {@link RVec3} instance.
      *
-     * @param in The source Minecraft {@link net.minecraft.world.phys.Vec3}.
+     * @param in The source Minecraft {@link Position}.
      * @return A new {@link RVec3} instance with the converted values.
      */
-    public static RVec3 toJolt(net.minecraft.world.phys.Vec3 in) {
+    public static RVec3 toJolt(Position in) {
         return toJolt(in, new RVec3());
     }
 
     /**
-     * Converts a Minecraft {@link net.minecraft.world.phys.Vec3} to a Jolt {@link RVec3} (double-precision).
+     * Converts a Minecraft {@link Position} to a Jolt {@link RVec3} (double-precision).
      * This method populates a pre-existing {@link RVec3} instance for performance.
      *
-     * @param in  The source Minecraft {@link net.minecraft.world.phys.Vec3}.
+     * @param in  The source Minecraft {@link Position}.
      * @param out The target Jolt {@link RVec3} to store the result in.
      * @return The populated {@link RVec3} (the same instance as {@code out}).
      */
-    public static RVec3 toJolt(net.minecraft.world.phys.Vec3 in, RVec3 out) {
+    public static RVec3 toJolt(Position in, RVec3 out) {
         out.set(in.x(), in.y(), in.z());
         return out;
     }
@@ -291,25 +295,25 @@ public final class Conversions {
     }
 
     /**
-     * Converts a JOML {@link Vector3d} to a Minecraft {@link net.minecraft.world.phys.Vec3}.
+     * Converts a JOML {@link Vector3dc} to a Minecraft {@link net.minecraft.world.phys.Vec3}.
      * Note: A new {@link net.minecraft.world.phys.Vec3} is always returned as it is an immutable type.
      *
-     * @param in The source JOML {@link Vector3d}.
+     * @param in The source JOML {@link Vector3dc}.
      * @return A new Minecraft {@link net.minecraft.world.phys.Vec3} instance.
      */
-    public static net.minecraft.world.phys.Vec3 toMinecraft(Vector3d in) {
-        return new net.minecraft.world.phys.Vec3(in.x, in.y, in.z);
+    public static net.minecraft.world.phys.Vec3 toMinecraft(Vector3dc in) {
+        return new net.minecraft.world.phys.Vec3(in.x(), in.y(), in.z());
     }
 
     /**
-     * Converts a JOML {@link Vector3f} to a Minecraft {@link net.minecraft.world.phys.Vec3}.
+     * Converts a JOML {@link Vector3fc} to a Minecraft {@link net.minecraft.world.phys.Vec3}.
      * Note: A new {@link net.minecraft.world.phys.Vec3} is always returned as it is an immutable type.
      *
-     * @param in The source JOML {@link Vector3f}.
+     * @param in The source JOML {@link Vector3fc}.
      * @return A new Minecraft {@link net.minecraft.world.phys.Vec3} instance.
      */
-    public static net.minecraft.world.phys.Vec3 toMinecraft(Vector3f in) {
-        return new net.minecraft.world.phys.Vec3(in.x, in.y, in.z);
+    public static net.minecraft.world.phys.Vec3 toMinecraft(Vector3fc in) {
+        return new net.minecraft.world.phys.Vec3(in.x(), in.y(), in.z());
     }
 
     /**

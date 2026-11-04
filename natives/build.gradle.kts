@@ -241,3 +241,14 @@ tasks.shadowJar {
 tasks.assemble {
     dependsOn(tasks.shadowJar)
 }
+
+// Publish the fat jar, so `common`'s POM dependency on natives resolves for consumers
+publishing {
+    publications {
+        register<MavenPublication>("mavenJava") {
+            artifactId = base.archivesName.get()
+            from(components["shadow"])
+            artifact(tasks.named("sourcesJar"))
+        }
+    }
+}

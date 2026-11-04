@@ -11,7 +11,7 @@ val minecraftVersion = commonMod.dep("minecraft")
 val javaVersion = commonMod.prop("java.version")
 
 base {
-    archivesName.set("$modId-${project.name}-$minecraftVersion")
+    archivesName.set("$modId-$minecraftVersion-${project.name}")
 }
 
 java {
@@ -65,7 +65,7 @@ listOf("apiElements", "runtimeElements", "sourcesElements", "javadocElements").f
     configurations.named(variant) {
         outgoing {
             capability("$group:${base.archivesName.get()}:$version")
-            capability("$group:$modId-${project.name}-$minecraftVersion:$version")
+            capability("$group:$modId-$minecraftVersion-${project.name}:$version")
             capability("$group:$modId:$version")
         }
     }

@@ -31,6 +31,27 @@ repositories {
     }
 }
 
+// Registered only when credentials are present (CI), so local `publish` runs don't hit the remote repo
+pluginManager.withPlugin("maven-publish") {
+    extensions.configure<PublishingExtension> {
+        repositories {
+            val repoUser = System.getenv("REPO_USER")
+            val repoPassword = System.getenv("REPO_PASSWORD")
+            if (!repoUser.isNullOrEmpty() && !repoPassword.isNullOrEmpty()) {
+                maven {
+                    name = "Interactors"
+                    val isSnapshot = project.version.toString().contains("SNAPSHOT")
+                    url = uri(commonMod.prop(if (isSnapshot) "maven.snapshots" else "maven.releases"))
+                    credentials {
+                        username = repoUser
+                        password = repoPassword
+                    }
+                }
+            }
+        }
+    }
+}
+
 dependencies {
     add("compileOnly", "org.projectlombok:lombok:1.18.30")
     add("annotationProcessor", "org.projectlombok:lombok:1.18.30")

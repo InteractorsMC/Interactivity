@@ -1,0 +1,126 @@
+name: Build
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  natives:
+    name: Natives (${{ matrix.platform }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux-x86_64
+            os: ubuntu-22.04
+            file: libinteractivity_natives.so
+          - platform: linux-aarch64
+            os: ubuntu-22.04-arm
+            file: libinteractivity_natives.so
+          - platform: windows-x86_64
+            os: windows-latest
+            file: interactivity_natives.dll
+          - platform: macos-x86_64
+            os: macos-15-intel
+            file: libinteractivity_natives.dylib
+          - platform: macos-aarch64
+            os: macos-latest
+            file: libinteractivity_natives.dylib
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Compile natives
+        run: ./gradlew :natives:compileNatives
+
+      - name: Verify native library
+        run: |
+          lib="natives/src/main/resources/natives/${{ matrix.platform }}/${{ matrix.file }}"
+          if [ ! -f "$lib" ]; then
+            echo "::error::Native library was not built: $lib"
+            exit 1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: natives-${{ matrix.platform }}
+          path: natives/src/main/resources/natives/
+          if-no-files-found: error
+
+  build:
+    name: Build mod
+    needs: natives
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Download natives
+        uses: actions/download-artifact@v4
+        with:
+          pattern: natives-*
+          path: natives/src/main/resources/natives/
+          merge-multiple: true
+
+      - name: Read version
+        id: version
+        run: |
+          echo "version=$(grep '^mod.version=' gradle.properties | cut -d= -f2)" >> "$GITHUB_OUTPUT"
+          echo "minecraft=$(grep '^deps.minecraft=' gradle.properties | cut -d= -f2)" >> "$GITHUB_OUTPUT"
+
+      # -PskipNatives keeps CMake from rebuilding the downloaded libraries
+      - name: Build
+        run: ./gradlew build -PskipNatives
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: interactivity-${{ steps.version.outputs.minecraft }}-fabric-${{ steps.version.outputs.version }}
+          path: |
+            fabric/build/libs/*.jar
+            !fabric/build/libs/*-dev-shadow.jar
+            !fabric/build/libs/*-sources.jar
+            !fabric/build/libs/*-javadoc.jar
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: interactivity-${{ steps.version.outputs.minecraft }}-neoforge-${{ steps.version.outputs.version }}
+          path: |
+            neoforge/build/libs/*.jar
+            !neoforge/build/libs/*-shadow-intermediate.jar
+            !neoforge/build/libs/*-sources.jar
+            !neoforge/build/libs/*-javadoc.jar
+          if-no-files-found: error
+
+      - name: Publish to Maven
+        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        run: ./gradlew publishAllPublicationsToInteractorsRepository -PskipNatives
+        env:
+          REPO_USER: ${{ secrets.REPO_USER }}
+          REPO_PASSWORD: ${{ secrets.REPO_PASSWORD }}

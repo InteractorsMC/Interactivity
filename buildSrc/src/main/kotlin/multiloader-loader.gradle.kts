@@ -59,3 +59,8 @@ tasks.shadowJar {
     mergeServiceFiles()
     exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
 }
+
+// Shadow adds its intermediate jar to the java component; only the final jar should be published
+(components["java"] as AdhocComponentWithVariants).withVariantsFromConfiguration(configurations["shadowRuntimeElements"]) {
+    skip()
+}

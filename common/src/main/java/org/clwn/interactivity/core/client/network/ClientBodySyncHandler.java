@@ -64,6 +64,8 @@ public final class ClientBodySyncHandler {
 
             manager.addRemote(state.networkId, uuid, type.get(), state, data, packet.tick());
         }
+
+        world.onServerTick(packet.tick());
     }
 
     public static void handleRemove(S2CBodyRemovePacket packet) {

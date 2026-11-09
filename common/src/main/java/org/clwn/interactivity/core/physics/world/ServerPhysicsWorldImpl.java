@@ -28,6 +28,8 @@ import org.clwn.interactivity.core.event.internal.lifecycle.LevelSaveEvents;
 import org.clwn.interactivity.core.event.internal.lifecycle.LevelTickEvents;
 import org.clwn.interactivity.core.physics.body.ServerBodyManager;
 import org.clwn.interactivity.core.physics.body.store.SimulatedPhysicsStateContainer;
+import org.clwn.interactivity.core.physics.util.intersection.ApproximateIntersector;
+import org.clwn.interactivity.core.physics.util.intersection.PreciseIntersector;
 import org.clwn.interactivity.core.physics.network.NetworkDispatcher;
 import org.clwn.interactivity.core.physics.persistence.SaveManager;
 
@@ -48,6 +50,12 @@ public class ServerPhysicsWorldImpl extends SimulatedPhysicsWorldImpl implements
     protected final SaveManager saveManager;
 
     private final List<Event.Subscription> subscriptions = new ArrayList<>();
+
+    @Getter
+    private final PreciseIntersector preciseIntersector = new PreciseIntersector(this);
+
+    @Getter
+    private final ApproximateIntersector approximateIntersector = new ApproximateIntersector(this);
 
     public ServerPhysicsWorldImpl(ServerLevel level, PhysicsSimulationConfig physicsSimulationConfig) {
         super(level, physicsSimulationConfig);

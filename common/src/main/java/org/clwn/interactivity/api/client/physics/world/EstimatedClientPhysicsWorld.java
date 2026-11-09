@@ -9,6 +9,8 @@ package org.clwn.interactivity.api.client.physics.world;
 
 import org.clwn.interactivity.api.physics.world.PhysicsWorld;
 
+// todo: estimated worlds may work as physics system worlds without simulation for narrow/broad phase queries,
+//  but this will require users to load natives and will most likely lead to bad code.
 public interface EstimatedClientPhysicsWorld extends PhysicsWorld, ClientPhysicsWorld {
     @Override
     default boolean isSimulated() {

@@ -13,6 +13,8 @@ package org.clwn.interactivity.api.util.math;
  *     It's not expected to be implemented by external code as it is not being used outside public API.
  * </p>
  */
+// todo: we could use custom implementation to unify calls between jolt-jni, joml and minecraft,
+//    and we can also get rid of custom interfaces and use joml arg types directly in args
 public interface Vec3d {
     double getX();
     double getY();

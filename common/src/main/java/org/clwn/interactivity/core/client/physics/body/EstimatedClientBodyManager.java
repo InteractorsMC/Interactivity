@@ -113,6 +113,11 @@ public class EstimatedClientBodyManager extends AbstractBodyManager implements C
     }
 
     @Override
+    public Body getBodyByJoltId(int joltBodyId) {
+        return null;
+    }
+
+    @Override
     public int getJoltBodyId(UUID id) {
         return Jolt.cInvalidBodyId;
     }

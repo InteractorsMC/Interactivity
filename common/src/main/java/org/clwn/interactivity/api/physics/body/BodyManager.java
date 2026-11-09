@@ -15,6 +15,7 @@ import org.jetbrains.annotations.ApiStatus;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+// todo: split into read-only and extended interfaces for jolt body id lookup
 public interface BodyManager {
     <T extends Body> T spawnBody(BodyType<T> bodyType, RVec3Arg position, QuatArg rotation, Consumer<T> configurator);
 
@@ -26,6 +27,10 @@ public interface BodyManager {
     void removeBody(UUID id, RemovalReason removalReason);
 
     Body getBody(UUID id);
+
+    // todo: is under questionable state
+    @ApiStatus.Experimental
+    Body getBodyByJoltId(int joltBodyId);
 
     void requestDataSync(Body body);
 

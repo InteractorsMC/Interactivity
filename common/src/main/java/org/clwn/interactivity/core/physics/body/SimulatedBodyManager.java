@@ -169,6 +169,18 @@ public abstract class SimulatedBodyManager extends AbstractBodyManager {
         store.removeBody(uuid);
     }
 
+    @Override
+    public Body getBodyByJoltId(int joltBodyId) {
+        // todo: dumb solution, map lookup will work better
+        for (Body body : getBodyDataStore().getPhysicsStateContainer().bodies) {
+            if (getJoltBodyId(body.getUuid()) == joltBodyId) {
+                return body;
+            }
+        }
+
+        return null;
+    }
+
     public int getJoltBodyId(UUID id) {
         int index = getBodyDataStore().getIndexByUuid(id);
         return index == -1 ? Jolt.cInvalidBodyId : getBodyDataStore().getPhysicsStateContainer().joltBodyId.get(index);

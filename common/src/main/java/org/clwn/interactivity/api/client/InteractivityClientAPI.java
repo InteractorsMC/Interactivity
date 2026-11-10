@@ -9,6 +9,7 @@ package org.clwn.interactivity.api.client;
 
 import org.clwn.interactivity.api.client.physics.ClientPhysicsPipeline;
 import org.clwn.interactivity.api.client.physics.render.BodyRendererRegistry;
+import org.clwn.interactivity.api.client.util.render.RenderPassChecker;
 import org.clwn.interactivity.core.client.InteractivityClientAPIImpl;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,6 +19,8 @@ public interface InteractivityClientAPI {
     }
 
     BodyRendererRegistry getBodyRendererRegistry();
+
+    RenderPassChecker getRenderPassChecker();
 
     /**
      *

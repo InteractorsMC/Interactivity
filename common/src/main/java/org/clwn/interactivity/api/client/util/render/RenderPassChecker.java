@@ -9,4 +9,5 @@ package org.clwn.interactivity.api.client.util.render;
 
 public interface RenderPassChecker {
     boolean isFirstPerson();
+    boolean isThirdPerson();
 }

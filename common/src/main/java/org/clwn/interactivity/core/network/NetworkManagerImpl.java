@@ -128,7 +128,7 @@ public class NetworkManagerImpl implements NetworkManager {
     private List<NetworkTransport> getEnabledTransports() {
         return networkTransports.stream()
                 .filter(networkTransport -> networkTransport.getPriority() != -1)
-                .sorted(Comparator.comparingInt(NetworkTransport::getPriority))
+                .sorted(Comparator.comparingInt(NetworkTransport::getPriority).reversed())
                 .toList();
     }
 }

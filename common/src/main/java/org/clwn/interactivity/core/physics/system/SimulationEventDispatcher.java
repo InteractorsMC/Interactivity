@@ -18,10 +18,10 @@ public final class SimulationEventDispatcher {
     private SimulationEventDispatcher() {}
 
     public static void prePhysicsTick(PhysicsWorldImpl physicsWorld, float deltaTime) {
-        EventBusImpl.INSTANCE.publishEvent(new PhysicsTickEvent.PrePhysicsTickEvent(physicsWorld, deltaTime));
+        EventBusImpl.INSTANCE.publishEvent(new PhysicsTickEvent.PreTick(physicsWorld, deltaTime));
     }
 
     public static void postPhysicsTick(PhysicsWorldImpl physicsWorld, float deltaTime) {
-        EventBusImpl.INSTANCE.publishEvent(new PhysicsTickEvent.PostPhysicsTickEvent(physicsWorld, deltaTime));
+        EventBusImpl.INSTANCE.publishEvent(new PhysicsTickEvent.PostTick(physicsWorld, deltaTime));
     }
 }

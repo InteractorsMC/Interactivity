@@ -2,14 +2,12 @@ package org.clwn.interactivity.core.event.external;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import org.clwn.interactivity.Interactivity;
-import org.clwn.interactivity.api.event.CustomEvent;
-import org.clwn.interactivity.api.event.Event;
-import org.clwn.interactivity.api.event.EventBus;
-import org.clwn.interactivity.api.event.SubscribeEvent;
+import org.clwn.interactivity.api.event.*;
 import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.physics.body.BodyType;
 import org.clwn.interactivity.api.physics.event.BodyEvent;
 import org.clwn.interactivity.api.physics.event.PhysicsWorldEvent;
+import org.clwn.interactivity.core.InteractivityCore;
 import org.clwn.interactivity.core.physics.world.PhysicsWorldImpl;
 
 import java.lang.reflect.InvocationTargetException;
@@ -45,6 +43,12 @@ public final class EventBusImpl implements EventBus {
             }
 
             validateListener(method);
+
+            if (InteractivityCore.isRegistrationPhaseDone() && RegistrationEvent.class.isAssignableFrom(method.getParameterTypes()[0])) {
+                throw new IllegalStateException(
+                        "Registration events were already fired, register this listener during mod initialization: " + method
+                );
+            }
 
             if (!Modifier.isPublic(method.getModifiers())) {
                 throw new IllegalArgumentException(

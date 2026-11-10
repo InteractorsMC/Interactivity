@@ -9,20 +9,16 @@
  *
  * For full legal text, see: https://creativecommons.org
  */
-package org.clwn.interactivity.builtin.regsity;
+package org.clwn.interactivity.builtin.regsitry;
 
-import org.clwn.interactivity.api.client.InteractivityClientAPI;
+import org.clwn.interactivity.api.client.physics.render.RegisterBodyRenderersEvent;
+import org.clwn.interactivity.api.event.SubscribeEvent;
 import org.clwn.interactivity.builtin.body.block.BlockRenderer;
 
 public class RendererRegistry {
-    public static void register() {
-        InteractivityClientAPI.getInstance().getBodyRendererRegistry().register(
-                BodyRegistry.BLOCK_BODY,
-                new BlockRenderer()
-        );
-        InteractivityClientAPI.getInstance().getBodyRendererRegistry().register(
-                BodyRegistry.TEMPORARY_BLOCK_BODY,
-                new BlockRenderer()
-        );
+    @SubscribeEvent
+    public static void onRegisterRenderers(RegisterBodyRenderersEvent event) {
+        event.register(BodyRegistry.BLOCK_BODY, new BlockRenderer());
+        event.register(BodyRegistry.TEMPORARY_BLOCK_BODY, new BlockRenderer());
     }
 }

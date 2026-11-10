@@ -20,6 +20,7 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -28,6 +29,7 @@ import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.api.network.PacketContext;
 import org.clwn.interactivity.api.util.Side;
 import org.clwn.interactivity.builtin.item.physicsgun.PhysicsGunItem;
+import org.clwn.interactivity.core.event.internal.lifecycle.ModLoaderLifecycleEvents;
 import org.clwn.interactivity.core.physics.command.argument.BodySelectorArgument;
 import org.clwn.interactivity.core.physics.command.argument.BodySpecArgument;
 import org.clwn.interactivity.core.util.InteractivityIdentifier;
@@ -143,5 +145,11 @@ public class InteractivityNeoforge {
                 InteractivityIdentifier.getIdentifier("body_spec"),
                 () -> ArgumentTypeInfos.registerByClass(BodySpecArgument.class, SingletonArgumentInfo.contextFree(BodySpecArgument::bodySpec))
         );
+    }
+
+    // This event is restricted outside of mod class
+    @SubscribeEvent
+    public static void commonSetup(final FMLCommonSetupEvent event) {
+        event.enqueueWork(() -> ModLoaderLifecycleEvents.LOAD_COMPLETE_EVENT.publish(new ModLoaderLifecycleEvents.LoadCompleteEvent()));
     }
 }

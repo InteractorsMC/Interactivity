@@ -13,11 +13,6 @@ import org.clwn.interactivity.api.physics.body.BodyType;
 
 
 public interface BodyRendererRegistry {
-    <B extends Body, R extends BodyRenderer<?>> void register(
-            BodyType<B> bodyType,
-            R renderer
-    );
-
     default <B extends Body> BodyRenderer<?> getRenderer(BodyType<B> bodyType) {
         return getRenderer(bodyType.getTypeId());
     }

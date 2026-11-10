@@ -9,11 +9,12 @@
  *
  * For full legal text, see: https://creativecommons.org
  */
-package org.clwn.interactivity.builtin.regsity;
+package org.clwn.interactivity.builtin.regsitry;
 
-import org.clwn.interactivity.api.InteractivityAPI;
+import org.clwn.interactivity.api.event.SubscribeEvent;
 import org.clwn.interactivity.api.physics.behavior.*;
 import org.clwn.interactivity.api.physics.body.BodyType;
+import org.clwn.interactivity.api.physics.body.RegisterBodyTypesEvent;
 import org.clwn.interactivity.builtin.body.block.BlockRigidBody;
 import org.clwn.interactivity.core.util.InteractivityIdentifier;
 
@@ -21,8 +22,9 @@ public final class BodyRegistry {
     public static BodyType<BlockRigidBody> BLOCK_BODY;
     public static BodyType<BlockRigidBody> TEMPORARY_BLOCK_BODY;
 
-    public static void register() {
-        BLOCK_BODY = InteractivityAPI.getInstance().getBodyTypeRegistry().registerBodyType(
+    @SubscribeEvent
+    public static void onRegisterBodyTypes(RegisterBodyTypesEvent event) {
+        BLOCK_BODY = event.register(
                 InteractivityIdentifier.getIdentifier("block"),
                 BlockRigidBody.class,
                 BlockRigidBody::new,
@@ -35,7 +37,7 @@ public final class BodyRegistry {
                 ))
         );
 
-        TEMPORARY_BLOCK_BODY = InteractivityAPI.getInstance().getBodyTypeRegistry().registerBodyType(
+        TEMPORARY_BLOCK_BODY = event.register(
                 InteractivityIdentifier.getIdentifier("temporary_block"),
                 BlockRigidBody.class,
                 BlockRigidBody::new,

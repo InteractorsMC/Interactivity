@@ -10,34 +10,34 @@ public abstract class BodyLifecycleEvent extends BodyEvent {
         super(body.getPhysicsWorld(), body);
     }
 
-    public static final class BodyAddedEvent extends BodyLifecycleEvent {
+    public static final class Added extends BodyLifecycleEvent {
         @Getter
         private final AddReason addReason;
 
-        public BodyAddedEvent(Body body, AddReason addReason) {
+        public Added(Body body, AddReason addReason) {
             super(body);
             this.addReason = addReason;
         }
     }
 
-    public static final class BodyRemovedEvent extends BodyLifecycleEvent {
+    public static final class Removed extends BodyLifecycleEvent {
         @Getter
         private final RemovalReason removalReason;
 
-        public BodyRemovedEvent(Body body, RemovalReason removalReason) {
+        public Removed(Body body, RemovalReason removalReason) {
             super(body);
             this.removalReason = removalReason;
         }
     }
 
-    public static final class BodyActivatedEvent extends BodyLifecycleEvent {
-        public BodyActivatedEvent(Body body) {
+    public static final class Activated extends BodyLifecycleEvent {
+        public Activated(Body body) {
             super(body);
         }
     }
 
-    public static final class BodyDeactivatedEvent extends BodyLifecycleEvent {
-        public BodyDeactivatedEvent(Body body) {
+    public static final class Deactivated extends BodyLifecycleEvent {
+        public Deactivated(Body body) {
             super(body);
         }
     }

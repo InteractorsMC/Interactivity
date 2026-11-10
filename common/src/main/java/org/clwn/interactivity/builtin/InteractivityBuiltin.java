@@ -12,19 +12,21 @@
 package org.clwn.interactivity.builtin;
 
 import org.clwn.interactivity.api.InteractivityAPI;
+import org.clwn.interactivity.api.event.EventBus;
 import org.clwn.interactivity.builtin.item.physicsgun.PhysicsGunLogic;
-import org.clwn.interactivity.builtin.regsity.BodyRegistry;
-import org.clwn.interactivity.builtin.regsity.RendererRegistry;
+import org.clwn.interactivity.builtin.regsitry.BodyRegistry;
+import org.clwn.interactivity.builtin.regsitry.RendererRegistry;
 import org.clwn.interactivity.core.util.platform.Services;
 
 public final class InteractivityBuiltin {
     public static void init() {
-        BodyRegistry.register();
+        EventBus eventBus = InteractivityAPI.getInstance().getEventBus();
 
-        InteractivityAPI.getInstance().getEventBus().registerListener(PhysicsGunLogic.class, false);
+        eventBus.registerListener(BodyRegistry.class, false);
+        eventBus.registerListener(PhysicsGunLogic.class, false);
 
         if (Services.PLATFORM.isClientEnvironment()) {
-            RendererRegistry.register();
+            eventBus.registerListener(RendererRegistry.class, false);
         }
     }
 }

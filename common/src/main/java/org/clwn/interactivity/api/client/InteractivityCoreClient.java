@@ -8,7 +8,13 @@
 package org.clwn.interactivity.api.client;
 
 import lombok.Getter;
+import org.clwn.interactivity.api.client.physics.render.BodyRenderer;
+import org.clwn.interactivity.api.client.physics.render.RegisterBodyRenderersEvent;
+import org.clwn.interactivity.api.physics.body.Body;
+import org.clwn.interactivity.api.physics.body.BodyType;
+import org.clwn.interactivity.core.client.physics.render.BodyRendererRegistryImpl;
 import org.clwn.interactivity.core.client.render.RenderDispatcher;
+import org.clwn.interactivity.core.event.external.EventBusImpl;
 
 public final class InteractivityCoreClient {
     @Getter
@@ -18,5 +24,15 @@ public final class InteractivityCoreClient {
 
     public static void init() {
         renderDispatcher = new RenderDispatcher();
+    }
+
+    public static void registerContent() {
+        EventBusImpl.INSTANCE.publishEvent(new RegisterBodyRenderersEvent() {
+            @Override
+            public <B extends Body> void register(BodyType<B> bodyType, BodyRenderer<?> renderer) {
+                BodyRendererRegistryImpl.INSTANCE.register(bodyType, renderer);
+            }
+        });
+        BodyRendererRegistryImpl.INSTANCE.freeze();
     }
 }

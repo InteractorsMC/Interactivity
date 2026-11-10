@@ -20,11 +20,15 @@ public final class BehaviorRegistryImpl implements BehaviorRegistry {
 
     private final Map<Class<? extends Behavior>, Integer> bits = new LinkedHashMap<>();
 
+    private boolean frozen;
+
     private BehaviorRegistryImpl() {
     }
 
-    @Override
     public synchronized <B extends Behavior> void registerBehavior(Class<B> behaviorClass) {
+        if (frozen) {
+            throw new IllegalStateException("Behavior registry is frozen");
+        }
         if (behaviorClass == null) {
             throw new IllegalArgumentException("behaviorClass cannot be null");
         }
@@ -48,6 +52,10 @@ public final class BehaviorRegistryImpl implements BehaviorRegistry {
     @Override
     public synchronized Set<Class<? extends Behavior>> getRegisteredBehaviors() {
         return Set.copyOf(bits.keySet());
+    }
+
+    public synchronized void freeze() {
+        frozen = true;
     }
 
     public synchronized long getMask(Class<? extends Behavior> behaviorClass) {

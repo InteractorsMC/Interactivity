@@ -15,7 +15,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.api.physics.PhysicsPipeline;
+import org.clwn.interactivity.api.physics.event.PhysicsWorldLifecycleEvent;
 import org.clwn.interactivity.api.physics.world.PhysicsWorld;
+import org.clwn.interactivity.core.event.external.EventBusImpl;
 import org.clwn.interactivity.core.event.internal.lifecycle.LevelLifecycleEvents;
 import org.clwn.interactivity.core.event.internal.lifecycle.LevelTickEvents;
 import org.clwn.interactivity.core.event.internal.lifecycle.PlayerLifecycleEvents;
@@ -90,6 +92,7 @@ public class PhysicsPipelineImpl implements PhysicsPipeline {
     public void registerWorld(Level level, PhysicsWorldImpl physicsWorld) {
         physicsWorlds.put(level, physicsWorld);
         physicsWorld.init();
+        EventBusImpl.INSTANCE.publishEvent(new PhysicsWorldLifecycleEvent.Created(physicsWorld));
     }
 
     public void removePhysicsWorld(Level level) {
@@ -99,6 +102,7 @@ public class PhysicsPipelineImpl implements PhysicsPipeline {
         }
 
         Interactivity.LOGGER.info("Removing physics world for level: {}", level.dimension().location());
+        EventBusImpl.INSTANCE.publishEvent(new PhysicsWorldLifecycleEvent.Removed(physicsWorld));
         physicsWorld.close();
     }
 

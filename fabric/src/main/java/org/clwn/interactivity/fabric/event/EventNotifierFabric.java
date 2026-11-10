@@ -9,6 +9,7 @@ package org.clwn.interactivity.fabric.event;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -17,6 +18,8 @@ import net.fabricmc.loader.api.FabricLoader;
 import org.clwn.interactivity.core.event.internal.lifecycle.*;
 
 public class EventNotifierFabric {
+    private static boolean loadComplete;
+
     public static void registerEvents() {
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTING.register((server) -> ServerLifecycleEvents.SERVER_STARTING_EVENT.publish(new ServerLifecycleEvents.ServerEvent(server)));
 
@@ -35,6 +38,12 @@ public class EventNotifierFabric {
 
         ServerChunkEvents.CHUNK_UNLOAD.register((level, chunk) -> ChunkLifecycleEvents.CHUNK_UNLOAD_EVENT.publish(new ChunkLifecycleEvents.ServerChunkEvent(level, chunk)));
 
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTING.register((server) -> {
+            if (!loadComplete) {
+                ModLoaderLifecycleEvents.LOAD_COMPLETE_EVENT.publish(new ModLoaderLifecycleEvents.LoadCompleteEvent());
+                loadComplete = true;
+            }
+        });
 
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
             registerClientEvents();
@@ -43,6 +52,11 @@ public class EventNotifierFabric {
 
     @Environment(EnvType.CLIENT)
     private static void registerClientEvents() {
-
+        ClientLifecycleEvents.CLIENT_STARTED.register((client) -> {
+            if (!loadComplete) {
+                ModLoaderLifecycleEvents.LOAD_COMPLETE_EVENT.publish(new ModLoaderLifecycleEvents.LoadCompleteEvent());
+                loadComplete = true;
+            }
+        });
     }
 }

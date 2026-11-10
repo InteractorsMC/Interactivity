@@ -127,7 +127,7 @@ public final class PhysicsGunLogic {
     }
 
     @SubscribeEvent
-    public static void onPrePhysicsTick(PhysicsTickEvent.PrePhysicsTickEvent event) {
+    public static void onPrePhysicsTick(PhysicsTickEvent.PreTick event) {
         if (GRABS.isEmpty() || !(event.getPhysicsWorld() instanceof ServerPhysicsWorld world)) {
             return;
         }

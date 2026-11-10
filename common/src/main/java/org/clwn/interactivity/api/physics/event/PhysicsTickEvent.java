@@ -12,14 +12,14 @@ public abstract class PhysicsTickEvent extends PhysicsWorldEvent {
         this.deltaTime = deltaTime;
     }
 
-    public static final class PrePhysicsTickEvent extends PhysicsTickEvent {
-        public PrePhysicsTickEvent(PhysicsWorld physicsWorld, float deltaTime) {
+    public static final class PreTick extends PhysicsTickEvent {
+        public PreTick(PhysicsWorld physicsWorld, float deltaTime) {
             super(physicsWorld, deltaTime);
         }
     }
 
-    public static final class PostPhysicsTickEvent extends PhysicsTickEvent {
-        public PostPhysicsTickEvent(PhysicsWorld physicsWorld, float deltaTime) {
+    public static final class PostTick extends PhysicsTickEvent {
+        public PostTick(PhysicsWorld physicsWorld, float deltaTime) {
             super(physicsWorld, deltaTime);
         }
     }

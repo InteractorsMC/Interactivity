@@ -14,17 +14,24 @@ public class BodyRendererRegistryImpl implements BodyRendererRegistry {
 
     private final Map<ResourceLocation, BodyRenderer<?>> renderers = new LinkedHashMap<>();
 
+    private boolean frozen;
+
     private BodyRendererRegistryImpl() {}
 
-    @Override
-    public synchronized <B extends Body, R extends BodyRenderer<?>> void register(BodyType<B> bodyType, R renderer) {
-        if (bodyType == null) {
+    public synchronized <B extends Body> void register(BodyType<B> bodyType, BodyRenderer<?> renderer) {
+        if (frozen) {
+            throw new IllegalStateException("Renderer registry is frozen");
+        }        if (bodyType == null) {
             throw new IllegalArgumentException("bodyType cannot be null");
         }
         if (renderer == null) {
             throw new IllegalArgumentException("renderer cannot be null");
         }
         renderers.put(bodyType.getTypeId(), renderer);
+    }
+
+    public synchronized void freeze() {
+        frozen = true;
     }
 
     @Override

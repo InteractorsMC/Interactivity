@@ -17,10 +17,10 @@ import org.clwn.interactivity.core.event.external.EventBusImpl;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public final class BodyTypeRegistryImpl implements BodyTypeRegistry {
     public static final BodyTypeRegistryImpl INSTANCE = new BodyTypeRegistryImpl(BehaviorRegistryImpl.INSTANCE);
@@ -28,17 +28,21 @@ public final class BodyTypeRegistryImpl implements BodyTypeRegistry {
     private final BehaviorRegistryImpl behaviorRegistry;
     private final Map<ResourceLocation, BodyTypeImpl<? extends Body>> bodyTypes = new LinkedHashMap<>();
 
+    private boolean frozen;
+
     private BodyTypeRegistryImpl(BehaviorRegistryImpl behaviorRegistry) {
         this.behaviorRegistry = behaviorRegistry;
     }
 
-    @Override
     public synchronized <T extends Body> BodyType<T> registerBodyType(
             ResourceLocation typeId,
             Class<T> bodyClass,
             BodyType.Factory<T> factory,
             Consumer<BodyType.Builder<T>> configure
     ) {
+        if (frozen) {
+            throw new IllegalStateException("BodyType registration is closed, register body types in RegisterBodyTypesEvent");
+        }
         if (typeId == null) {
             throw new IllegalArgumentException("typeId cannot be null");
         }
@@ -66,6 +70,10 @@ public final class BodyTypeRegistryImpl implements BodyTypeRegistry {
         return bodyType;
     }
 
+    public synchronized void freeze() {
+        frozen = true;
+    }
+
     @Override
     public synchronized Optional<BodyType<? extends Body>> get(ResourceLocation typeId) {
         return Optional.ofNullable(bodyTypes.get(typeId));
@@ -78,8 +86,6 @@ public final class BodyTypeRegistryImpl implements BodyTypeRegistry {
 
     @Override
     public synchronized Collection<BodyType<? extends Body>> getAll() {
-        return bodyTypes.values().stream()
-                .map(type -> (BodyType<? extends Body>) type)
-                .collect(Collectors.toSet());
+        return List.copyOf(bodyTypes.values());
     }
 }

@@ -13,6 +13,7 @@ import com.github.stephengold.joltjni.enumerate.EMotionType;
 import com.github.stephengold.joltjni.readonly.QuatArg;
 import com.github.stephengold.joltjni.readonly.RVec3Arg;
 import com.github.stephengold.joltjni.readonly.Vec3Arg;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.api.physics.body.AddReason;
 import org.clwn.interactivity.api.physics.body.Body;
@@ -22,6 +23,7 @@ import org.clwn.interactivity.core.physics.body.store.SimulatedBodyDataStore;
 import org.clwn.interactivity.core.physics.body.store.SimulatedPhysicsStateContainer;
 import org.clwn.interactivity.core.physics.body.type.BodyTypeImpl;
 import org.clwn.interactivity.core.physics.world.SimulatedPhysicsWorldImpl;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -29,6 +31,9 @@ import java.util.function.Consumer;
 
 public abstract class SimulatedBodyManager extends AbstractBodyManager {
     protected final SimulatedPhysicsWorldImpl simulatedWorld;
+
+    // not sure if it should be datastore/container or bodymanager
+    private final Int2ObjectOpenHashMap<Body> joltIdToBody = new Int2ObjectOpenHashMap<>();
 
     public SimulatedBodyManager(SimulatedPhysicsWorldImpl physicsWorld) {
         super(physicsWorld);
@@ -128,6 +133,7 @@ public abstract class SimulatedBodyManager extends AbstractBodyManager {
         }
 
         container.joltBodyId.put(index, bodyId);
+        joltIdToBody.put(bodyId, body);
 
         try (
                 TransformedShape shape = simulatedWorld.getJoltBridge().getPhysicsSystem().getBodyInterface().getTransformedShape(bodyId);
@@ -160,9 +166,11 @@ public abstract class SimulatedBodyManager extends AbstractBodyManager {
 
         onBodyRemove(body, index, removalReason);
         simulatedWorld.getConstraintManager().onBodyRemoving(uuid);
+        simulatedWorld.getContactManager().onBodyRemoving(uuid);
 
         int bodyId = container.joltBodyId.get(index);
         if (bodyId != Jolt.cInvalidBodyId) {
+            joltIdToBody.remove(bodyId);
             simulatedWorld.getJoltBridge().destroyJoltBody(bodyId);
         }
 
@@ -170,15 +178,8 @@ public abstract class SimulatedBodyManager extends AbstractBodyManager {
     }
 
     @Override
-    public Body getBodyByJoltId(int joltBodyId) {
-        // todo: dumb solution, map lookup will work better
-        for (Body body : getBodyDataStore().getPhysicsStateContainer().bodies) {
-            if (getJoltBodyId(body.getUuid()) == joltBodyId) {
-                return body;
-            }
-        }
-
-        return null;
+    public @Nullable Body getBodyByJoltId(int joltBodyId) {
+        return joltIdToBody.get(joltBodyId);
     }
 
     public int getJoltBodyId(UUID id) {

@@ -22,6 +22,13 @@ import java.util.UUID;
 
 public final class BodyTypeImpl<T extends Body> implements BodyType<T> {
     private final ResourceLocation typeId;
+
+    /**
+     * used for userdata
+     */
+    @Getter
+    private final int numericId;
+
     private final BodyType.Factory<T> factory;
     private final Map<Class<? extends Behavior>, Behavior> behaviors;
     @Getter
@@ -32,12 +39,14 @@ public final class BodyTypeImpl<T extends Body> implements BodyType<T> {
 
     BodyTypeImpl(
             ResourceLocation typeId,
+            int numericId,
             Class<T> bodyClass,
             BodyType.Factory<T> factory,
             Map<Class<? extends Behavior>, Behavior> behaviors,
             long behaviorMask
     ) {
         this.typeId = typeId;
+        this.numericId = numericId;
         this.bodyClass = bodyClass;
         this.factory = factory;
         this.behaviors = Map.copyOf(new LinkedHashMap<>(behaviors));

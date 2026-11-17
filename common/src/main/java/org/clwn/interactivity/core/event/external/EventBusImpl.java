@@ -5,10 +5,12 @@ import org.clwn.interactivity.Interactivity;
 import org.clwn.interactivity.api.event.*;
 import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.physics.body.BodyType;
-import org.clwn.interactivity.api.physics.event.BodyEvent;
 import org.clwn.interactivity.api.physics.event.PhysicsWorldEvent;
+import org.clwn.interactivity.api.physics.event.body.BodyEvent;
+import org.clwn.interactivity.api.physics.event.contact.ContactEvent;
 import org.clwn.interactivity.core.InteractivityCore;
 import org.clwn.interactivity.core.physics.world.PhysicsWorldImpl;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -25,6 +27,16 @@ public final class EventBusImpl implements EventBus {
     // Every body type is mapped to a single Body class, which have same listeners
     private final Object2ObjectArrayMap<BodyType<?>, List<RegisteredListener>> bodyTypeEventListeners = new Object2ObjectArrayMap<>();
 
+    // @ContactNotifierEvent methods, every physics world creates a native contact notifier for each of them
+    private final List<ContactListener> contactListeners = new ArrayList<>();
+
+    public record ContactListener(
+            Method method,
+            @Nullable BodyType<?> bodyType,
+            ContactNotifierEvent settings
+    ) {
+    }
+
     private record RegisteredListener(
             Class<?> eventType,
             Method method,
@@ -38,11 +50,12 @@ public final class EventBusImpl implements EventBus {
     @Override
     public void registerListener(Class<?> clazz, boolean listensCustomEvents) {
         for (Method method : clazz.getDeclaredMethods()) {
-            if (!method.isAnnotationPresent(SubscribeEvent.class)) {
+            ContactNotifierEvent contactListener = method.getAnnotation(ContactNotifierEvent.class);
+            if (contactListener == null && !method.isAnnotationPresent(SubscribeEvent.class)) {
                 continue;
             }
 
-            validateListener(method);
+            validateListener(method, contactListener != null);
 
             if (InteractivityCore.isRegistrationPhaseDone() && RegistrationEvent.class.isAssignableFrom(method.getParameterTypes()[0])) {
                 throw new IllegalStateException(
@@ -62,6 +75,11 @@ public final class EventBusImpl implements EventBus {
                 );
             }
 
+            if (contactListener != null) {
+                contactListeners.add(new ContactListener(method, null, contactListener));
+                continue;
+            }
+
             eventListeners.add(new RegisteredListener(
                     method.getParameterTypes()[0],
                     method,
@@ -73,16 +91,27 @@ public final class EventBusImpl implements EventBus {
     public <T extends Body> void registerBodyType(BodyType<T> bodyType, boolean listensCustomEvents) {
         List<RegisteredListener> listeners = new ArrayList<>();
         for (Method method : bodyType.getBodyClass().getDeclaredMethods()) {
-            if (!method.isAnnotationPresent(SubscribeEvent.class)) {
+            ContactNotifierEvent contactListener = method.getAnnotation(ContactNotifierEvent.class);
+            if (contactListener == null && !method.isAnnotationPresent(SubscribeEvent.class)) {
                 continue;
             }
 
-            validateListener(method);
+            validateListener(method, contactListener != null);
 
             if (!Modifier.isPublic(method.getModifiers())) {
                 throw new IllegalArgumentException(
                         "Global event handler must be public: " + method
                 );
+            }
+
+            if (contactListener != null) {
+                if (!contactListener.bodyType1().isEmpty()) {
+                    throw new IllegalArgumentException(
+                            "@ContactNotifierEvent method of a body class receives the contacts of its body, bodyType can't be set: " + method
+                    );
+                }
+                contactListeners.add(new ContactListener(method, bodyType, contactListener));
+                continue;
             }
 
             listeners.add(new RegisteredListener(method.getParameterTypes()[0], method, listensCustomEvents));
@@ -91,20 +120,22 @@ public final class EventBusImpl implements EventBus {
         bodyTypeEventListeners.put(bodyType, listeners);
     }
 
-    private static void validateListener(Method method) {
+    private static void validateListener(Method method, boolean isContactListener) {
         Class<?>[] parameterTypes = method.getParameterTypes();
+        Class<?> eventType = isContactListener ? ContactEvent.class : Event.class;
+        String annotation = isContactListener ? "@ContactNotifierEvent" : "@SubscribeEvent";
 
         if (parameterTypes.length != 1
-                || !Event.class.isAssignableFrom(parameterTypes[0])) {
+                || !eventType.isAssignableFrom(parameterTypes[0])) {
             throw new IllegalArgumentException(
-                    "@SubscribeEvent method must accept exactly one Event "
-                            + "subtype: " + method
+                    annotation + " method must accept exactly one " + eventType.getSimpleName()
+                            + " subtype: " + method
             );
         }
 
         if (method.getReturnType() != void.class) {
             throw new IllegalArgumentException(
-                    "@SubscribeEvent method must return void: " + method
+                    annotation + " method must return void: " + method
             );
         }
     }
@@ -156,6 +187,14 @@ public final class EventBusImpl implements EventBus {
 
             invokeListener(listener.method(), body, event);
         }
+    }
+
+    public List<ContactListener> getContactListeners() {
+        return List.copyOf(contactListeners);
+    }
+
+    public void publishContactEvent(ContactListener listener, ContactEvent event) {
+        invokeListener(listener.method(), listener.bodyType() != null ? event.getBody() : null, event);
     }
 
     private static boolean shouldSkipEvent(Event event, RegisteredListener listener) {

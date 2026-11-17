@@ -10,12 +10,14 @@ package org.clwn.interactivity.api.physics.world;
 import net.minecraft.server.level.ServerLevel;
 import org.clwn.interactivity.api.physics.body.BodyManager;
 import org.clwn.interactivity.api.physics.constraint.ConstraintManager;
+import org.clwn.interactivity.api.physics.contact.ContactManager;
 import org.clwn.interactivity.api.util.Side;
 
 public interface ServerPhysicsWorld extends SimulatedPhysicsWorld {
     ServerLevel getServerLevel();
     BodyManager getBodyManager();
     ConstraintManager getConstraintManager();
+    ContactManager getContactManager();
 
     @Override
     default Side getSide() {

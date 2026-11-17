@@ -18,6 +18,7 @@ import org.clwn.interactivity.api.physics.world.SimulatedPhysicsWorld;
 import org.clwn.interactivity.core.config.InteractivityConfig;
 import org.clwn.interactivity.core.physics.body.SimulatedBodyManager;
 import org.clwn.interactivity.core.physics.constraint.ConstraintManagerImpl;
+import org.clwn.interactivity.core.physics.contact.ContactManagerImpl;
 import org.clwn.interactivity.core.physics.system.SimulationEventDispatcher;
 import org.clwn.interactivity.core.physics.terrain.TerrainBlockClassifier;
 import org.clwn.interactivity.core.physics.terrain.TerrainModule;
@@ -56,6 +57,8 @@ public abstract class SimulatedPhysicsWorldImpl extends PhysicsWorldImpl impleme
     @Getter
     protected final ConstraintManagerImpl constraintManager = new ConstraintManagerImpl(this);
 
+    @Getter
+    protected final ContactManagerImpl contactManager = new ContactManagerImpl(this);
 
     public SimulatedPhysicsWorldImpl(Level level, PhysicsSimulationConfig physicsSimulationConfig) {
         super(level);
@@ -84,6 +87,7 @@ public abstract class SimulatedPhysicsWorldImpl extends PhysicsWorldImpl impleme
                 this.physicsSimulation.getJoltBridge().getPhysicsSystem().va(),
                 getBodyManager().getBodyDataStore()
         );
+        this.contactManager.init();
 
         this.isRunning = true;
         String threadName = "Interactivity Physics Thread - " + level.dimension().location().getPath();
@@ -116,6 +120,7 @@ public abstract class SimulatedPhysicsWorldImpl extends PhysicsWorldImpl impleme
         }
 
         constraintManager.close();
+        contactManager.close();
         physicsSimulation.close();
     }
 
@@ -170,6 +175,8 @@ public abstract class SimulatedPhysicsWorldImpl extends PhysicsWorldImpl impleme
         this.batchPhysicsSync.sync();
 
         this.updateDeltaTime = (System.nanoTime() - updateStart) / 1_000_000f;
+
+        this.contactManager.drain();
 
         SimulationEventDispatcher.postPhysicsTick(this, fixedTimeStep);
 

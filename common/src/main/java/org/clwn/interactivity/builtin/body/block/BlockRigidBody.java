@@ -24,21 +24,29 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.clwn.interactivity.Interactivity;
+import org.clwn.interactivity.api.event.ContactNotifierEvent;
 import org.clwn.interactivity.api.physics.ObjectLayer;
 import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.physics.body.BodyType;
 import org.clwn.interactivity.api.physics.body.RigidBodyFactory;
-import org.clwn.interactivity.api.physics.event.BodyEvent;
+import org.clwn.interactivity.api.physics.event.body.BodyEvent;
 import org.clwn.interactivity.api.event.SubscribeEvent;
+import org.clwn.interactivity.api.physics.event.contact.ContactAddedEvent;
 import org.clwn.interactivity.api.physics.world.PhysicsWorld;
+import org.clwn.interactivity.api.physics.world.ServerPhysicsWorld;
 
 import java.util.UUID;
 
 public class BlockRigidBody extends Body {
     private static final String BLOCK_STATE_KEY = "block_state";
+
+    private static final float IMPACT_SOUND_SPEED = 4.0f;
 
     @Getter
     private volatile BlockState blockState = Blocks.STONE.defaultBlockState();
@@ -86,6 +94,21 @@ public class BlockRigidBody extends Body {
         }
     }
 
+    @ContactNotifierEvent(minApproachSpeed = IMPACT_SOUND_SPEED)
+    public void onContactAdded(ContactAddedEvent event) {
+        if (!(getPhysicsWorld() instanceof ServerPhysicsWorld serverWorld)) {
+            return;
+        }
+
+        SoundType soundType = blockState.getSoundType();
+        float volume = soundType.getVolume() * Math.min(1.0f, event.getApproachSpeed() / (8 * IMPACT_SOUND_SPEED));
+        double x = event.getPoint().xx(), y = event.getPoint().yy(), z = event.getPoint().zz();
+
+        ServerLevel level = serverWorld.getServerLevel();
+        level.getServer().execute(() ->
+                level.playSound(null, x, y, z, soundType.getHitSound(), SoundSource.BLOCKS, volume, soundType.getPitch())
+        );
+    }
 
     @SubscribeEvent
     public void onBodyEvent(BodyEvent bodyEvent) {

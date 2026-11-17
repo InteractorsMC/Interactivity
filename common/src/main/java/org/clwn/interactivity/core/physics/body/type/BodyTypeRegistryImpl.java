@@ -14,6 +14,7 @@ import org.clwn.interactivity.api.physics.body.BodyType;
 import org.clwn.interactivity.api.physics.body.BodyTypeRegistry;
 import org.clwn.interactivity.core.physics.behavior.BehaviorRegistryImpl;
 import org.clwn.interactivity.core.event.external.EventBusImpl;
+import org.clwn.interactivity.natives.ContactNative;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -59,7 +60,12 @@ public final class BodyTypeRegistryImpl implements BodyTypeRegistry {
         BodyTypeBuilderImpl<T> builder = new BodyTypeBuilderImpl<>();
         configure.accept(builder);
 
-        BodyTypeImpl<T> bodyType = builder.build(typeId, bodyClass, factory, behaviorRegistry);
+        int numericId = bodyTypes.size() + 1;
+        if (numericId >= ContactNative.BODY_TYPE_TERRAIN) {
+            throw new IllegalStateException("You reached body type limit.");
+        }
+
+        BodyTypeImpl<T> bodyType = builder.build(typeId, numericId, bodyClass, factory, behaviorRegistry);
         bodyTypes.put(typeId, bodyType);
 
         Optional<EventListenerBehavior> eventListenerBehavior = bodyType.getBehavior(EventListenerBehavior.class);

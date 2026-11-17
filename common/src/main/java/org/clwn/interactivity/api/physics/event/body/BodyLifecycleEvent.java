@@ -1,4 +1,4 @@
-package org.clwn.interactivity.api.physics.event;
+package org.clwn.interactivity.api.physics.event.body;
 
 import lombok.Getter;
 import org.clwn.interactivity.api.physics.body.AddReason;

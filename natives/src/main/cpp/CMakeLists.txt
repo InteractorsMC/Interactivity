@@ -63,6 +63,10 @@ endif()
 add_library(interactivity_natives SHARED
     src/physics_sync.cpp
     src/terrain_shape.cpp
+    src/contact/contact_listener_manager.cpp
+    src/contact/body_pair_ignore.cpp
+    src/contact/contact_notifier.cpp
+    src/contact/contact_native.cpp
 )
 
 target_include_directories(interactivity_natives PRIVATE

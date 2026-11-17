@@ -19,6 +19,7 @@ import org.clwn.interactivity.api.physics.body.Body;
 import org.clwn.interactivity.api.physics.body.RigidBodyFactory;
 import org.clwn.interactivity.api.physics.body.RigidProvider;
 import org.clwn.interactivity.api.physics.world.JoltBridge;
+import org.clwn.interactivity.core.physics.body.type.BodyTypeImpl;
 
 import java.util.Optional;
 
@@ -54,6 +55,8 @@ public class JoltBridgeImpl implements JoltBridge {
 
                 // Ensure MotionProperties are created even for static bodies to allow future state transitions
                 bcs.setAllowDynamicOrKinematic(true);
+
+                bcs.setUserData(((BodyTypeImpl<?>) body.getType()).getNumericId() & 0xFFFFL);
 
                 return this.physicsSystem.getBodyInterface().createAndAddBody(bcs, activation);
             };

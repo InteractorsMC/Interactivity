@@ -1,7 +1,8 @@
-package org.clwn.interactivity.api.physics.event;
+package org.clwn.interactivity.api.physics.event.body;
 
 import lombok.Getter;
 import org.clwn.interactivity.api.physics.body.Body;
+import org.clwn.interactivity.api.physics.event.PhysicsWorldEvent;
 import org.clwn.interactivity.api.physics.world.PhysicsWorld;
 
 public class BodyEvent extends PhysicsWorldEvent {

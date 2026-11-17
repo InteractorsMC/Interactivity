@@ -1,3 +1,9 @@
+import io.freefair.gradle.plugins.lombok.tasks.Delombok
+
+plugins {
+    id("io.freefair.lombok")
+}
+
 group = commonMod.group
 version = commonMod.version
 
@@ -52,9 +58,12 @@ pluginManager.withPlugin("maven-publish") {
     }
 }
 
-dependencies {
-    add("compileOnly", "org.projectlombok:lombok:1.18.30")
-    add("annotationProcessor", "org.projectlombok:lombok:1.18.30")
-    add("testCompileOnly", "org.projectlombok:lombok:1.18.30")
-    add("testAnnotationProcessor", "org.projectlombok:lombok:1.18.30")
+lombok {
+    version = "1.18.30"
+}
+
+tasks.withType<Jar>().matching { it.name == "sourcesJar" }.configureEach {
+    val javaDirs = project.extensions.getByType<SourceSetContainer>()["main"].java.srcDirs
+    exclude { element -> javaDirs.any { element.file.startsWith(it) } }
+    from(tasks.named<Delombok>("delombok"))
 }

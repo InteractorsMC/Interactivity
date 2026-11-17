@@ -1,3 +1,5 @@
+import io.freefair.gradle.plugins.lombok.tasks.Delombok
+
 plugins {
     id("multiloader-common")
     id("com.gradleup.shadow")
@@ -42,14 +44,12 @@ tasks.named<ProcessResources>("processResources") {
     from(commonResources)
 }
 
-tasks.named<Javadoc>("javadoc") {
+tasks.named<Delombok>("delombok") {
     dependsOn(commonJava)
-    source(commonJava)
+    input.from(commonJava)
 }
 
 tasks.named<Jar>("sourcesJar") {
-    dependsOn(commonJava)
-    from(commonJava)
     dependsOn(commonResources)
     from(commonResources)
 }
